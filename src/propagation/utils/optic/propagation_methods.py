@@ -36,6 +36,8 @@ def angular_spectrum_propagation(wave: Wave, z: float):
         (wave.wavelength * nu_y_grid) ** 2)
     h = np.exp(1j * wave_number * z * exp_term)
 
+    # todo H((1-(Lambda*U).^2-(Lambda*V).^2)<0) = 0; % neglect evanescent wave
+
     # обратное преобразование Фурье
     wave.field = ifft2(field * h)
 
@@ -89,3 +91,40 @@ def angular_spectrum_bl_propagation(wave: Wave, z: float):
 
     wave.phase = np.angle(wave.field)
     wave.intensity = np.abs(wave.field) ** 2
+
+
+def fresnel(field: np.ndarray, propagate_distance: float,
+            wavelenght: float, pixel_size: float) -> np.ndarray:
+    """
+    Расчет комплексной амплитуды светового поля прошедшей через слой пространства толщиной propagate_distance
+    с использованием передаточной функции Френеля
+    :param field: array-like
+    :param propagate_distance: float z
+    :param wavelenght: float lambda
+    :param pixel_size: float px_size
+    :return: array-like
+    """
+    raise NotImplementedError("This method not implemented yet")
+
+    height = field.shape[0]
+    width = field.shape[1]
+
+    wave_number = 2 * np.pi / wavelenght
+
+    # Сетка в частотной области
+    nu_x = np.arange(-width / 2, width / 2) / (width * pixel_size)
+    nu_y = np.arange(-height / 2, height / 2) / (height * pixel_size)
+    nu_x_grid, nu_y_grid = np.meshgrid(nu_x, nu_y)
+    nu_x_grid, nu_y_grid = ifftshift(nu_x_grid), ifftshift(nu_y_grid)
+
+    if propagate_distance != 0 and np.abs(propagate_distance) <= 1 / (wavelenght * (nu_x.max()**2 + nu_y.max()**2)**2):
+        raise ValueError(f'Не выполняется критерий Релея z < 1 / (lamda*(nu_x^2+nu_y^2): '
+                         f'{np.abs(propagate_distance)} <= {1 / (wavelength * (nu_x.max()**2 + nu_y.max()**2)**2)}')
+
+    # Фурье-образ исходного поля
+    field = fft2(field)
+
+    exp_term = np.sqrt(1 - ((wavelenght * nu_x_grid) ** 2 - (wavelenght * nu_y_grid) ** 2) / 2)
+    h = np.exp(1j * wave_number * propagate_distance * exp_term)
+
+    return ifft2(field * h)
