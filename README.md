@@ -21,4 +21,4 @@ In recent years, the intensity transfer equation as a phase imaging method has b
 - scipy==1.6.0
 - six==1.15.0
 - tifffile==2020.9.3 <br/><br/>
-Use them to avoid build errors. You also can read them in [requirements.txt](https://github.com/megamott/TIE/blob/master/requirements.txt)
+Use them to avoid build errors. You also can read them in [requirements.txt](https://github.com/megamott/TIE/blob/master/requirements.txt) .
