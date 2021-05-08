@@ -25,11 +25,13 @@ def configuration(func):
         y_scale = kwargs.get('yscale', 'linear')
         facecolor = kwargs.get('facecolor', 'w')
         edgecolor = kwargs.get('edgecolor', 'k')
+        linewidth = kwargs.get('linewidth', 1.5)
 
         fig, ax = plt.subplots(figsize=figsize,
                                dpi=dpi,
                                facecolor=facecolor,
-                               edgecolor=edgecolor)
+                               edgecolor=edgecolor,
+                               linewidth=linewidth)
 
         ax.grid(grid)
         plt.yscale(y_scale)
@@ -85,13 +87,13 @@ class Plotter(ABC):
         Строит график с исчерпывающей информацией об интенсивности волны
         :return:
         """
-        # title = kwargs.get('title', '')
+        title = kwargs.get('title', '')
         dpi = kwargs.get('dpi', 100)
         linewidth = kwargs.get('linewidth', 1.5)
         cmap = kwargs.get('cmap', 'jet')
         color_bar = kwargs.get('color_bar', True)
-        # xlabel = kwargs.get('xlabel', 'x')
-        # ylabel = kwargs.get('ylabel', 'y')
+        xlabel = kwargs.get('xlabel', 'x')
+        ylabel = kwargs.get('ylabel', 'y')
         ymin, ymax = kwargs.get('ylims', [None, None])
         xmin, xmax = kwargs.get('xlims', [None, None])
         intensity_lbl = kwargs.get('intensity_lbl', '')  # mm
