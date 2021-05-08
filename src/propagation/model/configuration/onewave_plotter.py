@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .split_plotter import make_intensity_plot
+from .split_intensity_plotter import make_intensity_plot
+from .split_phase_plotter import make_phase_plot
 from ..areas.interface.aperture import Aperture
 from ..configuration.interface.plotter import Plotter, configuration
 from ..configuration.interface.saver import Saver
@@ -42,10 +43,13 @@ class OneWavePlotter(Plotter):
 
         wrapped_phase_lbl = f'z: {units.m2mm(self.__z):.1f} mm; R: {self.__wave.get_wavefront_radius(self.__aperture):.3f} mm'
 
-        fig = super().make_phase_plot(self.__wave.get_wrapped_phase(self.__aperture),
-                                      self.__wave.get_unwrapped_phase(self.__aperture)[0], geometry_center=True, linewidth=1,
-                                      unwrapped_ylims=(-100, 100), unwrapped_phase_lbl=unwrapped_phase_lbl,
-                                      wrapped_phase_lbl=wrapped_phase_lbl)
+        fig = make_phase_plot(wrp_phase=self.__wave.get_wrapped_phase(self.__aperture),
+                              unwrp_phase=self.__wave.get_unwrapped_phase(self.__aperture)[0],
+                              geometry_center=True,
+                              linewidth=1,
+                              unwrapped_ylims=(-100, 100),
+                              unwrapped_phase_lbl=unwrapped_phase_lbl,
+                              wrapped_phase_lbl=wrapped_phase_lbl)
 
         package_name = f'phase/phase_f{int(units.m2mm(np.around(focus, decimals=3)))}_' \
                        f'g{gaussian_width_param}_' \
@@ -60,7 +64,7 @@ class OneWavePlotter(Plotter):
         Сохраняет график для интенсивности
         :return:
         """
-        fig = make_intensity_plot(self.__wave.intensity)
+        fig = make_intensity_plot(intensity=self.__wave.intensity)
 
         package_name = f'intensity/intensity_f{int(units.m2mm(np.around(self.__wave.focal_len, decimals=3)))}_' \
                        f'g{self.__wave.gaussian_width_param}_' \
