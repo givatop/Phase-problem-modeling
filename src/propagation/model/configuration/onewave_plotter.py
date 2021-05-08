@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+from .split_plotter import make_intensity_plot
 from ..areas.interface.aperture import Aperture
 from ..configuration.interface.plotter import Plotter, configuration
 from ..configuration.interface.saver import Saver
@@ -59,7 +60,7 @@ class OneWavePlotter(Plotter):
         Сохраняет график для интенсивности
         :return:
         """
-        fig = super().make_intensity_plot(self.__wave.intensity)
+        fig = make_intensity_plot(self.__wave.intensity)
 
         package_name = f'intensity/intensity_f{int(units.m2mm(np.around(self.__wave.focal_len, decimals=3)))}_' \
                        f'g{self.__wave.gaussian_width_param}_' \

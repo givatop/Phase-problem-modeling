@@ -13,7 +13,7 @@ class MacSaver(Saver):
     """
 
     def save_image(self, fig: Union[Figure, np.ndarray], package_name: str, filename: str):
-        filepath = f"/Users/megamot/Programming/Python/TIE_objects/data/images/{package_name}/{filename}"
+        filepath = f"/Users/megamot/Programming/Python/Phase-problem-modeling/data/images/{package_name}/{filename}"
 
         if isinstance(fig, Figure):
             fig.savefig(filepath)

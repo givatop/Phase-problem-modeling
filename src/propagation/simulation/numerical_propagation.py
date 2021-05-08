@@ -4,6 +4,7 @@ from src.propagation.model.areas.radial_aperture import RadialAperture
 from src.propagation.model.areas.radial_area import RadialArea
 from src.propagation.model.areas.square_area import SquareArea
 from src.propagation.model.configuration.mac_saver import MacSaver
+from src.propagation.model.configuration.onewave_plotter import OneWavePlotter
 from src.propagation.model.configuration.serieswave_plotter import SeriesWavePlotter
 from src.propagation.model.waves.spherical_wave import SphericalWave
 from src.propagation.utils.files_routine import *
@@ -81,10 +82,10 @@ for matrix in matrixes:
         ic(r)
 
         # построение графиков для снапшотов
-        # one_wave_plotter = OneWavePlotter(field, aperture, z, saver)
+        one_wave_plotter = OneWavePlotter(field, aperture, z, saver)
         # one_wave_plotter.save_aperture_bound(100)
         # one_wave_plotter.save_phase()
-        # one_wave_plotter.save_intensity()
+        one_wave_plotter.save_intensity()
 
         wave_array.append(field)
         aperture_array.append(aperture)
