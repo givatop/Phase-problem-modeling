@@ -22,6 +22,21 @@ def make_phase_plot(**kwargs):
     return fig
 
 
+def __find_max_coordinates(geometry_center, wrp_phase, unwrp_phase) -> (float, float):
+    """
+    Поиск максимальных по модулю координат для заданного центра: геометрического или энергетического
+    """
+    height, width = wrp_phase.shape
+    if geometry_center:
+        y_max, x_max = [height // 2, width // 2]
+    else:
+        abs_max = np.argmax(unwrp_phase)
+        if np.abs(np.min(unwrp_phase)) > np.abs(np.max(unwrp_phase)):  # Отрицательный энергетический центр
+            abs_max = np.argmin(unwrp_phase)
+        y_max, x_max = np.unravel_index(abs_max, unwrp_phase.shape)
+    return y_max, x_max
+
+
 @axes_configurator
 def make_wrp_phase_x_slice_ax(ax, **kwargs):
     wrp_phase = kwargs.get('wrp_phase')
@@ -31,16 +46,7 @@ def make_wrp_phase_x_slice_ax(ax, **kwargs):
     linewidth = kwargs.get('linewidth', 1.5)
     grid_centering = kwargs.get('grid_centering', False)  # mm
 
-    height, width = wrp_phase.shape
-
-    # Поиск максимальных по модулю координат для заданного центра: геометрического или энергетического
-    if geometry_center:
-        y_max, x_max = [height // 2, width // 2]
-    else:
-        abs_max = np.argmax(unwrp_phase)
-        if np.abs(np.min(unwrp_phase)) > np.abs(np.max(unwrp_phase)):  # Отрицательный энергетический центр
-            abs_max = np.argmin(unwrp_phase)
-        y_max, x_max = np.unravel_index(abs_max, unwrp_phase.shape)
+    y_max, x_max = __find_max_coordinates(geometry_center, wrp_phase, unwrp_phase)
 
     wrp_phase_xslice_x, wrp_phase_xslice_y = get_slice(wrp_phase, x_max, xslice=True)
 
@@ -63,22 +69,13 @@ def make_wrp_phase_y_slice_ax(ax, **kwargs):
     linewidth = kwargs.get('linewidth', 1.5)
     grid_centering = kwargs.get('grid_centering', False)  # mm
 
-    height, width = wrp_phase.shape
-
-    # Поиск максимальных по модулю координат для заданного центра: геометрического или энергетического
-    if geometry_center:
-        y_max, x_max = [height // 2, width // 2]
-    else:
-        abs_max = np.argmax(unwrp_phase)
-        if np.abs(np.min(unwrp_phase)) > np.abs(np.max(unwrp_phase)):  # Отрицательный энергетический центр
-            abs_max = np.argmin(unwrp_phase)
-        y_max, x_max = np.unravel_index(abs_max, unwrp_phase.shape)
+    y_max, x_max = __find_max_coordinates(geometry_center, wrp_phase, unwrp_phase)
 
     wrp_phase_yslice_x, wrp_phase_yslice_y = get_slice(wrp_phase, y_max, xslice=False)
 
     # Центрирование координатной сетки
     if grid_centering:
-        wrp_phase_yslice_x -= wrp_phase_yslice_x[wrp_phase_yslice_x.size // 2]  # plot()
+        wrp_phase_yslice_x -= wrp_phase_yslice_x[wrp_phase_yslice_x.size // 2] # plot()
 
     ax.title.set_text('y slice')
     ax.plot(wrp_phase_yslice_x, wrp_phase_yslice_y, linewidth=linewidth, label=f'y: {x_max}')
@@ -96,16 +93,7 @@ def make_unwrp_phase_x_slice_ax(ax, **kwargs):
     grid_centering = kwargs.get('grid_centering', False)  # mm
     xmin, xmax = kwargs.get('xlims', [None, None])
 
-    height, width = wrp_phase.shape
-
-    # Поиск максимальных по модулю координат для заданного центра: геометрического или энергетического
-    if geometry_center:
-        y_max, x_max = [height // 2, width // 2]
-    else:
-        abs_max = np.argmax(unwrp_phase)
-        if np.abs(np.min(unwrp_phase)) > np.abs(np.max(unwrp_phase)):  # Отрицательный энергетический центр
-            abs_max = np.argmin(unwrp_phase)
-        y_max, x_max = np.unravel_index(abs_max, unwrp_phase.shape)
+    y_max, x_max = __find_max_coordinates(geometry_center, wrp_phase, unwrp_phase)
 
     unwrp_phase_xslice_x, unwrp_phase_xslice_y = get_slice(unwrp_phase, x_max, xslice=True)
 
@@ -130,16 +118,7 @@ def make_unwrp_phase_y_slice_ax(ax, **kwargs):
     grid_centering = kwargs.get('grid_centering', False)  # mm
     xmin, xmax = kwargs.get('xlims', [None, None])
 
-    height, width = wrp_phase.shape
-
-    # Поиск максимальных по модулю координат для заданного центра: геометрического или энергетического
-    if geometry_center:
-        y_max, x_max = [height // 2, width // 2]
-    else:
-        abs_max = np.argmax(unwrp_phase)
-        if np.abs(np.min(unwrp_phase)) > np.abs(np.max(unwrp_phase)):  # Отрицательный энергетический центр
-            abs_max = np.argmin(unwrp_phase)
-        y_max, x_max = np.unravel_index(abs_max, unwrp_phase.shape)
+    y_max, x_max = __find_max_coordinates(geometry_center, wrp_phase, unwrp_phase)
 
     unwrp_phase_yslice_x, unwrp_phase_yslice_y = get_slice(unwrp_phase, y_max, xslice=False)
 
@@ -165,14 +144,7 @@ def make_wrp_phase_color_ax(ax, **kwargs):
 
     height, width = wrp_phase.shape
 
-    # Поиск максимальных по модулю координат для заданного центра: геометрического или энергетического
-    if geometry_center:
-        y_max, x_max = [height // 2, width // 2]
-    else:
-        abs_max = np.argmax(unwrp_phase)
-        if np.abs(np.min(unwrp_phase)) > np.abs(np.max(unwrp_phase)):  # Отрицательный энергетический центр
-            abs_max = np.argmin(unwrp_phase)
-        y_max, x_max = np.unravel_index(abs_max, unwrp_phase.shape)
+    y_max, x_max = __find_max_coordinates(geometry_center, wrp_phase, unwrp_phase)
 
     # Центрирование координатной сетки
     if grid_centering:
@@ -207,14 +179,7 @@ def make_unwrp_phase_color_ax(ax, **kwargs):
 
     height, width = wrp_phase.shape
 
-    # Поиск максимальных по модулю координат для заданного центра: геометрического или энергетического
-    if geometry_center:
-        y_max, x_max = [height // 2, width // 2]
-    else:
-        abs_max = np.argmax(unwrp_phase)
-        if np.abs(np.min(unwrp_phase)) > np.abs(np.max(unwrp_phase)):  # Отрицательный энергетический центр
-            abs_max = np.argmin(unwrp_phase)
-        y_max, x_max = np.unravel_index(abs_max, unwrp_phase.shape)
+    y_max, x_max = __find_max_coordinates(geometry_center, wrp_phase, unwrp_phase)
 
     # Центрирование координатной сетки
     if grid_centering:

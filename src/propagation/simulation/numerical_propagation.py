@@ -84,8 +84,8 @@ for matrix in matrixes:
         # построение графиков для снапшотов
         one_wave_plotter = OneWavePlotter(field, aperture, z, saver)
         # one_wave_plotter.save_aperture_bound(100)
-        # one_wave_plotter.save_phase()
-        one_wave_plotter.save_intensity()
+        one_wave_plotter.save_phase()
+        # one_wave_plotter.save_intensity()
 
         wave_array.append(field)
         aperture_array.append(aperture)
