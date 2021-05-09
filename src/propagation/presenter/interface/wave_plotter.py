@@ -1,16 +1,16 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from src.propagation.presenter.plotter.split_intensity_plotter import make_intensity_plot
-from src.propagation.presenter.plotter.split_phase_plotter import make_phase_plot
+from src.propagation.presenter.plotter.figure_maker import make_r_z_plot, make_phase_plot, make_intensity_plot
 from src.propagation.model.areas.interface.aperture import Aperture
-from src.propagation.presenter.saver.plotter import Plotter
+from src.propagation.presenter.interface.plotter import Plotter
+from src.propagation.presenter.saver.mac_saver import MacSaver
 from src.propagation.presenter.saver.saver import Saver
 from src.propagation.model.waves.interface.wave import Wave
 from src.propagation.utils.math import units
 
 
-class OneWavePlotter(Plotter):
+class WavePlotter(Plotter):
     """
     Построение графиков одной прогонки волны в пространстве
     """
@@ -74,42 +74,25 @@ class OneWavePlotter(Plotter):
 
         plt.close(fig)
 
-    @configuration
-    def save_aperture_bound(self, fig, ax, bound: float = 2, **kwargs):
+    def save_r_z(self, array_wave_array, array_aperture_array, z_array, matrixes, step):
         """
-        Сохраняет график для соответствия скачка аперутры и фазы в конкретный момент
-        :param fig:
-        :param ax:
-        :param bound:
-        :param kwargs:
+        Сохраняет график для интенсивности
         :return:
         """
+        saver = MacSaver()
+        fig = make_r_z_plot(**{'array_wave_array': array_wave_array,
+                               'array_aperture_array': array_aperture_array,
+                               'z_array': z_array,
+                               'matrixes': matrixes,
+                               'step': step})
 
-        data = super()._make_aperture_bound_dependency(self.__wave, self.__aperture, bound)
-
-        for (x, y) in data:
-            ax.plot(x, y, label=f'z: {units.m2mm(self.__z):.1f} mm; '
-                                f'R: {self.__wave.get_wavefront_radius(self.__aperture):.3f} mm;'
-                                f'D: {self.__aperture.aperture_diameter}')
-
-        plt.legend(loc='upper right')
-        plt.title(f'f\' = {units.m2mm(np.around(self.wave.focal_len, decimals=3))} mm; '
-                  f'g = {self.wave.gaussian_width_param}',
-                  fontsize=14)
-
-        package_name = self.__saver.create_folder_name('b')
-        filename = self.__saver.create_filename(self.__wave, 'bound', z=self.__z)
-        self.__saver.save_image(fig, package_name, filename)
+        # сохранение графиков
+        package_name = 'r(z)'
+        filename = f'trz_f_{int(units.m2mm(np.around(array_wave_array[0][0].focal_len, decimals=3)))}_' \
+                   f'g{array_wave_array[0][0].gaussian_width_param}_matrix_multiple'
+        saver.save_image(fig, package_name, filename)
 
         plt.close(fig)
-
-    def save_r_z(self):
-        """
-        Данный метод может быть реализован для серии волна, а не для одной волны
-        Пользуйся функций из SeriesWavePlotter
-        :return:
-        """
-        pass
 
     @property
     def wave(self):
