@@ -5,7 +5,6 @@ from .model.areas.radial_aperture import RadialAperture
 from .model.configuration.onewave_plotter import Plotter
 from .model.configuration.serieswave_plotter import SeriesWavePlotter
 from .model.configuration.mac_saver import MacSaver
-from .utils.files_routine import save_r_z
 from .utils.math import units
 from .utils.optic import propagation_methods
 

@@ -4,10 +4,9 @@ from src.propagation.model.areas.radial_aperture import RadialAperture
 from src.propagation.model.areas.radial_area import RadialArea
 from src.propagation.model.areas.square_area import SquareArea
 from src.propagation.model.configuration.mac_saver import MacSaver
-from src.propagation.model.configuration.onewave_plotter import OneWavePlotter
-from src.propagation.model.configuration.serieswave_plotter import SeriesWavePlotter
+from src.propagation.model.configuration.split_r_z_plotter import save_r_z
 from src.propagation.model.waves.spherical_wave import SphericalWave
-from src.propagation.utils.files_routine import *
+from src.propagation.utils.math import units
 from src.propagation.utils.math.general import *
 # конфигурация
 from src.propagation.utils.optic.propagation_methods import angular_spectrum_bl_propagation
@@ -30,11 +29,11 @@ t_num = 0
 # параметры для итерации при рапространении волны
 start = units.mm2m(0)
 stop = units.mm2m(600)
-step = units.mm2m(10)
+step = units.mm2m(50)
 z_array = np.array(np.arange(units.m2mm(start), units.m2mm(stop + step), units.m2mm(step)))
 
 # изменяющийся параметр для выборок
-matrixes = np.array([512])
+matrixes = np.array([512, 256])
 
 # массивы для записи значений циклов нескольких прогонок
 array_wave_array = []
@@ -82,18 +81,18 @@ for matrix in matrixes:
         ic(r)
 
         # построение графиков для снапшотов
-        one_wave_plotter = OneWavePlotter(field, aperture, z, saver)
+        # one_wave_plotter = OneWavePlotter(field, aperture, z, saver)
         # one_wave_plotter.save_aperture_bound(100)
-        one_wave_plotter.save_phase()
+        # one_wave_plotter.save_phase()
         # one_wave_plotter.save_intensity()
 
         wave_array.append(field)
         aperture_array.append(aperture)
 
     # построение графиков для одной прогонки
-    series_wave_plotter = SeriesWavePlotter(wave_array, aperture_array, z_array, step, saver)
+    # series_wave_plotter = SeriesWavePlotter(wave_array, aperture_array, z_array, step, saver)
     # series_wave_plotter.save_r_z(xlabel='Propagation distance, mm', ylabel='R(z), mm')
-    series_wave_plotter.save_aperture_bound(bound=2)
+    # series_wave_plotter.save_aperture_bound(bound=2)
 
     ic()
     array_wave_array.append(wave_array)
@@ -103,4 +102,5 @@ for matrix in matrixes:
 # построение графиков для нескольких прогонок
 # multi_wave_plotter = MultiWavePlotter(array_wave_array, array_aperture_array, z_array, matrixes, step, saver)
 # multi_wave_plotter.save_r_z(xlabel='Propagation distance, mm', ylabel='R(z), mm')
+save_r_z(array_wave_array, array_aperture_array, z_array, matrixes, step)
 
