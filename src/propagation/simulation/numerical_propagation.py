@@ -3,8 +3,8 @@ from icecream import ic
 from src.propagation.model.areas.radial_aperture import RadialAperture
 from src.propagation.model.areas.radial_area import RadialArea
 from src.propagation.model.areas.square_area import SquareArea
-from src.propagation.model.presenter.saver.mac_saver import MacSaver
-from src.propagation.model.presenter.plotter.split_r_z_plotter import save_r_z
+from src.propagation.presenter.saver.mac_saver import MacSaver
+from src.propagation.presenter.plotter.split_r_z_plotter import save_r_z
 from src.propagation.model.waves.spherical_wave import SphericalWave
 from src.propagation.utils.math import units
 from src.propagation.utils.math.general import *

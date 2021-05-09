@@ -2,7 +2,7 @@ from typing import Union
 from matplotlib.figure import Figure
 import numpy as np
 
-from src.propagation.model.presenter.saver.saver import Saver
+from src.propagation.presenter.saver.saver import Saver
 from src.propagation.model.waves.interface.wave import Wave
 from src.propagation.utils.math import units
 

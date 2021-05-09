@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from matplotlib.figure import Figure
 
-from ...waves.interface.wave import Wave
+from src.propagation.model.waves.interface.wave import Wave
 
 
 class Saver(ABC):

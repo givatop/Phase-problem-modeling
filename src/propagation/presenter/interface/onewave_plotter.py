@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from src.propagation.model.presenter.plotter.split_intensity_plotter import make_intensity_plot
-from src.propagation.model.presenter.plotter.split_phase_plotter import make_phase_plot
+from src.propagation.presenter.plotter.split_intensity_plotter import make_intensity_plot
+from src.propagation.presenter.plotter.split_phase_plotter import make_phase_plot
 from src.propagation.model.areas.interface.aperture import Aperture
-from src.propagation.model.presenter.saver.plotter import Plotter, configuration
-from src.propagation.model.presenter.saver.saver import Saver
+from src.propagation.presenter.saver.plotter import Plotter
+from src.propagation.presenter.saver.saver import Saver
 from src.propagation.model.waves.interface.wave import Wave
 from src.propagation.utils.math import units
 

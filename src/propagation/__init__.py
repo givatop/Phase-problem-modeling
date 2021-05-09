@@ -2,8 +2,6 @@ from .model.waves.spherical_wave import SphericalWave
 from .model.areas.square_area import SquareArea
 from .model.areas.radial_area import RadialArea
 from .model.areas.radial_aperture import RadialAperture
-from src.propagation.model.presenter.interface.onewave_plotter import Plotter
-from src.propagation.model.presenter.saver.mac_saver import MacSaver
 from .utils.math import units
 from .utils.optic import propagation_methods
 
