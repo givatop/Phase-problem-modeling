@@ -9,7 +9,7 @@ from src.propagation.model.waves.interface.wave import Wave
 from src.propagation.utils.math import units
 
 
-class MacSaver(Saver):
+class SimpleSaver(Saver):
     """
     Сохранение файлов в MacBook Матвей
     """

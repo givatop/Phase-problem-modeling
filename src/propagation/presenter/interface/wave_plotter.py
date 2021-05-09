@@ -3,7 +3,7 @@ import numpy as np
 
 from src.propagation.presenter.plotter.figure_maker import make_r_z_plot, make_phase_plot, make_intensity_plot
 from src.propagation.model.areas.interface.aperture import Aperture
-from src.propagation.presenter.saver.mac_saver import MacSaver
+from src.propagation.presenter.saver.mac_saver import SimpleSaver
 from src.propagation.presenter.saver.saver import Saver
 from src.propagation.model.waves.interface.wave import Wave
 from src.propagation.utils.math import units
@@ -64,7 +64,7 @@ class WavePlotter:
         plt.close(fig)
 
     @staticmethod
-    def save_r_z(array_wave_array, array_aperture_array, z_array, matrixes, step, saver: MacSaver):
+    def save_r_z(array_wave_array, array_aperture_array, z_array, matrixes, step, saver: SimpleSaver):
         """
         Сохраняет график для интенсивности
         :return:
