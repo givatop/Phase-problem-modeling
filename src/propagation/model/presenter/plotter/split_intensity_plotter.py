@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from src.propagation.model.configuration.configurator import figure_configurator, axes_configurator
+from src.propagation.model.presenter.configuration.configurator import figure_configurator, axes_configurator
 from src.propagation.utils.math.general import get_slice
 
 

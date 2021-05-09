@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from src.propagation import MacSaver
-from src.propagation.model.configuration.configurator import figure_configurator, axes_configurator
+from src.propagation.model.presenter.configuration.configurator import figure_configurator, axes_configurator
 from src.propagation.utils.math import units
 
 
