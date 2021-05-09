@@ -81,9 +81,8 @@ for matrix in matrixes:
         ic(r)
 
         # построение графиков для снапшотов
-        one_wave_plotter = WavePlotter(field, aperture, z, saver)
-        one_wave_plotter.save_phase()
-        one_wave_plotter.save_intensity()
+        WavePlotter.save_phase(field, aperture, z, saver)
+        WavePlotter.save_intensity(field, z, saver)
 
         wave_array.append(field)
         aperture_array.append(aperture)
@@ -94,6 +93,5 @@ for matrix in matrixes:
 
 
 # построение графиков для нескольких прогонок
-one_wave_plotter = WavePlotter(field, aperture, step, saver)
-one_wave_plotter.save_r_z(array_wave_array, array_aperture_array, z_array, matrixes, step)
+WavePlotter.save_r_z(array_wave_array, array_aperture_array, z_array, matrixes, step, saver)
 
