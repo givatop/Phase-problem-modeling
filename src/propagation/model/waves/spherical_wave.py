@@ -74,13 +74,6 @@ class SphericalWave(Wave):
         # развернутая фаза, обрезанная апертурой
         cut_phase, new_aperture = self.get_unwrapped_phase(aperture=aperture)
 
-        # преобразование развернутой фазы для устранения ошибок
-        # первый подход через развернутую фазу
-        # mask2 = cut_phase == 0
-        # cut_phase[mask2] = np.max(cut_phase)
-        # cut_phase -= cut_phase.min()
-        # cut_phase[mask2] = 0
-
         # поиск стрелки прогиба
         amplitude = calc_amplitude(cut_phase)
         sagitta = units.rad2mm(amplitude, self.__wavelength)

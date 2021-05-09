@@ -64,7 +64,7 @@ class WavePlotter:
         plt.close(fig)
 
     @staticmethod
-    def save_r_z(array_wave_array, array_aperture_array, z_array, matrixes, step, saver: MacSaver()):
+    def save_r_z(array_wave_array, array_aperture_array, z_array, matrixes, step, saver: MacSaver):
         """
         Сохраняет график для интенсивности
         :return:

@@ -8,18 +8,15 @@ from src.propagation.presenter.saver.mac_saver import MacSaver
 from src.propagation.model.waves.spherical_wave import SphericalWave
 from src.propagation.utils.math import units
 from src.propagation.utils.math.general import *
-# конфигурация
 from src.propagation.utils.optic.propagation_methods import angular_spectrum_bl_propagation
 
-# todo интерфейс Saver переписать так, чтобы было удобно пользоваться
-# todo переделать Plotter
-
+# конфигурация
 saver = MacSaver()
 
 # основные параметры для синтеза волны
 wavelength = 659.6e-9
 px_size = 5.04e-6
-focal_len = 200e-3
+focal_len = 100e-3
 gaussian_width_param = 250
 
 # вариации порога определения апертуры
@@ -29,7 +26,7 @@ t_num = 0
 # параметры для итерации при рапространении волны
 start = units.mm2m(0)
 stop = units.mm2m(600)
-step = units.mm2m(200)
+step = units.mm2m(50)
 z_array = np.array(np.arange(units.m2mm(start), units.m2mm(stop + step), units.m2mm(step)))
 
 # изменяющийся параметр для выборок
@@ -38,13 +35,6 @@ matrixes = np.array([512])
 # массивы для записи значений циклов нескольких прогонок
 array_wave_array = []
 array_aperture_array = []
-
-# создание волны
-square_area_1 = SquareArea(matrixes[0], matrixes[0], pixel_size=px_size)
-radial_area_1 = RadialArea(square_area_1)
-aperture = RadialAperture(radial_area_1, 2 * gaussian_width_param)
-field = SphericalWave(square_area_1, focal_len, gaussian_width_param, wavelength, 0)
-field.field *= aperture.aperture
 
 for matrix in matrixes:
     ic(matrix)
@@ -91,7 +81,5 @@ for matrix in matrixes:
     array_wave_array.append(wave_array)
     array_aperture_array.append(aperture_array)
 
-
 # построение графиков для нескольких прогонок
 WavePlotter.save_r_z(array_wave_array, array_aperture_array, z_array, matrixes, step, saver)
-

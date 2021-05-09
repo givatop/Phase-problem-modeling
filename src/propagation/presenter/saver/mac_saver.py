@@ -1,6 +1,8 @@
 from typing import Union
 from matplotlib.figure import Figure
 import numpy as np
+import os
+from os import path
 
 from src.propagation.presenter.saver.saver import Saver
 from src.propagation.model.waves.interface.wave import Wave
@@ -13,7 +15,11 @@ class MacSaver(Saver):
     """
 
     def save_image(self, fig: Union[Figure, np.ndarray], package_name: str, filename: str):
-        filepath = f"/Users/megamot/Programming/Python/Phase-problem-modeling/data/images/{package_name}/{filename}"
+
+        if not path.exists(f"./../../data/images/{package_name}/"):
+            os.makedirs(f"./../../data/images/{package_name}")
+
+        filepath = os.getcwd() + f"/../../data/images/{package_name}/{filename}"
 
         if isinstance(fig, Figure):
             fig.savefig(filepath)
