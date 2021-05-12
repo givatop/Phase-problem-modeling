@@ -1,11 +1,11 @@
+import os
+import numpy as np
+
+from os import path
 from typing import Union
 from matplotlib.figure import Figure
-import numpy as np
-import os
-from os import path
 
 from src.propagation.presenter.saver.saver import Saver
-from src.propagation.model.waves.interface.wave import Wave
 from src.propagation.utils.math import units
 
 
@@ -16,7 +16,7 @@ class SimpleSaver(Saver):
     def __init__(self, folder_name: str):
         super().__init__(folder_name)
 
-    def save_image(self, fig: Union[Figure, np.ndarray], package_name: str, filename: str):
+    def save_image(self, image: Union[Figure, np.ndarray], package_name: str, filename: str):
 
         # todo add path.join
         if not path.exists(f"./../../data/{self.folder_name}/{package_name}/"):
@@ -27,10 +27,10 @@ class SimpleSaver(Saver):
 
         filepath = os.getcwd() + f"/../../data/{self.folder_name}/{package_name}/{filename}"
 
-        if isinstance(fig, Figure):
-            fig.savefig(filepath)
-        elif isinstance(fig, np.ndarray):
-            np.save(filepath, fig)
+        if isinstance(image, Figure):
+            image.savefig(filepath)
+        elif isinstance(image, np.ndarray):
+            np.save(filepath, image)
 
     @staticmethod
     def create_filename(z: float, extension: str = 'png') -> str:

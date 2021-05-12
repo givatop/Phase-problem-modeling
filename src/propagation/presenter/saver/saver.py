@@ -1,7 +1,8 @@
+import numpy as np
+
+from typing import Union
 from abc import ABC, abstractmethod
 from matplotlib.figure import Figure
-
-from src.propagation.model.waves.interface.wave import Wave
 
 
 class Saver(ABC):
@@ -13,7 +14,7 @@ class Saver(ABC):
         self.folder_name = folder_name
 
     @abstractmethod
-    def save_image(self, fig: Figure, package_name: str, filename: str):
+    def save_image(self, image: Union[Figure, np.ndarray], package_name: str, filename: str):
         """
         Сохраняет кратинку
         :return:
