@@ -33,13 +33,8 @@ class SimpleSaver(Saver):
             np.save(filepath, fig)
 
     @staticmethod
-    def create_filename(wave: Wave, method: str, z=False, it=False) -> str:
-        return f'{method}_' \
-               f'f{int(units.m2mm(np.around(wave.focal_len, decimals=3)))}_' \
-               f'g{wave.gaussian_width_param}_' \
-               f's{wave.area.coordinate_grid[0].shape[0]}_' + \
-               f'{str(int(units.m2mm(z))) + "_" if z else "0_"}' + \
-               f'{f"{it}.png" if it else ".png"}'
+    def create_filename(z: float, extension: str = 'png') -> str:
+        return f'z_{units.m2mm(z):.3f}mm.{extension}'
 
     @staticmethod
     def create_folder_name(method: str, wave=False) -> str:

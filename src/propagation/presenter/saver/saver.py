@@ -22,14 +22,11 @@ class Saver(ABC):
 
     @staticmethod
     @abstractmethod
-    def create_filename(wave: Wave, method: str, z=False, it=False) -> str:
+    def create_filename(z: float, extension: str = 'png') -> str:
         """
         Создаёт имя файла по указанным параметрам типа:
-        method_f..._g..._s..._it.png
-        :param wave: волна
-        :param method: тип графика
-        :param z: в случае, если нужно передать дистанцию распространения
-        :param it: в случае, если нужно передать какой-то итератор или любое другое дополнительное значение
+        :param z:
+        :param extension: png or npy
         :return:
         """
         pass
