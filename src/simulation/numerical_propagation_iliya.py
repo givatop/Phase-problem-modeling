@@ -11,13 +11,16 @@ from src.propagation.utils.math.general import *
 from src.propagation.utils.optic.propagation_methods import angular_spectrum_bl_propagation
 
 # конфигурация
+# todo статический класс...
 saver = SimpleSaver()
 
 # основные параметры для синтеза волны
-wavelength = 659.6e-9
-px_size = 5.04e-6
-focal_len = 100e-3
-gaussian_width_param = 250
+width, height = 1024, 1024
+wavelength = units.nm2m(632.8)
+px_size = units.um2m(5.04)
+gaussian_width_params = [250]
+focal_lens = [100]
+focal_lens = list(map(units.mm2m, focal_lens))
 
 # вариации порога определения апертуры
 thresholds = [np.exp(-2), units.percent2decimal(13), units.percent2decimal(0.5), units.percent2decimal(0.8)]
@@ -25,61 +28,33 @@ t_num = 0
 
 # параметры для итерации при рапространении волны
 start = units.mm2m(0)
-stop = units.mm2m(600)
-step = units.mm2m(50)
-z_array = np.array(np.arange(units.m2mm(start), units.m2mm(stop + step), units.m2mm(step)))
+stop = units.mm2m(100)
+step = units.mm2m(25)
+distances = np.arange(start, stop + step, step)
 
-# изменяющийся параметр для выборок
-matrixes = np.array([512])
+# матрица в квадратичных координатах
+square_area_1 = SquareArea(height, width, pixel_size=px_size)
+radial_area_1 = RadialArea(square_area_1)
 
-# массивы для записи значений циклов нескольких прогонок
-array_wave_array = []
-array_aperture_array = []
+for focal_len in focal_lens:
+    for gaussian_width_param in gaussian_width_params:
+        for z in distances:
+            # создание сферической волны
+            field = SphericalWave(square_area_1, focal_len, gaussian_width_param, wavelength, z)
 
-for matrix in matrixes:
-    ic(matrix)
-    matrix_size = matrix
+            # распространение волны на дистанцию z
+            field.propagate_on_distance(z, method=angular_spectrum_bl_propagation)
+            # todo мы теряем U(z=0) и на каждой итерации цикла приходится генерить её заново
 
-    # матрица в квадратичных координатах
-    square_area_1 = SquareArea(matrix_size, matrix_size, pixel_size=px_size)
+            # определение апертуры для поиска радиуса волнового фронта
+            aperture = RadialAperture(radial_area_1, widest_diameter(field.intensity, thresholds[t_num]))
 
-    # массивы для снапшотов
-    wave_array = []
-    aperture_array = []
+            # радиус волнового фронта просто для вывода
+            r = field.get_wavefront_radius(aperture)
+            ic(z, r)
 
-    # массивы для одной прогонки
-    z_distances_array = []
-    wavefront_radius_array = []
+            # построение графиков для снапшотов
+            WavePlotter.save_phase(field, aperture, z, saver)
+            WavePlotter.save_intensity(field, z, saver)
 
-    for z in np.arange(start, stop + step, step):
-        # синтез фиктивной апертуры
-        radial_area_1 = RadialArea(square_area_1)
-        aperture = RadialAperture(radial_area_1, 2 * gaussian_width_param)
-
-        # создание сферической волны
-        field = SphericalWave(square_area_1, focal_len, gaussian_width_param, wavelength, z)
-        field.field *= aperture.aperture
-
-        # распространение волны на дистанцию z
-        field.propagate_on_distance(z, method=angular_spectrum_bl_propagation)
-
-        # определение апертуры для поиска радиуса волнового фронта
-        aperture = RadialAperture(radial_area_1, widest_diameter(field.intensity, thresholds[t_num]))
-
-        # радиус волнового фронта просто для вывода
-        r = field.get_wavefront_radius(aperture)
-        ic(r)
-
-        # построение графиков для снапшотов
-        WavePlotter.save_phase(field, aperture, z, saver)
-        WavePlotter.save_intensity(field, z, saver)
-
-        wave_array.append(field)
-        aperture_array.append(aperture)
-
-    ic()
-    array_wave_array.append(wave_array)
-    array_aperture_array.append(aperture_array)
-
-# построение графиков для нескольких прогонок
-WavePlotter.save_r_z(array_wave_array, array_aperture_array, z_array, matrixes, step, saver)
+        ic()
