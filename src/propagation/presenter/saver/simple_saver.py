@@ -13,13 +13,19 @@ class SimpleSaver(Saver):
     """
     Сохранение файлов в MacBook Матвей
     """
+    def __init__(self, folder_name: str):
+        super().__init__(folder_name)
 
     def save_image(self, fig: Union[Figure, np.ndarray], package_name: str, filename: str):
 
-        if not path.exists(f"./../../data/images/{package_name}/"):
-            os.makedirs(f"./../../data/images/{package_name}")
+        # todo add path.join
+        if not path.exists(f"./../../data/{self.folder_name}/{package_name}/"):
+            os.makedirs(f"./../../data/{self.folder_name}/{package_name}")
+        else:
+            pass
+            # todo логика, если директория уже существует
 
-        filepath = os.getcwd() + f"/../../data/images/{package_name}/{filename}"
+        filepath = os.getcwd() + f"/../../data/{self.folder_name}/{package_name}/{filename}"
 
         if isinstance(fig, Figure):
             fig.savefig(filepath)

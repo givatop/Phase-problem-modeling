@@ -10,10 +10,6 @@ from src.propagation.utils.math import units
 from src.propagation.utils.math.general import *
 from src.propagation.utils.optic.propagation_methods import angular_spectrum_bl_propagation
 
-# конфигурация
-# todo статический класс...
-saver = SimpleSaver()
-
 # основные параметры для синтеза волны
 width, height = 1024, 1024
 wavelength = units.nm2m(632.8)
@@ -38,6 +34,15 @@ radial_area_1 = RadialArea(square_area_1)
 
 for focal_len in focal_lens:
     for gaussian_width_param in gaussian_width_params:
+
+        # конфигурация
+        folder_name = \
+            f'z_{units.m2mm(start)}-{units.m2mm(stop)}-{units.m2mm(step)} ' \
+            f'f_{focal_len} ' \
+            f'w_{gaussian_width_param} ' \
+            f'{width}x{height}'
+        saver = SimpleSaver(folder_name)
+
         for z in distances:
             # создание сферической волны
             field = SphericalWave(square_area_1, focal_len, gaussian_width_param, wavelength, z)

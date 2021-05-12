@@ -39,9 +39,7 @@ class WavePlotter:
                               unwrapped_phase_lbl=unwrapped_phase_lbl,
                               wrapped_phase_lbl=wrapped_phase_lbl)
 
-        package_name = f'phase/phase_f{int(units.m2mm(np.around(focus, decimals=3)))}_' \
-                       f'g{gaussian_width_param}_' \
-                       f's{wave.area.coordinate_grid[0].shape[0]}'
+        package_name = f'phase'
 
         filename = saver.create_filename(wave, 'phase', z=z)
         saver.save_image(fig, package_name, filename)
@@ -55,9 +53,7 @@ class WavePlotter:
         """
         fig = make_intensity_plot(intensity=wave.intensity)
 
-        package_name = f'intensity/intensity_f{int(units.m2mm(np.around(wave.focal_len, decimals=3)))}_' \
-                       f'g{wave.gaussian_width_param}_' \
-                       f's{wave.area.coordinate_grid[0].shape[0]}'
+        package_name = f'intensity'
         filename = saver.create_filename(wave, 'intensity', z=z)
         saver.save_image(fig, package_name, filename)
 

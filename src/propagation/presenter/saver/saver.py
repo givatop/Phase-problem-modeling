@@ -8,6 +8,9 @@ class Saver(ABC):
     """
     Интерфейс сохранения файлов в папку
     """
+    @abstractmethod
+    def __init__(self, folder_name: str):
+        self.folder_name = folder_name
 
     @abstractmethod
     def save_image(self, fig: Figure, package_name: str, filename: str):
