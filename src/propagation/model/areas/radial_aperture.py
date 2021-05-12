@@ -60,6 +60,7 @@ class RadialAperture(Aperture):
         new_aperture_diameter = (wave.area.coordinate_grid[0].shape[0] // 2 - jump) * 2
         new_aperture_diameter += 2 if wave.distance < wave.focal_len else 0
 
+        # todo разобраться со свойствами
         self.aperture_diameter = new_aperture_diameter
 
     @property
