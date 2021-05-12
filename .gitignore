@@ -5,6 +5,7 @@ output*/
 results*/
 lens_propagation */
 *.bat
+data/
 
 
 # Byte-compiled / optimized / DLL files
