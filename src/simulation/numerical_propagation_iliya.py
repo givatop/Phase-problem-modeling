@@ -59,7 +59,7 @@ for focal_len in focal_lens:
             ic(z, r)
 
             # построение графиков для снапшотов
-            WavePlotter.save_phase(field, aperture, z, saver)
-            WavePlotter.save_intensity(field, z, saver)
+            WavePlotter.save_phase(field, aperture, z, saver, save_npy=True)
+            WavePlotter.save_intensity(field, z, saver, save_npy=True)
 
         ic()

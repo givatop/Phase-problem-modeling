@@ -15,13 +15,11 @@ class WavePlotter:
     """
 
     @staticmethod
-    def save_phase(wave: Wave, aperture: Aperture, z: float, saver: Saver):
+    def save_phase(wave: Wave, aperture: Aperture, z: float, saver: Saver, save_npy: bool = False):
         """
         Сохраняет график для фазы
         :return:
         """
-        focus = wave.focal_len
-        gaussian_width_param = wave.gaussian_width_param
         k = 2 * np.pi / wave.wavelength
 
         unwrapped_phase_lbl = f'[{np.min(wave.get_unwrapped_phase(aperture)[0]):.2f}, ' \
@@ -39,25 +37,29 @@ class WavePlotter:
                               unwrapped_phase_lbl=unwrapped_phase_lbl,
                               wrapped_phase_lbl=wrapped_phase_lbl)
 
-        package_name = f'phase'
-
-        filename = saver.create_filename(wave, 'phase', z=z)
-        saver.save_image(fig, package_name, filename)
+        filename = saver.create_filename(z)
+        saver.save_image(fig, 'phase png', filename)
         plt.close(fig)
 
+        if save_npy:
+            filename = saver.create_filename(z, extension='npy')
+            saver.save_image(wave.intensity, 'phase npy', filename)
+
     @staticmethod
-    def save_intensity(wave: Wave, z: float, saver: Saver):
+    def save_intensity(wave: Wave, z: float, saver: Saver, save_npy: bool = False):
         """
         Сохраняет график для интенсивности
         :return:
         """
         fig = make_intensity_plot(intensity=wave.intensity)
 
-        package_name = f'intensity'
-        filename = saver.create_filename(wave, 'intensity', z=z)
-        saver.save_image(fig, package_name, filename)
-
+        filename = saver.create_filename(z, extension='png')
+        saver.save_image(fig, 'intensity png', filename)
         plt.close(fig)
+
+        if save_npy:
+            filename = saver.create_filename(z, extension='npy')
+            saver.save_image(wave.intensity, 'intensity npy', filename)
 
     @staticmethod
     def save_r_z(array_wave_array, array_aperture_array, z_array, matrixes, step, saver: SimpleSaver):
