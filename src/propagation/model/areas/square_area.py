@@ -1,3 +1,4 @@
+from typing import Tuple
 import numpy as np
 
 from ..areas.interface.area import Area
@@ -21,7 +22,7 @@ class SquareArea(Area):
         self.__pixel_size = pixel_size
 
     @property
-    def coordinate_grid(self) -> tuple[np.ndarray, np.ndarray]:
+    def coordinate_grid(self) -> Tuple[np.ndarray, np.ndarray]:
         y_grid_array, x_grid_array = np.mgrid[-self.__height / 2:self.__height / 2, -self.__width / 2:self.__width / 2]
         y_grid_array, x_grid_array = (units.px2m(y_grid_array, px_size_m=self.__pixel_size),
                                       units.px2m(x_grid_array, px_size_m=self.__pixel_size))
