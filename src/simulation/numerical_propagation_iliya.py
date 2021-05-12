@@ -4,7 +4,7 @@ from src.propagation.model.areas.radial_aperture import RadialAperture
 from src.propagation.model.areas.radial_area import RadialArea
 from src.propagation.model.areas.square_area import SquareArea
 from src.propagation.presenter.interface.wave_plotter import WavePlotter
-from src.propagation.presenter.saver.mac_saver import SimpleSaver
+from src.propagation.presenter.saver.simple_saver import SimpleSaver
 from src.propagation.model.waves.spherical_wave import SphericalWave
 from src.propagation.utils.math import units
 from src.propagation.utils.math.general import *
