@@ -38,7 +38,7 @@ for focal_len in focal_lens:
         # конфигурация
         folder_name = \
             f'z_{units.m2mm(start)}-{units.m2mm(stop)}-{units.m2mm(step)} ' \
-            f'f_{focal_len} ' \
+            f'f_{units.m2mm(focal_len)} ' \
             f'w_{gaussian_width_param} ' \
             f'{width}x{height}'
         saver = SimpleSaver(folder_name)
