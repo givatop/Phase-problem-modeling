@@ -80,3 +80,16 @@ class WavePlotter:
         saver.save_image(fig, package_name, filename)
 
         plt.close(fig)
+
+    @staticmethod
+    def write_r_z(r: float, z: float, saver: SimpleSaver):
+        """
+        Записывает значения R(z) и z в текстовый файл
+        :param r:
+        :param z:
+        :param saver:
+        """
+        # raise NotImplementedError()
+        text = f'{z:.3f} {r:.3f}'
+        filename = 'z R(z)'
+        saver.save_text(text, '', filename)
