@@ -1,6 +1,6 @@
 import numpy as np
 
-from typing import Union
+from typing import Union, Dict
 from abc import ABC, abstractmethod
 from matplotlib.figure import Figure
 
@@ -18,6 +18,16 @@ class Saver(ABC):
         """
         Сохраняет кратинку
         :return:
+        """
+        pass
+
+    @abstractmethod
+    def save_text(self, text: Union[str, Dict], package_name: str, filename: str):
+        """
+        Сохраняет текст в файл
+        :param text:
+        :param package_name:
+        :param filename:
         """
         pass
 

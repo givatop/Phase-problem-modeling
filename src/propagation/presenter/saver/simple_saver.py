@@ -2,7 +2,7 @@ import os
 import numpy as np
 
 from os import path
-from typing import Union
+from typing import Union, Dict
 from matplotlib.figure import Figure
 
 from src.propagation.presenter.saver.saver import Saver
@@ -31,6 +31,33 @@ class SimpleSaver(Saver):
             image.savefig(filepath)
         elif isinstance(image, np.ndarray):
             np.save(filepath, image)
+
+    def save_text(self, text: Union[str, Dict], package_name: str, filename: str):
+
+        if not path.exists(f"./../../data/{self.folder_name}/{package_name}/"):
+            os.makedirs(f"./../../data/{self.folder_name}/{package_name}")
+        else:
+            pass # todo
+
+        filepath = os.getcwd() + f"/../../data/{self.folder_name}/{package_name}/{filename}.txt"
+
+        with open(filepath, 'a') as file:
+            if isinstance(text, str):
+                file.write(text + '\n')
+
+            elif isinstance(text, Dict):
+                for key, value in text.items():
+                    file.write(f'{key}: {value}\n')
+                file.write('\n' + '-' * 150 + '\n\n')
+                file.write(
+                    f'{"z": >6}'
+                    f'{"R": >8}'
+                    f'{"Ap": >8}'
+                    f'{"Amp": >8}'
+                    f'{"x0": >7}'
+                    f'{"y0": >7}'
+                    f'\n'
+                )
 
     @staticmethod
     def create_filename(z: float, extension: str = 'png') -> str:
