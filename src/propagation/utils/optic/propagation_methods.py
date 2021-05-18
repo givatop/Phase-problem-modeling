@@ -41,9 +41,6 @@ def angular_spectrum_propagation(wave: Wave, z: float):
     # обратное преобразование Фурье
     wave.field = ifft2(field * h)
 
-    wave.phase = np.angle(wave.field)
-    wave.intensity = np.abs(wave.field) ** 2
-
 
 def angular_spectrum_bl_propagation(wave: Wave, z: float):
     """
@@ -88,9 +85,6 @@ def angular_spectrum_bl_propagation(wave: Wave, z: float):
 
     # обратное преобразование Фурье
     wave.field = ifft2(fft2(new_field) * h)[top:bottom, left:right]
-
-    wave.phase = np.angle(wave.field)
-    wave.intensity = np.abs(wave.field) ** 2
 
 
 def fresnel(field: np.ndarray, propagate_distance: float,

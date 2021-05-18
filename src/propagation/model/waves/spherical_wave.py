@@ -94,6 +94,8 @@ class SphericalWave(Wave):
     @field.setter
     def field(self, field):
         self.__field = field
+        self.__phase = np.angle(field)
+        self.__intensity = np.abs(field) ** 2
 
     @property
     def area(self) -> Area:
@@ -105,19 +107,21 @@ class SphericalWave(Wave):
 
     @property
     def phase(self) -> np.ndarray:
-        return np.angle(self.__field)
+        return self.__phase
 
     @phase.setter
     def phase(self, phase):
-        self.__phase = phase
+        # todo добавить перерасчет __field
+        raise NotImplementedError
 
     @property
     def intensity(self) -> np.ndarray:
-        return np.abs(self.__field) ** 2
+        return self.__intensity
 
     @intensity.setter
     def intensity(self, intensity):
-        self.__intensity = intensity
+        # todo добавить перерасчет __field
+        raise NotImplementedError
 
     @property
     def wavelength(self) -> float:
