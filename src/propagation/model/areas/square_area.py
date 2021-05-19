@@ -29,6 +29,13 @@ class SquareArea(Area):
         return y_grid_array, x_grid_array
 
     @property
+    def frequency_grid(self):
+        nu_x = np.arange(-self.__width / 2, self.__width / 2) / (self.__width * self.__pixel_size)
+        nu_y = np.arange(-self.__height / 2, self.__height / 2) / (self.__height * self.__pixel_size)
+        nu_x_grid, nu_y_grid = np.meshgrid(nu_x, nu_y)
+        return nu_y_grid, nu_x_grid
+
+    @property
     def pixel_size(self) -> float:
         return self.__pixel_size
 
