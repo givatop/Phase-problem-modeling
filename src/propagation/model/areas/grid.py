@@ -1,40 +1,20 @@
+from abc import ABC
 from typing import Tuple
 
 import numpy as np
 
-from src.propagation.utils.math import units
+from ...utils.math.units import px2m
 
 
-class CoordinateGrid:
-    """ Сетка в декартовых координатах (квадратная матрица) """
-
-    def __init__(self, height, width, pixel_size=5.04e-6):
-        """
-        Создаёт квадратную матрицу
-        :param height: высота матрицы [px]
-        :param width: ширина матрицы [px]
-        :param pixel_size: размер пикселя матрицы [м]
-        """
+class Grid(ABC):
+    def __init__(self, height, width, pixel_size):
         self.__height = height
         self.__width = width
         self.__pixel_size = pixel_size
 
     @property
-    def coordinate_grid(self) -> Tuple[np.ndarray, np.ndarray]:
-        y_grid_array, x_grid_array = np.mgrid[-self.__height / 2:self.__height / 2, -self.__width / 2:self.__width / 2]
-        y_grid_array, x_grid_array = (units.px2m(y_grid_array, px_size_m=self.__pixel_size),
-                                      units.px2m(x_grid_array, px_size_m=self.__pixel_size))
-        return y_grid_array, x_grid_array
-
-    @property
-    def frequency_grid(self):
-        nu_x = np.arange(-self.__width / 2, self.__width / 2) / (self.__width * self.__pixel_size)
-        nu_y = np.arange(-self.__height / 2, self.__height / 2) / (self.__height * self.__pixel_size)
-        nu_x_grid, nu_y_grid = np.meshgrid(nu_x, nu_y)
-        return nu_y_grid, nu_x_grid
-
-    @property
     def pixel_size(self) -> float:
+        """ Размер пикселя матрицы [м] """
         return self.__pixel_size
 
     @pixel_size.setter
@@ -43,6 +23,7 @@ class CoordinateGrid:
 
     @property
     def height(self) -> float:
+        """ Высота матрицы [px] """
         return self.__height
 
     @height.setter
@@ -51,6 +32,7 @@ class CoordinateGrid:
 
     @property
     def width(self) -> float:
+        """ Ширина матрицы [px] """
         return self.__width
 
     @width.setter
@@ -58,31 +40,29 @@ class CoordinateGrid:
         self.__width = width
 
 
-class RadialCoordinateGrid:
+class CoordinateGrid(Grid):
+    """ Центрированная сетка в декартовых координатах (квадратная матрица) """
+
+    def __init__(self, height, width, pixel_size=5.04e-6):
+        super().__init__(height, width, pixel_size)
+        self.__grid = px2m(np.mgrid[
+                           -self.height / 2:self.height / 2,
+                           -self.width / 2:self.width / 2
+                           ])
+
+    @property
+    def grid(self) -> Tuple[np.ndarray, np.ndarray]:
+        return self.__grid
+
+
+class PolarGrid(Grid):
     """ Сетка в радиальных координатах """
 
-    def __init__(self, square_area: CoordinateGrid):
-        """
-        Создаёт матрицу в сферических координатах на основе матрицы в квадратичных координатах
-        :param square_area: матрица в квадратичных координатах
-        """
-        self.__height = square_area.height
-        self.__width = square_area.width
-        self.__pixel_size = square_area.pixel_size
+    def __init__(self, coordinate_grid: CoordinateGrid):
+        """ Создаёт сетку  в полярных координатах на основе сетки в квадратичных координатах """
+        super().__init__(coordinate_grid.height, coordinate_grid.width, coordinate_grid.pixel_size)
+        self.__polar_grid = np.sqrt(sum(map(lambda x: x * x, coordinate_grid.grid)))
 
     @property
-    def coordinate_grid(self):
-        y_grid_array, x_grid_array = np.mgrid[-self.__height / 2:self.__height / 2, -self.__width / 2:self.__width / 2]
-        y_grid_array, x_grid_array = (units.px2m(y_grid_array, px_size_m=self.__pixel_size),
-                                      units.px2m(x_grid_array, px_size_m=self.__pixel_size))
-        # переход из квадратичных координат в сферические
-        radial_grid = np.sqrt(x_grid_array ** 2 + y_grid_array ** 2)
-        return radial_grid
-
-    @property
-    def pixel_size(self):
-        return self.__pixel_size
-
-    @pixel_size.setter
-    def pixel_size(self, pixel_size):
-        self.__pixel_size = pixel_size
+    def polar_grid(self) -> Tuple[np.ndarray, np.ndarray]:
+        return self.__polar_grid

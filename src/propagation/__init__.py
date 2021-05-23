@@ -1,6 +1,6 @@
 from .model.waves.spherical_wave import SphericalWave
 from .model.areas.grid import CoordinateGrid
-from .model.areas.grid import RadialCoordinateGrid
+from .model.areas.grid import PolarGrid
 from .model.areas.aperture import Aperture
 from .utils.math import units
 from .utils.optic import propagation_methods

@@ -1,4 +1,4 @@
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 import numpy as np
 
 from ...areas.aperture import Aperture
@@ -6,7 +6,7 @@ from ...areas.grid import CoordinateGrid
 from ...propagation.interface.propagate import Propagable
 
 
-class Wave(Propagable):
+class Wave(Propagable, ABC):
     """
     Интерфейс волны
     """

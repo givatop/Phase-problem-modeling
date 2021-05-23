@@ -12,9 +12,7 @@ from ...utils.optic.propagation_methods import angular_spectrum_propagation
 
 
 class SphericalWave(Wave):
-    """
-    Волны со сферической аберрацией или сходящейся сферической волны
-    """
+    """ Волна со сферической аберрацией или сходящаяся сферическая волна """
 
     def __init__(self, coordinate_grid: CoordinateGrid, focal_len: float, gaussian_width_param: int, wavelength: float,
                  distance: float):
@@ -34,7 +32,7 @@ class SphericalWave(Wave):
         self.__distance = distance
 
         # задание распределения интенсивности волны
-        y_grid, x_grid = self.__coordinate_grid.coordinate_grid
+        y_grid, x_grid = self.__coordinate_grid.grid
         gaussian_width_param = units.px2m(gaussian_width_param, px_size_m=coordinate_grid.pixel_size)
         self.__intensity = gauss_2d(x_grid, y_grid,
                                     wx=gaussian_width_param / 4,
@@ -181,7 +179,7 @@ def modify_aperture(aperture: Aperture, wave: Wave):
 
     # ближайшая к скачку апертуры координата Х справа от скачка
     # в кторой значение неразвернутой фазы наиболее близко к нулю
-    rwrp = next((i for i in range(jump, wave.coordinate_grid.coordinate_grid[0].shape[0], 1) if
+    rwrp = next((i for i in range(jump, wave.coordinate_grid.grid[0].shape[0], 1) if
                  (wrp_phase_values[i] > 0) and (wrp_phase_values[i - 1] < 0)),
                 1)
 
@@ -190,7 +188,7 @@ def modify_aperture(aperture: Aperture, wave: Wave):
 
     # генерация новой апертуры с скорректированным диаметром
     # в случае, если волна сходящаяся, вводится дополнительная корректировка
-    new_aperture_diameter = (wave.coordinate_grid.coordinate_grid[0].shape[0] // 2 - jump) * 2
+    new_aperture_diameter = (wave.coordinate_grid.grid[0].shape[0] // 2 - jump) * 2
     new_aperture_diameter += 2 if wave.distance < wave.focal_len else 0
 
     # todo разобраться со свойствами
