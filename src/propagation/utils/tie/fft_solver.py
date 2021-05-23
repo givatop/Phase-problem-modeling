@@ -4,7 +4,7 @@ from typing import Tuple
 from numpy.fft import fftshift
 from src.propagation.utils.tie.solver import TIESolver
 from src.propagation.utils.tie.boundary_conditions import BoundaryConditions, clip
-from src.propagation.model.areas.square_area import SquareArea
+from src.propagation.model.areas.square_area import CoordinateGrid
 from src.propagation.utils.math.derivative.fourier import gradient_2d, ilaplacian_2d
 
 
@@ -50,7 +50,7 @@ class FFTSolver(TIESolver):
         Расчет частотных коэффициентов
         :return:
         """
-        area = SquareArea(*self.ref_intensity.shape, self.pixel_size)
+        area = CoordinateGrid(*self.ref_intensity.shape, self.pixel_size)
         nu_y_grid, nu_x_grid = area.frequency_grid
 
         kx = 1j * 2 * np.pi * fftshift(nu_x_grid)

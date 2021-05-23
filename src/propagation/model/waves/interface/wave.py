@@ -1,8 +1,8 @@
 from abc import abstractmethod
 import numpy as np
 
-from ...areas.interface.aperture import Aperture
-from ...areas.interface.area import Area
+from ...areas.aperture import Aperture
+from ...areas.grid import CoordinateGrid
 from ...propagation.interface.propagate import Propagable
 
 
@@ -60,15 +60,15 @@ class Wave(Propagable):
 
     @property
     @abstractmethod
-    def area(self) -> Area:
+    def coordinate_grid(self) -> CoordinateGrid:
         """
         Координатная сетка
         """
         pass
 
-    @area.setter
+    @coordinate_grid.setter
     @abstractmethod
-    def area(self, area):
+    def coordinate_grid(self, area):
         pass
 
     @property

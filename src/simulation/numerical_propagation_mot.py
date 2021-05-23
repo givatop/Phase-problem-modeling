@@ -1,8 +1,8 @@
 from icecream import ic
 
-from src.propagation.model.areas.radial_aperture import RadialAperture
-from src.propagation.model.areas.radial_area import RadialArea
-from src.propagation.model.areas.square_area import SquareArea
+from src.propagation.model.areas.aperture import Aperture
+from src.propagation.model.areas.grid import RadialCoordinateGrid
+from src.propagation.model.areas.grid import CoordinateGrid
 from src.propagation.presenter.interface.wave_plotter import WavePlotter
 from src.propagation.presenter.saver.simple_saver import SimpleSaver
 from src.propagation.model.waves.spherical_wave import SphericalWave
@@ -24,13 +24,13 @@ t_num = 0
 
 # параметры для итерации при рапространении волны
 start = units.mm2m(0)
-stop = units.mm2m(100)
+stop = units.mm2m(200)
 step = units.mm2m(25)
 distances = np.arange(start, stop + step, step)
 
 # матрица в квадратичных координатах
-square_area_1 = SquareArea(height, width, pixel_size=px_size)
-radial_area_1 = RadialArea(square_area_1)
+square_area_1 = CoordinateGrid(height, width, pixel_size=px_size)
+radial_area_1 = RadialCoordinateGrid(square_area_1)
 
 for focal_len in focal_lens:
     for gaussian_width_param in gaussian_width_params:
@@ -52,7 +52,7 @@ for focal_len in focal_lens:
             # todo мы теряем U(z=0) и на каждой итерации цикла приходится генерить её заново
 
             # определение апертуры для поиска радиуса волнового фронта
-            aperture = RadialAperture(radial_area_1, widest_diameter(field.intensity, thresholds[t_num]))
+            aperture = Aperture(radial_area_1, widest_diameter(field.intensity, thresholds[t_num]))
 
             # радиус волнового фронта просто для вывода
             r = field.get_wavefront_radius(aperture)
