@@ -1,7 +1,7 @@
 import numpy as np
 from skimage.restoration import unwrap_phase
 
-from ..areas.grid import CoordinateGrid
+from ..areas.grid import CartesianGrid
 from ...model.areas.aperture import Aperture
 from ...model.waves.interface.wave import Wave
 from ...utils.math import units
@@ -14,7 +14,7 @@ from ...utils.optic.propagation_methods import angular_spectrum_propagation
 class SphericalWave(Wave):
     """ Волна со сферической аберрацией или сходящаяся сферическая волна """
 
-    def __init__(self, coordinate_grid: CoordinateGrid, focal_len: float, gaussian_width_param: int, wavelength: float,
+    def __init__(self, coordinate_grid: CartesianGrid, focal_len: float, gaussian_width_param: int, wavelength: float,
                  distance: float):
         """
         Создание распределения поля на двухмерной координатной сетке
@@ -97,7 +97,7 @@ class SphericalWave(Wave):
         self.__intensity = np.abs(field) ** 2
 
     @property
-    def coordinate_grid(self) -> CoordinateGrid:
+    def coordinate_grid(self) -> CartesianGrid:
         return self.__coordinate_grid
 
     @coordinate_grid.setter

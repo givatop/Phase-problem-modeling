@@ -1,5 +1,5 @@
 from .model.waves.spherical_wave import SphericalWave
-from .model.areas.grid import CoordinateGrid
+from .model.areas.grid import CartesianGrid
 from .model.areas.grid import PolarGrid
 from .model.areas.aperture import Aperture
 from .utils.math import units

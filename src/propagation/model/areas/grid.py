@@ -40,7 +40,7 @@ class Grid(ABC):
         self.__width = width
 
 
-class CoordinateGrid(Grid):
+class CartesianGrid(Grid):
     """ Центрированная сетка в декартовых координатах (квадратная матрица) """
 
     def __init__(self, height, width, pixel_size=5.04e-6):
@@ -58,7 +58,7 @@ class CoordinateGrid(Grid):
 class PolarGrid(Grid):
     """ Сетка в радиальных координатах """
 
-    def __init__(self, coordinate_grid: CoordinateGrid):
+    def __init__(self, coordinate_grid: CartesianGrid):
         """ Создаёт сетку  в полярных координатах на основе сетки в квадратичных координатах """
         super().__init__(coordinate_grid.height, coordinate_grid.width, coordinate_grid.pixel_size)
         self.__polar_grid = np.sqrt(sum(map(lambda x: x * x, coordinate_grid.grid)))

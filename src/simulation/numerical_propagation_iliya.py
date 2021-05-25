@@ -2,7 +2,7 @@ from icecream import ic
 
 from src.propagation.model.areas.aperture import Aperture
 from src.propagation.model.areas.grid import PolarGrid
-from src.propagation.model.areas.grid import CoordinateGrid
+from src.propagation.model.areas.grid import CartesianGrid
 from src.propagation.presenter.interface.wave_plotter import WavePlotter
 from src.propagation.presenter.saver.simple_saver import SimpleSaver
 from src.propagation.model.waves.spherical_wave import SphericalWave
@@ -29,7 +29,7 @@ step = units.mm2m(25)
 distances = np.arange(start, stop + step, step)
 
 # матрица в квадратичных координатах
-square_area_1 = CoordinateGrid(height, width, pixel_size=px_size)
+square_area_1 = CartesianGrid(height, width, pixel_size=px_size)
 radial_area_1 = PolarGrid(square_area_1)
 
 for focal_len in focal_lens:
