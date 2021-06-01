@@ -4,7 +4,10 @@ from typing import Tuple
 import numpy as np
 from numpy.fft import fftshift
 
-from ...utils.math.units import px2m
+from ...utils.math.units import (
+    px2m,
+    m2px
+)
 
 
 class Grid(ABC):
@@ -77,11 +80,10 @@ class FrequencyGrid(Grid):
         super().__init__(cart_grid.height, cart_grid.width, cart_grid.pixel_size)
 
         # создание сетки в частотной области при условии выполнения теоремы Котельникова
-        nu_x = np.arange(
-            -cart_grid.width / 2, cart_grid.width / 2) / (cart_grid.width * cart_grid.pixel_size)
-        nu_y = np.arange(
-            -cart_grid.height / 2, cart_grid.height / 2) / (cart_grid.height * cart_grid.pixel_size)
-        nu_x_grid, nu_y_grid = np.meshgrid(nu_x, nu_y)
+        nu_x_grid, nu_y_grid = (
+            m2px(cart_grid.grid[0]) / (self.width * self.pixel_size),
+            m2px(cart_grid.grid[1]) / (self.height * self.pixel_size)
+        )
 
         # сдвиг высоких частот к краям сетки
         self._grid = (fftshift(nu_x_grid), fftshift(nu_y_grid))

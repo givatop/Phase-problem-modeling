@@ -75,7 +75,7 @@ def decimal2percent(decimal):
 
 # В пиксели
 def m2px(m, px_size_m=5.04e-6):
-    return int(m / px_size_m)
+    return m / px_size_m
 
 
 if __name__ == '__main__':
