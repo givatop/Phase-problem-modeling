@@ -2,13 +2,15 @@ import numpy as np
 from numpy.fft import fft2, fftshift, ifft2, ifftshift
 
 from src.propagation.model.waves.interface.wave import Wave
+from src.propagation.model.areas.grid import FrequencyGrid
 from src.propagation.utils.optic.field import rect_2d
 
 
-def angular_spectrum_propagation(wave: Wave, z: float):
+def angular_spectrum_propagation(wave: Wave, frequency_grid: FrequencyGrid, z: float):
     """
     Метод распространения (преобразования) волны методом углового спектра
     :param wave: волна
+    :param frequency_grid
     :param z: дистанция распространения
     :return:
     """
@@ -19,13 +21,7 @@ def angular_spectrum_propagation(wave: Wave, z: float):
     # волновое число
     wave_number = 2 * np.pi / wave.wavelength
 
-    # создание сетки в частотной области при условии выполнения теоремы Котельникова
-    nu_x = np.arange(-width / 2, width / 2) / (width * wave.coordinate_grid.pixel_size)
-    nu_y = np.arange(-height / 2, height / 2) / (height * wave.coordinate_grid.pixel_size)
-    nu_x_grid, nu_y_grid = np.meshgrid(nu_x, nu_y)
-
-    # сдвиг высоких частот к краям сетки
-    nu_x_grid, nu_y_grid = fftshift(nu_x_grid), fftshift(nu_y_grid)
+    nu_x_grid, nu_y_grid = frequency_grid.grid
 
     # Фурье-образ исходного поля
     field = fft2(wave.field)

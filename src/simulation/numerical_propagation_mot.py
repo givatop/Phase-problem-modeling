@@ -1,14 +1,13 @@
 from icecream import ic
 
 from src.propagation.model.areas.aperture import Aperture
+from src.propagation.model.areas.grid import CartesianGrid, FrequencyGrid
 from src.propagation.model.areas.grid import PolarGrid
-from src.propagation.model.areas.grid import CoordinateGrid
+from src.propagation.model.waves.spherical_wave import SphericalWave
 from src.propagation.presenter.interface.wave_plotter import WavePlotter
 from src.propagation.presenter.saver.simple_saver import SimpleSaver
-from src.propagation.model.waves.spherical_wave import SphericalWave
 from src.propagation.utils.math import units
 from src.propagation.utils.math.general import *
-from src.propagation.utils.optic.propagation_methods import angular_spectrum_bl_propagation
 
 # основные параметры для синтеза волны
 width, height = 512, 512
@@ -29,8 +28,9 @@ step = units.mm2m(25)
 distances = np.arange(start, stop + step, step)
 
 # матрица в квадратичных координатах
-square_area_1 = CoordinateGrid(height, width, pixel_size=px_size)
+square_area_1 = CartesianGrid(height, width, pixel_size=px_size)
 radial_area_1 = PolarGrid(square_area_1)
+freq_grid = FrequencyGrid(square_area_1)
 
 for focal_len in focal_lens:
     for gaussian_width_param in gaussian_width_params:
@@ -48,7 +48,7 @@ for focal_len in focal_lens:
             field = SphericalWave(square_area_1, focal_len, gaussian_width_param, wavelength, z)
 
             # распространение волны на дистанцию z
-            field.propagate_on_distance(z, method=angular_spectrum_bl_propagation)
+            field.propagate_on_distance(freq_grid, z)
             # todo мы теряем U(z=0) и на каждой итерации цикла приходится генерить её заново
 
             # определение апертуры для поиска радиуса волнового фронта
@@ -59,8 +59,8 @@ for focal_len in focal_lens:
             ic(z, r)
 
             # построение графиков для снапшотов
-            # WavePlotter.write_r_z(r, z, saver)
-            # WavePlotter.save_phase(field, aperture, z, saver, save_npy=True)
+            WavePlotter.write_r_z(r, z, saver)
+            WavePlotter.save_phase(field, aperture, z, saver, save_npy=True)
             WavePlotter.save_intensity(field, z, saver, save_npy=True)
 
         ic()

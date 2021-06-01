@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 from ...areas.aperture import Aperture
-from ...areas.grid import CoordinateGrid
+from ...areas.grid import CartesianGrid
 from ...propagation.interface.propagate import Propagable
 
 
@@ -60,7 +60,7 @@ class Wave(Propagable, ABC):
 
     @property
     @abstractmethod
-    def coordinate_grid(self) -> CoordinateGrid:
+    def coordinate_grid(self) -> CartesianGrid:
         """
         Координатная сетка
         """

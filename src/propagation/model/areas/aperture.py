@@ -17,7 +17,7 @@ class Aperture:
         aperture_diameter = px2m(aperture_diameter, px_size_m=polar_grid.pixel_size)  # [м]
         self._aperture_diameter = aperture_diameter
         self._radial_area = polar_grid
-        self._aperture = circ(polar_grid.polar_grid, w=aperture_diameter)
+        self._aperture = circ(polar_grid.grid, w=aperture_diameter)
 
     @property
     def aperture_diameter(self):
@@ -26,7 +26,7 @@ class Aperture:
     @aperture_diameter.setter
     def aperture_diameter(self, aperture_diameter):
         self._aperture_diameter = px2m(aperture_diameter, px_size_m=self._radial_area.pixel_size)  # [м]
-        self._aperture = circ(self.radial_area.polar_grid, w=self._aperture_diameter)
+        self._aperture = circ(self.radial_area.grid, w=self._aperture_diameter)
 
     @property
     def radial_area(self):
