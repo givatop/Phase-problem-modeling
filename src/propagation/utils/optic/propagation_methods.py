@@ -10,17 +10,15 @@ def angular_spectrum_propagation(wave: Wave, frequency_grid: FrequencyGrid, z: f
     """
     Метод распространения (преобразования) волны методом углового спектра
     :param wave: волна
-    :param frequency_grid
+    :param frequency_grid частотная сетка
     :param z: дистанция распространения
     :return:
     """
 
-    height = wave.field.shape[0]  # количество строк матрицы
-    width = wave.field.shape[1]  # количество элеметов в каждой строке матрицы
-
     # волновое число
     wave_number = 2 * np.pi / wave.wavelength
 
+    # частотная сетка
     nu_x_grid, nu_y_grid = frequency_grid.grid
 
     # Фурье-образ исходного поля

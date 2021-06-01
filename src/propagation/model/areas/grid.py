@@ -60,7 +60,7 @@ class PolarGrid(Grid):
     """ Сетка в радиальных координатах """
 
     def __init__(self, cart_grid: CartesianGrid):
-        """ Созданик сетки в полярных координатах на основе сетки в декартовых координатах """
+        """ Создание сетки в полярных координатах на основе сетки в декартовых координатах """
         super().__init__(cart_grid.height, cart_grid.width, cart_grid.pixel_size)
         self._grid = np.sqrt(sum(map(lambda x: x * x, cart_grid.grid)))
 
