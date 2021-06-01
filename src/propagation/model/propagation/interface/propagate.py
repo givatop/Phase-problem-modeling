@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
 
-# интерфейс объекта, способного распространяться в пространстве
 class Propagable(ABC):
+    """ Интерфейс объекта, способного распространяться в пространстве """
 
     @abstractmethod
     def propagate_on_distance(self, z: float, method):
