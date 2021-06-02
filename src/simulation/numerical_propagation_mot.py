@@ -48,7 +48,7 @@ for focal_len in focal_lens:
             field = SphericalWave(square_area_1, focal_len, gaussian_width_param, wavelength, z)
 
             # распространение волны на дистанцию z
-            field.propagate_on_distance(freq_grid, z)
+            field.propagate_on_distance(z, frequency_grid=freq_grid)
             # todo мы теряем U(z=0) и на каждой итерации цикла приходится генерить её заново
 
             # определение апертуры для поиска радиуса волнового фронта

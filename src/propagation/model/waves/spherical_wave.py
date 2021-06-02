@@ -83,8 +83,8 @@ class SphericalWave(Wave):
 
         return wavefront_radius
 
-    def propagate_on_distance(self, freq_grid: FrequencyGrid, z: float, method=angular_spectrum_propagation):
-        method(self, freq_grid, z)
+    def propagate_on_distance(self, z: float, method=angular_spectrum_propagation, **kwargs):
+        method(self, z, **kwargs)
 
     @property
     def field(self) -> np.ndarray:

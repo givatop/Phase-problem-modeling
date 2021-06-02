@@ -1,19 +1,18 @@
 import numpy as np
-from numpy.fft import fft2, fftshift, ifft2, ifftshift
+from numpy.fft import fft2, ifft2, ifftshift
 
 from src.propagation.model.waves.interface.wave import Wave
-from src.propagation.model.areas.grid import FrequencyGrid
 from src.propagation.utils.optic.field import rect_2d
 
 
-def angular_spectrum_propagation(wave: Wave, frequency_grid: FrequencyGrid, z: float):
+def angular_spectrum_propagation(wave: Wave, z: float, **kwargs):
     """
     Метод распространения (преобразования) волны методом углового спектра
     :param wave: волна
-    :param frequency_grid частотная сетка
     :param z: дистанция распространения
     :return:
     """
+    frequency_grid = kwargs.get('frequency_grid')
 
     # волновое число
     wave_number = 2 * np.pi / wave.wavelength
