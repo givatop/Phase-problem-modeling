@@ -19,7 +19,7 @@ def angular_spectrum_propagation(wave: Wave, frequency_grid: FrequencyGrid, z: f
     wave_number = 2 * np.pi / wave.wavelength
 
     # частотная сетка
-    nu_x_grid, nu_y_grid = frequency_grid.grid
+    nu_y_grid, nu_x_grid = frequency_grid.grid.y_grid, frequency_grid.grid.x_grid
 
     # Фурье-образ исходного поля
     field = fft2(wave.field)
