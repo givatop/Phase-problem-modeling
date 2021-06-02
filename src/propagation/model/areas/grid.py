@@ -1,5 +1,4 @@
 from abc import ABC
-from typing import Tuple
 from collections import namedtuple
 
 import numpy as np

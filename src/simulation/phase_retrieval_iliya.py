@@ -3,7 +3,7 @@ import numpy as np
 
 from icecream import ic
 from src.propagation.utils.math import units
-from src.propagation.presenter.saver.simple_saver import SimpleSaver
+from src.propagation.presenter.saver.saver import Saver
 from src.propagation.utils.tie import FFTSolver, BoundaryConditions
 
 
@@ -36,7 +36,7 @@ for focal_len in focal_lens:
                 f'f_{units.m2mm(focal_len)} ' \
                 f'w_{gaussian_width_param} ' \
                 f'{width}x{height}'
-            saver = SimpleSaver(folder_name)
+            saver = Saver(folder_name)
 
             filepath = os.path.join(os.getcwd(), os.path.pardir, os.path.pardir,
                                     'data', folder_name, 'intensity npy')
