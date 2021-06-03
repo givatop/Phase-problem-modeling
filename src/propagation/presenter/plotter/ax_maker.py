@@ -278,7 +278,7 @@ def make_r_z_ax(ax, **kwargs):
         waves = array_wave_array[z]
         apertures = array_aperture_array[z]
         for wave, aperture, k in zip(waves, apertures, z_array):
-            radius_y.append(wave.get_wavefront_radius(aperture))
+            radius_y.append(wave.get_wavefront_radius(aperture=aperture, z=z))
             theory_r_z.append(np.abs(np.array(k) - units.m2mm(wave.focal_len)))
 
         if z == 0:
