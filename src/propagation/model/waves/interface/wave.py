@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Tuple
 
 import numpy as np
 
@@ -66,11 +65,6 @@ class Wave(Propagable, ABC):
         """
         pass
 
-    @grid.setter
-    @abstractmethod
-    def grid(self, area):
-        pass
-
     @property
     @abstractmethod
     def phase(self) -> np.ndarray:
@@ -78,11 +72,6 @@ class Wave(Propagable, ABC):
         Распределение фазы поля волны
         :return:
         """
-        pass
-
-    @phase.setter
-    @abstractmethod
-    def phase(self, phase):
         pass
 
     @property
@@ -94,11 +83,6 @@ class Wave(Propagable, ABC):
         """
         pass
 
-    @intensity.setter
-    @abstractmethod
-    def intensity(self, intensity):
-        pass
-
     @property
     @abstractmethod
     def wavelength(self) -> float:
@@ -106,11 +90,6 @@ class Wave(Propagable, ABC):
         Длина волны [м]
         :return:
         """
-        pass
-
-    @wavelength.setter
-    @abstractmethod
-    def wavelength(self, wavelength):
         pass
 
     @property
@@ -122,11 +101,6 @@ class Wave(Propagable, ABC):
         """
         pass
 
-    @focal_len.setter
-    @abstractmethod
-    def focal_len(self, focal_len):
-        pass
-
     # данный метод в дальнейшем нужно изменить на более общий,
     # так как не у всех волн в профиле интенсивности гауссоида
     @property
@@ -136,9 +110,4 @@ class Wave(Propagable, ABC):
         Размер гауссоиды на уровне 1/e^2 в [px]
         :return:
         """
-        pass
-
-    @gaussian_width_param.setter
-    @abstractmethod
-    def gaussian_width_param(self, gaussian_width_param):
         pass
