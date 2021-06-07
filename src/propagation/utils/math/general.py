@@ -3,18 +3,6 @@ from typing import Any, Union, Tuple
 import numpy as np
 
 
-def widest_diameter(array: np.ndarray, threshold: Union[int, float], axis: int = 1) -> int:
-    """
-    Ищет строку/столбец с максимальным количеством элементов, отвечающих условию "array >= threshold",
-    и возвращает количество этих элементов
-    :param array: матрица
-    :param threshold: порог (% в виде десятичной дроби: 10% == 0.1)
-    :param axis: направление суммирования: по строкам строкам == 1, столбцам == 0
-    :return: количество элементов
-    """
-    return np.max(np.sum(array >= array.max() * threshold, axis=axis))
-
-
 # todo после вызова функции я изменил матрицу, которую передавал в array и почему-то объект slice-а изменился!!!
 def get_slice(array: np.ndarray, index: int, step: int = 1, xslice: bool = True) -> Tuple[np.ndarray, np.ndarray]:
     """

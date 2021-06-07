@@ -52,10 +52,10 @@ for focal_len in focal_lens:
             # todo мы теряем U(z=0) и на каждой итерации цикла приходится генерить её заново
 
             # определение апертуры для поиска радиуса волнового фронта
-            aperture = Aperture(radial_area_1, widest_diameter(field.intensity, thresholds[t_num]))
+            aperture = Aperture(radial_area_1, field, z, thresholds[t_num])
 
             # радиус волнового фронта просто для вывода
-            r = field.get_wavefront_radius(aperture=aperture, z=z)
+            r = field.get_wavefront_radius(aperture=aperture)
             ic(z, r)
 
             # построение графиков для снапшотов

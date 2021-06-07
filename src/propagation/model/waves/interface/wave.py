@@ -14,28 +14,26 @@ class Wave(Propagable, ABC):
     """
 
     @abstractmethod
-    def get_wrapped_phase(self, *, aperture: Aperture = None, z: float = None) -> np.ndarray:
+    def get_wrapped_phase(self, aperture: Aperture) -> np.ndarray:
         """
         Возвращает неразвернутую фазу волны
         :param aperture: апертура (circ) для обрезания поля
         :rtype: Aperture
-        :param z: дистанция, на которую распространилась волна из начала координат
         :return: матрица значений фаз
         """
         pass
 
     @abstractmethod
-    def get_unwrapped_phase(self, *, aperture: Aperture = None, z: float = None) -> Tuple[np.ndarray, Aperture]:
+    def get_unwrapped_phase(self, aperture: Aperture) -> np.ndarray:
         """
         Возвращает развернутую фазу волны
         :param aperture: апертура (circ) для обрезания поля
-        :param z: дистанция, на которую распространилась волна из начала координат
         :return: матрица значений фаз
         """
         pass
 
     @abstractmethod
-    def get_wavefront_radius(self, aperture: Aperture, z: float) -> float:
+    def get_wavefront_radius(self, aperture: Aperture) -> float:
         """
         Возвращает радиус волнового фронта, найденный по следующей формуле:
         r = (s / 2) + (l ** 2 / (8 * s))
@@ -45,8 +43,7 @@ class Wave(Propagable, ABC):
         :param z: дистанция, на которую распространилась волна из начала координат
         :return: радиус волнового фронта при заданной обрезающей апертуре
         """
-
-    pass
+        pass
 
     @property
     @abstractmethod
@@ -63,15 +60,15 @@ class Wave(Propagable, ABC):
 
     @property
     @abstractmethod
-    def coordinate_grid(self) -> CartesianGrid:
+    def grid(self) -> CartesianGrid:
         """
         Координатная сетка
         """
         pass
 
-    @coordinate_grid.setter
+    @grid.setter
     @abstractmethod
-    def coordinate_grid(self, area):
+    def grid(self, area):
         pass
 
     @property
