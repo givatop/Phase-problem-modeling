@@ -4,8 +4,17 @@ from src.propagation.model.areas.aperture import Aperture
 from src.propagation.model.areas.grid import CartesianGrid, FrequencyGrid
 from src.propagation.model.areas.grid import PolarGrid
 from src.propagation.model.waves.spherical_wave import SphericalWave
-from src.propagation.presenter.interface.wave_plotter import WavePlotter
-from src.propagation.presenter.saver.saver import Saver
+from src.propagation.presenter_depr.interface.wave_plotter import WavePlotter
+from src.propagation.presenter_depr.saver.saver import Saver
+from src.propagation.presenter.presenter_interface import (
+    save_intensity_plot,
+    save_phase_plot,
+    save_r_z_plot,
+    save_phase_npy,
+    save_intensity_npy,
+    save_r_z_metadata,
+)
+from src.propagation.presenter.saver import create_folder_name, create_filename
 from src.propagation.utils.math import units
 from src.propagation.utils.math.general import *
 
@@ -14,7 +23,7 @@ width, height = 512, 512
 wavelength = units.nm2m(632.8)
 px_size = units.um2m(5.04)
 gaussian_width_params = [250]
-focal_lens = [100]
+focal_lens = [101]
 focal_lens = list(map(units.mm2m, focal_lens))
 
 # вариации порога определения апертуры
@@ -35,13 +44,8 @@ freq_grid = FrequencyGrid(square_area_1)
 for focal_len in focal_lens:
     for gaussian_width_param in gaussian_width_params:
 
-        # конфигурация
-        folder_name = \
-            f'z_{units.m2mm(start)}-{units.m2mm(stop)}-{units.m2mm(step)} ' \
-            f'f_{units.m2mm(focal_len)} ' \
-            f'w_{gaussian_width_param} ' \
-            f'{width}x{height}'
-        saver = Saver(folder_name)
+        field = SphericalWave(square_area_1, focal_len, gaussian_width_param, wavelength)
+        folder_name = create_folder_name(start, stop, step, field)
 
         for z in distances:
             # создание сферической волны
@@ -59,8 +63,27 @@ for focal_len in focal_lens:
             ic(z, r)
 
             # построение графиков для снапшотов
-            WavePlotter.write_r_z(r, z, saver)
-            WavePlotter.save_phase(field, aperture, z, saver, save_npy=True)
-            WavePlotter.save_intensity(field, z, saver, save_npy=True)
+            filename = create_filename(z, extension='png')
+
+            save_intensity_plot(folder_name, filename, field.intensity)
+            save_intensity_npy(folder_name, filename, field.intensity)
+
+            save_phase_plot(
+                folder_name,
+                filename,
+                field.get_wrapped_phase(aperture),
+                field.get_unwrapped_phase(aperture),
+                wavelength,
+                r,
+                z
+            )
+            save_phase_npy(folder_name, filename, field.phase)
+
+            save_r_z_metadata(
+                folder_name=folder_name,
+                filename='R (z)',
+                r=r,
+                z=z
+            )
 
         ic()

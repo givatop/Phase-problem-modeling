@@ -28,12 +28,13 @@ def save_plot(
     else:
         package_name = R_Z_FOLDER_NAME
 
-    if not path.exists(f"./../data/{folder_name}/{package_name}/"):
-        os.makedirs(f"./../data/{folder_name}/{package_name}")
+    if not path.exists(f"./../../data/{folder_name}/{package_name}/"):
+        os.makedirs(f"./../../data/{folder_name}/{package_name}")
 
-    filepath = os.getcwd() + f"/../data/{folder_name}/{package_name}/{filename}"
+    filepath = os.getcwd() + f"/../../data/{folder_name}/{package_name}/{filename}"
 
     plot_figure.savefig(filepath)
+    plt.close(plot_figure)
 
 
 def save_npy(
@@ -44,10 +45,10 @@ def save_npy(
 ):
     package_name = INTENSITY_NPY_FOLDER_NAME if how == 'intensity' else PHASE_NPY_FOLDER_NAME
 
-    if not path.exists(f"./../data/{folder_name}/{package_name}/"):
-        os.makedirs(f"./../data/{folder_name}/{package_name}")
+    if not path.exists(f"./../../data/{folder_name}/{package_name}/"):
+        os.makedirs(f"./../../data/{folder_name}/{package_name}")
 
-    filepath = os.getcwd() + f"/../data/{folder_name}/{package_name}/{filename}"
+    filepath = os.getcwd() + f"/../../data/{folder_name}/{package_name}/{filename}"
 
     np.save(filepath, npy_matrix)
 
@@ -58,10 +59,10 @@ def save_text(
         z: float,
         r: float
 ):
-    if not path.exists(f"./../data/{folder_name}/{TEXT_FOLDER_NAME}/"):
-        os.makedirs(f"./../data/{folder_name}/{TEXT_FOLDER_NAME}")
+    if not path.exists(f"./../../data/{folder_name}/{TEXT_FOLDER_NAME}/"):
+        os.makedirs(f"./../../data/{folder_name}/{TEXT_FOLDER_NAME}")
 
-    filepath = os.getcwd() + f"/../data/{folder_name}/{TEXT_FOLDER_NAME}/{filename}.txt"
+    filepath = os.getcwd() + f"/../../data/{folder_name}/{TEXT_FOLDER_NAME}/{filename}.txt"
 
     text = f'{z:.3f} {r:.3f}'
 

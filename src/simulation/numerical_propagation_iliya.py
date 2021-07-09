@@ -3,8 +3,8 @@ from icecream import ic
 from src.propagation.model.areas.aperture import Aperture
 from src.propagation.model.areas.grid import PolarGrid
 from src.propagation.model.areas.grid import CartesianGrid
-from src.propagation.presenter.interface.wave_plotter import WavePlotter
-from src.propagation.presenter.saver.saver import Saver
+from src.propagation.presenter_depr.interface.wave_plotter import WavePlotter
+from src.propagation.presenter_depr.saver.saver import Saver
 from src.propagation.model.waves.spherical_wave import SphericalWave
 from src.propagation.utils.math import units
 from src.propagation.utils.math.general import *
