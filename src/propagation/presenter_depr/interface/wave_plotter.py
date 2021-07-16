@@ -84,8 +84,8 @@ class WavePlotter:
     def write_r_z(r: float, z: float, saver: Saver):
         """
         Записывает значения R(z) и z в текстовый файл
-        :param r:
-        :param z:
+        :param r: мм
+        :param z: мм
         :param saver:
         """
         # raise NotImplementedError()

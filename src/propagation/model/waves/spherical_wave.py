@@ -60,6 +60,11 @@ class SphericalWave(Wave):
         return unwrap_phase(self._phase * aperture.aperture_view)
 
     def get_wavefront_radius(self, aperture: Aperture) -> float:
+        """
+        Расчитывает радиус кривизны волнового фронта
+        :param aperture:
+        :return: radius, mm
+        """
         # развернутая фаза, обрезанная апертурой
         cut_phase = self.get_unwrapped_phase(aperture=aperture)
 
