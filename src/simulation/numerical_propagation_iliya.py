@@ -3,8 +3,8 @@ from icecream import ic
 from src.propagation.model.areas.aperture import Aperture
 from src.propagation.model.areas.grid import PolarGrid
 from src.propagation.model.areas.grid import CartesianGrid
-from src.propagation.presenter.interface.wave_plotter import WavePlotter
-from src.propagation.presenter.saver.simple_saver import SimpleSaver
+from src.propagation.presenter_depr.interface.wave_plotter import WavePlotter
+from src.propagation.presenter_depr.saver.saver import Saver
 from src.propagation.model.waves.spherical_wave import SphericalWave
 from src.propagation.utils.math import units
 from src.propagation.utils.math.general import *
@@ -41,11 +41,11 @@ for focal_len in focal_lens:
             f'f_{units.m2mm(focal_len)} ' \
             f'w_{gaussian_width_param} ' \
             f'{width}x{height}'
-        saver = SimpleSaver(folder_name)
+        saver = Saver(folder_name)
 
         for z in distances:
             # создание сферической волны
-            field = SphericalWave(square_area_1, focal_len, gaussian_width_param, wavelength, z)
+            field = SphericalWave(square_area_1, focal_len, gaussian_width_param, wavelength)
 
             # распространение волны на дистанцию z
             field.propagate_on_distance(z, method=angular_spectrum_bl_propagation)
@@ -55,7 +55,7 @@ for focal_len in focal_lens:
             aperture = Aperture(radial_area_1, widest_diameter(field.intensity, thresholds[t_num]))
 
             # радиус волнового фронта просто для вывода
-            r = field.get_wavefront_radius(aperture)
+            r = field.get_wavefront_radius(aperture=aperture, z=z)
             ic(z, r)
 
             # построение графиков для снапшотов

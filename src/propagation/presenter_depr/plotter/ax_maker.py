@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from src.propagation.presenter.configuration.configurator import axes_configurator
+from src.propagation.presenter_depr.configuration.configurator import axes_configurator
 from src.propagation.utils.math import units
 from src.propagation.utils.math.general import get_slice
 
@@ -278,7 +278,7 @@ def make_r_z_ax(ax, **kwargs):
         waves = array_wave_array[z]
         apertures = array_aperture_array[z]
         for wave, aperture, k in zip(waves, apertures, z_array):
-            radius_y.append(wave.get_wavefront_radius(aperture))
+            radius_y.append(wave.get_wavefront_radius(aperture=aperture, z=z))
             theory_r_z.append(np.abs(np.array(k) - units.m2mm(wave.focal_len)))
 
         if z == 0:

@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
-from src.propagation.presenter.configuration.configurator import figure_configurator
-from src.propagation.presenter.plotter.ax_maker import make_intensity_x_slice_ax, make_intensity_y_slice_ax, \
+from src.propagation.presenter_depr.configuration.configurator import figure_configurator
+from src.propagation.presenter_depr.plotter.ax_maker import make_intensity_x_slice_ax, make_intensity_y_slice_ax, \
     make_intensity_color_ax, make_wrp_phase_x_slice_ax, make_wrp_phase_y_slice_ax, make_unwrp_phase_x_slice_ax, \
     make_unwrp_phase_y_slice_ax, make_wrp_phase_color_ax, make_unwrp_phase_color_ax, make_r_z_ax
 

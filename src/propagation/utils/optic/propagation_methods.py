@@ -1,31 +1,24 @@
 import numpy as np
-from numpy.fft import fft2, fftshift, ifft2, ifftshift
+from numpy.fft import fft2, ifft2, ifftshift
 
 from src.propagation.model.waves.interface.wave import Wave
 from src.propagation.utils.optic.field import rect_2d
 
 
-def angular_spectrum_propagation(wave: Wave, z: float):
+def angular_spectrum_propagation(wave: Wave, z: float, **kwargs):
     """
     Метод распространения (преобразования) волны методом углового спектра
     :param wave: волна
     :param z: дистанция распространения
     :return:
     """
-
-    height = wave.field.shape[0]  # количество строк матрицы
-    width = wave.field.shape[1]  # количество элеметов в каждой строке матрицы
+    frequency_grid = kwargs.get('frequency_grid')
 
     # волновое число
     wave_number = 2 * np.pi / wave.wavelength
 
-    # создание сетки в частотной области при условии выполнения теоремы Котельникова
-    nu_x = np.arange(-width / 2, width / 2) / (width * wave.coordinate_grid.pixel_size)
-    nu_y = np.arange(-height / 2, height / 2) / (height * wave.coordinate_grid.pixel_size)
-    nu_x_grid, nu_y_grid = np.meshgrid(nu_x, nu_y)
-
-    # сдвиг высоких частот к краям сетки
-    nu_x_grid, nu_y_grid = fftshift(nu_x_grid), fftshift(nu_y_grid)
+    # частотная сетка
+    nu_y_grid, nu_x_grid = frequency_grid.grid.y_grid, frequency_grid.grid.x_grid
 
     # Фурье-образ исходного поля
     field = fft2(wave.field)
@@ -66,16 +59,16 @@ def angular_spectrum_bl_propagation(wave: Wave, z: float):
     new_field[top:bottom, left:right] = wave.field
 
     # Сетка в частотной области
-    nu_x = np.arange(-width / 2, width / 2) / (width * wave.coordinate_grid.pixel_size)
-    nu_y = np.arange(-height / 2, height / 2) / (height * wave.coordinate_grid.pixel_size)
+    nu_x = np.arange(-width / 2, width / 2) / (width * wave.grid.pixel_size)
+    nu_y = np.arange(-height / 2, height / 2) / (height * wave.grid.pixel_size)
     nu_x_grid, nu_y_grid = np.meshgrid(nu_x, nu_y)
     nu_x_grid, nu_y_grid = ifftshift(nu_x_grid), ifftshift(nu_y_grid)
     nu_z_grid = np.sqrt(wave.wavelength ** -2 - nu_x_grid ** 2 - nu_y_grid ** 2)
     nu_z_grid[nu_x_grid ** 2 + nu_y_grid ** 2 > wave.wavelength ** -2] = 0
 
     # Расчет граничных частот U/V_limit
-    dnu_x = 1 / (width * wave.coordinate_grid.pixel_size)
-    dnu_y = 1 / (height * wave.coordinate_grid.pixel_size)
+    dnu_x = 1 / (width * wave.grid.pixel_size)
+    dnu_y = 1 / (height * wave.grid.pixel_size)
     nu_x_limit = 1 / (np.sqrt((2 * dnu_x * z) ** 2 + 1) * wave.wavelength)
     nu_y_limit = 1 / (np.sqrt((2 * dnu_y * z) ** 2 + 1) * wave.wavelength)
 

@@ -1,11 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from src.propagation.presenter.plotter.figure_maker import make_r_z_plot, make_phase_plot, make_intensity_plot
 from src.propagation.model.areas.aperture import Aperture
-from src.propagation.presenter.saver.simple_saver import SimpleSaver
-from src.propagation.presenter.saver.saver import Saver
 from src.propagation.model.waves.interface.wave import Wave
+from src.propagation.presenter_depr.plotter.figure_maker import make_r_z_plot, make_phase_plot, make_intensity_plot
+from src.propagation.presenter_depr.saver.saver import Saver
 from src.propagation.utils.math import units
 
 
@@ -22,15 +21,15 @@ class WavePlotter:
         """
         k = 2 * np.pi / wave.wavelength
 
-        unwrapped_phase_lbl = f'[{np.min(wave.get_unwrapped_phase(aperture)[0]):.2f}, ' \
-                              f'{np.max(wave.get_unwrapped_phase(aperture)[0]):.2f}] rad; ' \
-                              f'[{np.min(wave.get_unwrapped_phase(aperture)[0]) * 1e+6 / k:.1f}, ' \
-                              f'{np.max(wave.get_unwrapped_phase(aperture)[0]) * 1e+6 / k:.1f}] um'
+        unwrapped_phase_lbl = f'[{np.min(wave.get_unwrapped_phase(aperture=aperture)[0]):.2f}, ' \
+                              f'{np.max(wave.get_unwrapped_phase(aperture=aperture)[0]):.2f}] rad; ' \
+                              f'[{np.min(wave.get_unwrapped_phase(aperture=aperture)[0]) * 1e+6 / k:.1f}, ' \
+                              f'{np.max(wave.get_unwrapped_phase(aperture=aperture)[0]) * 1e+6 / k:.1f}] um'
 
-        wrapped_phase_lbl = f'z: {units.m2mm(z):.1f} mm; R: {wave.get_wavefront_radius(aperture):.3f} mm'
+        wrapped_phase_lbl = f'z: {units.m2mm(z):.1f} mm; R: {wave.get_wavefront_radius(aperture=aperture):.3f} mm'
 
-        fig = make_phase_plot(wrp_phase=wave.get_wrapped_phase(aperture),
-                              unwrp_phase=wave.get_unwrapped_phase(aperture)[0],
+        fig = make_phase_plot(wrp_phase=wave.get_wrapped_phase(aperture=aperture),
+                              unwrp_phase=wave.get_unwrapped_phase(aperture=aperture),
                               geometry_center=True,
                               linewidth=1,
                               unwrapped_ylims=(-100, 100),
@@ -62,7 +61,7 @@ class WavePlotter:
             saver.save_image(wave.intensity, 'intensity npy', filename)
 
     @staticmethod
-    def save_r_z(array_wave_array, array_aperture_array, z_array, matrixes, step, saver: SimpleSaver):
+    def save_r_z(array_wave_array, array_aperture_array, z_array, matrixes, step, saver: Saver):
         """
         Сохраняет график для интенсивности
         :return:
@@ -82,7 +81,7 @@ class WavePlotter:
         plt.close(fig)
 
     @staticmethod
-    def write_r_z(r: float, z: float, saver: SimpleSaver):
+    def write_r_z(r: float, z: float, saver: Saver):
         """
         Записывает значения R(z) и z в текстовый файл
         :param r:

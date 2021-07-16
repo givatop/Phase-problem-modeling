@@ -51,7 +51,7 @@ class FFTSolver(TIESolver):
         :return:
         """
         area = CoordinateGrid(*self.ref_intensity.shape, self.pixel_size)
-        nu_y_grid, nu_x_grid = area.frequency_grid
+        nu_y_grid, nu_x_grid = area.grid
 
         kx = 1j * 2 * np.pi * fftshift(nu_x_grid)
         ky = 1j * 2 * np.pi * fftshift(nu_y_grid)

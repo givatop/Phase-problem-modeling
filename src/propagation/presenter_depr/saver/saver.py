@@ -5,16 +5,13 @@ from os import path
 from typing import Union, Dict
 from matplotlib.figure import Figure
 
-from src.propagation.presenter.saver.saver import Saver
 from src.propagation.utils.math import units
 
 
-class SimpleSaver(Saver):
-    """
-    Сохранение файлов в MacBook Матвей
-    """
+class Saver:
+    """ Сохранение файлов """
     def __init__(self, folder_name: str):
-        super().__init__(folder_name)
+        self.folder_name = folder_name
 
     def save_image(self, image: Union[Figure, np.ndarray], package_name: str, filename: str):
 

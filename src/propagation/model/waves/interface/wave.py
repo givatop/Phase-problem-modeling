@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 import numpy as np
 
 from ...areas.aperture import Aperture
@@ -12,7 +13,7 @@ class Wave(Propagable, ABC):
     """
 
     @abstractmethod
-    def get_wrapped_phase(self, aperture=None) -> np.ndarray:
+    def get_wrapped_phase(self, aperture: Aperture) -> np.ndarray:
         """
         Возвращает неразвернутую фазу волны
         :param aperture: апертура (circ) для обрезания поля
@@ -22,11 +23,10 @@ class Wave(Propagable, ABC):
         pass
 
     @abstractmethod
-    def get_unwrapped_phase(self, aperture=None) -> np.ndarray:
+    def get_unwrapped_phase(self, aperture: Aperture) -> np.ndarray:
         """
         Возвращает развернутую фазу волны
         :param aperture: апертура (circ) для обрезания поля
-        :rtype: Aperture
         :return: матрица значений фаз
         """
         pass
@@ -39,11 +39,10 @@ class Wave(Propagable, ABC):
         s - стрелка прогиба
         l - хорда, являющаяся диаметром апертуры
         :param aperture: апертура (circ) для обрезания поля
-        :rtype: Aperture
+        :param z: дистанция, на которую распространилась волна из начала координат
         :return: радиус волнового фронта при заданной обрезающей апертуре
         """
-
-    pass
+        pass
 
     @property
     @abstractmethod
@@ -60,15 +59,10 @@ class Wave(Propagable, ABC):
 
     @property
     @abstractmethod
-    def coordinate_grid(self) -> CartesianGrid:
+    def grid(self) -> CartesianGrid:
         """
         Координатная сетка
         """
-        pass
-
-    @coordinate_grid.setter
-    @abstractmethod
-    def coordinate_grid(self, area):
         pass
 
     @property
@@ -80,11 +74,6 @@ class Wave(Propagable, ABC):
         """
         pass
 
-    @phase.setter
-    @abstractmethod
-    def phase(self, phase):
-        pass
-
     @property
     @abstractmethod
     def intensity(self) -> np.ndarray:
@@ -92,11 +81,6 @@ class Wave(Propagable, ABC):
         Распределение интенсивности поля волны
         :return:
         """
-        pass
-
-    @intensity.setter
-    @abstractmethod
-    def intensity(self, intensity):
         pass
 
     @property
@@ -108,11 +92,6 @@ class Wave(Propagable, ABC):
         """
         pass
 
-    @wavelength.setter
-    @abstractmethod
-    def wavelength(self, wavelength):
-        pass
-
     @property
     @abstractmethod
     def focal_len(self) -> float:
@@ -122,11 +101,6 @@ class Wave(Propagable, ABC):
         """
         pass
 
-    @focal_len.setter
-    @abstractmethod
-    def focal_len(self, focal_len):
-        pass
-
     # данный метод в дальнейшем нужно изменить на более общий,
     # так как не у всех волн в профиле интенсивности гауссоида
     @property
@@ -134,20 +108,6 @@ class Wave(Propagable, ABC):
     def gaussian_width_param(self) -> float:
         """
         Размер гауссоиды на уровне 1/e^2 в [px]
-        :return:
-        """
-        pass
-
-    @gaussian_width_param.setter
-    @abstractmethod
-    def gaussian_width_param(self, gaussian_width_param):
-        pass
-
-    @property
-    @abstractmethod
-    def distance(self) -> float:
-        """
-        Расстояние распространения волны
         :return:
         """
         pass
