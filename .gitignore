@@ -6,6 +6,7 @@ results*/
 lens_propagation */
 *.bat
 data/
+check.py
 
 
 # Byte-compiled / optimized / DLL files
