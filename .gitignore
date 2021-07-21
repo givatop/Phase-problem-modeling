@@ -1,12 +1,8 @@
 # Custom settings
 .idea/
-images/
-output*/
-results*/
-lens_propagation */
-*.bat
 data/
 check.py
+check/
 
 
 # Byte-compiled / optimized / DLL files
