@@ -42,7 +42,7 @@ class WavePlotter:
 
         if save_npy:
             filename = saver.create_filename(z, extension='npy')
-            saver.save_image(wave.intensity, 'phase npy', filename)
+            saver.save_image(wave.get_unwrapped_phase(aperture=aperture), 'phase npy', filename)
 
     @staticmethod
     def save_intensity(wave: Wave, z: float, saver: Saver, save_npy: bool = False):
