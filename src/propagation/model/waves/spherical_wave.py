@@ -1,5 +1,4 @@
 import numpy as np
-from skimage.restoration import unwrap_phase
 
 from ..areas.grid import CartesianGrid
 from ...model.areas.aperture import Aperture
@@ -28,42 +27,32 @@ class SphericalWave(Wave):
         :param wavelength: длина волны [м]
         """
 
-        self._grid = grid
         self._focal_len = focal_len
         self._gaussian_width_param = gaussian_width_param
-        self._wavelength = wavelength
 
         # задание распределения интенсивности волны
-        y_grid, x_grid = self._grid.grid
+        y_grid, x_grid = grid.grid
         gaussian_width_param = px2m(gaussian_width_param, px_size_m=grid.pixel_size)
-        self._intensity = gauss_2d(x_grid, y_grid,
-                                   wx=gaussian_width_param / 4,
-                                   wy=gaussian_width_param / 4)
+        intensity = gauss_2d(x_grid, y_grid,
+                             wx=gaussian_width_param / 4,
+                             wy=gaussian_width_param / 4)
 
         # волновой вектор
-        k = 2 * np.pi / self._wavelength
+        k = 2 * np.pi / wavelength
         # задание распределения комлексной амплитуды поля
         radius_vector = np.sqrt(x_grid ** 2 + y_grid ** 2 + focal_len ** 2)
-        self._field = np.sqrt(self._intensity) * np.exp(-1j * k * radius_vector)
+        field = np.sqrt(intensity) * np.exp(-1j * k * radius_vector)
 
-        # задание распределения фазы волны
-        self._phase = np.angle(self._field)
-
-    def get_wrapped_phase(self, aperture: Aperture) -> np.ndarray:
-        if aperture is None:
-            return self._phase
-        return self._phase * aperture.aperture_view
-
-    def get_unwrapped_phase(self, aperture: Aperture) -> np.ndarray:
-        if aperture is None:
-            return unwrap_phase(self._phase)
-        return unwrap_phase(self._phase * aperture.aperture_view)
+        super().__init__(field, grid, wavelength)
 
     def get_wavefront_radius(self, aperture: Aperture) -> float:
         """
-        Расчитывает радиус кривизны волнового фронта
-        :param aperture:
-        :return: radius, mm
+        Возвращает радиус волнового фронта, найденный по следующей формуле:
+        r = (s / 2) + (l ** 2 / (8 * s))
+        s - стрелка прогиба
+        l - хорда, являющаяся диаметром апертуры
+        :param aperture: апертура (circ) для обрезания поля
+        :return: радиус волнового фронта при заданной обрезающей апертуре
         """
         # развернутая фаза, обрезанная апертурой
         cut_phase = self.get_unwrapped_phase(aperture=aperture)
@@ -82,35 +71,17 @@ class SphericalWave(Wave):
         method(self, z, **kwargs)
 
     @property
-    def field(self) -> np.ndarray:
-        return self._field
-
-    @field.setter
-    def field(self, field):
-        self._field = field
-        self._phase = np.angle(field)
-        self._intensity = np.abs(field) ** 2
-
-    @property
-    def grid(self) -> CartesianGrid:
-        return self._grid
-
-    @property
-    def phase(self) -> np.ndarray:
-        return self._phase
-
-    @property
-    def intensity(self) -> np.ndarray:
-        return self._intensity
-
-    @property
-    def wavelength(self) -> float:
-        return self._wavelength
-
-    @property
     def focal_len(self) -> float:
+        """
+        Фокусное расстояние [м]
+        :return:
+        """
         return self._focal_len
 
     @property
     def gaussian_width_param(self) -> float:
+        """
+        Размер гауссоиды на уровне 1/e^2 в [px]
+        :return:
+        """
         return self._gaussian_width_param

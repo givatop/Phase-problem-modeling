@@ -1,6 +1,8 @@
-from abc import ABC, abstractmethod
+from abc import ABC
+from typing import Union, Tuple
 
 import numpy as np
+from skimage.restoration import unwrap_phase
 
 from ...areas.aperture import Aperture
 from ...areas.grid import CartesianGrid
@@ -11,8 +13,16 @@ class Wave(Propagable, ABC):
     """
     Интерфейс волны
     """
+    def __init__(self, field: Union[np.ndarray, Tuple[np.ndarray, np.ndarray]], grid: CartesianGrid, wavelength: float):
+        self._grid = grid
+        self._wavelength = wavelength
 
-    @abstractmethod
+        if isinstance(field, np.ndarray):
+            self._field = field
+        elif len(field) == 2:
+            self._intensity, self._phase = field
+            self._field = np.sqrt(self._intensity) * np.exp(-1j * self._phase)
+
     def get_wrapped_phase(self, aperture: Aperture) -> np.ndarray:
         """
         Возвращает неразвернутую фазу волны
@@ -20,94 +30,42 @@ class Wave(Propagable, ABC):
         :rtype: Aperture
         :return: матрица значений фаз
         """
-        pass
+        if aperture is None:
+            return self._phase
+        return self._phase * aperture.aperture_view
 
-    @abstractmethod
     def get_unwrapped_phase(self, aperture: Aperture) -> np.ndarray:
         """
         Возвращает развернутую фазу волны
         :param aperture: апертура (circ) для обрезания поля
         :return: матрица значений фаз
         """
-        pass
-
-    @abstractmethod
-    def get_wavefront_radius(self, aperture: Aperture) -> float:
-        """
-        Возвращает радиус волнового фронта, найденный по следующей формуле:
-        r = (s / 2) + (l ** 2 / (8 * s))
-        s - стрелка прогиба
-        l - хорда, являющаяся диаметром апертуры
-        :param aperture: апертура (circ) для обрезания поля
-        :param z: дистанция, на которую распространилась волна из начала координат
-        :return: радиус волнового фронта при заданной обрезающей апертуре
-        """
-        pass
+        if aperture is None:
+            return unwrap_phase(self._phase)
+        return unwrap_phase(self._phase * aperture.aperture_view)
 
     @property
-    @abstractmethod
     def field(self) -> np.ndarray:
-        """
-        Распределение поля волны на координатной сетке в комплексной форме
-        """
-        pass
+        return self._field
 
     @field.setter
-    @abstractmethod
     def field(self, field):
-        pass
+        self._field = field
+        self._phase = np.angle(field)
+        self._intensity = np.abs(field) ** 2
 
     @property
-    @abstractmethod
-    def grid(self) -> CartesianGrid:
-        """
-        Координатная сетка
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def phase(self) -> np.ndarray:
-        """
-        Распределение фазы поля волны
-        :return:
-        """
-        pass
-
-    @property
-    @abstractmethod
     def intensity(self) -> np.ndarray:
-        """
-        Распределение интенсивности поля волны
-        :return:
-        """
-        pass
+        return self._intensity
 
     @property
-    @abstractmethod
+    def phase(self) -> np.ndarray:
+        return self._phase
+
+    @property
+    def grid(self) -> CartesianGrid:
+        return self._grid
+
+    @property
     def wavelength(self) -> float:
-        """
-        Длина волны [м]
-        :return:
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def focal_len(self) -> float:
-        """
-        Фокусное расстояние [м]
-        :return:
-        """
-        pass
-
-    # данный метод в дальнейшем нужно изменить на более общий,
-    # так как не у всех волн в профиле интенсивности гауссоида
-    @property
-    @abstractmethod
-    def gaussian_width_param(self) -> float:
-        """
-        Размер гауссоиды на уровне 1/e^2 в [px]
-        :return:
-        """
-        pass
+        return self._wavelength
