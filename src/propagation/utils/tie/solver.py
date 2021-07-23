@@ -12,7 +12,7 @@ class TIESolver(ABC):
     Абстрактный класс для решения TIE
     """
 
-    def __init__(self, paths: List[str], dz: float, wavelength: Union[float, None], bc: BoundaryConditions):
+    def __init__(self, paths: Union[List[str], List[np.ndarray]], dz: float, wavelength: Union[float, None], bc: BoundaryConditions):
         """
         :param paths: список с путям к файлам интенсивностей
         :param dz: шаг, м
@@ -23,7 +23,10 @@ class TIESolver(ABC):
         if len(paths) > 2:
             raise NotImplementedError(f'Expect 2 intensities, instead got {len(paths)}')
 
-        self.__intensities = load_files(paths)
+        if isinstance(paths[0], str):
+            self.__intensities = load_files(paths)
+        elif isinstance(paths[0], np.ndarray):
+            self.__intensities = paths
         self.__intensities = [apply_volkov_scheme(i, bc) for i in self.__intensities]
 
         self.__dz = dz
