@@ -1,7 +1,7 @@
 # Custom settings
 .idea/
 data/
-check.py
+check*.py
 check/
 
 
