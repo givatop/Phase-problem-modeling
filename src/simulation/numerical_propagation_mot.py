@@ -4,12 +4,9 @@ from src.propagation.model.areas.aperture import Aperture
 from src.propagation.model.areas.grid import CartesianGrid, FrequencyGrid
 from src.propagation.model.areas.grid import PolarGrid
 from src.propagation.model.waves.spherical_wave import SphericalWave
-from src.propagation.presenter_depr.interface.wave_plotter import WavePlotter
-from src.propagation.presenter_depr.saver.saver import Saver
 from src.propagation.presenter.presenter_interface import (
     save_intensity_plot,
     save_phase_plot,
-    save_r_z_plot,
     save_phase_npy,
     save_intensity_npy,
     save_r_z_metadata,
@@ -23,7 +20,7 @@ width, height = 512, 512
 wavelength = units.nm2m(632.8)
 px_size = units.um2m(5.04)
 gaussian_width_params = [250]
-focal_lens = [101]
+focal_lens = [100]
 focal_lens = list(map(units.mm2m, focal_lens))
 
 # вариации порога определения апертуры
@@ -33,7 +30,7 @@ t_num = 0
 # параметры для итерации при рапространении волны
 start = units.mm2m(0)
 stop = units.mm2m(200)
-step = units.mm2m(25)
+step = units.mm2m(1)
 distances = np.arange(start, stop + step, step)
 
 # матрица в квадратичных координатах
@@ -65,8 +62,11 @@ for focal_len in focal_lens:
             # построение графиков для снапшотов
             filename = create_filename(z, extension='png')
 
-            save_intensity_plot(folder_name, filename, field.intensity)
-            save_intensity_npy(folder_name, filename, field.intensity)
+            save_intensity_plot(
+                folder_name,
+                filename,
+                field.intensity
+            )
 
             save_phase_plot(
                 folder_name,
@@ -77,7 +77,10 @@ for focal_len in focal_lens:
                 r,
                 z
             )
+
+            filename = create_filename(z, extension='npy')
             save_phase_npy(folder_name, filename, field.phase)
+            save_intensity_npy(folder_name, filename, field.intensity)
 
             save_r_z_metadata(
                 folder_name=folder_name,
