@@ -1,4 +1,62 @@
+import math
 import numpy as np
+
+
+def central_finite_difference(planes: tuple, h: float = 1., deriv: int = 1):
+    """
+    Central finite difference
+    https://en.wikipedia.org/wiki/Finite_difference_coefficient#cite_note-fornberg-1
+    https://github.com/maroba/findiff/tree/20194621fc2d54a10057cd6c3a9888eee67ab1f6
+    """
+    # todo: нужно убрать центральный нулевой коэффициент, иначе не будет работать
+    coefs = coefficients(deriv, len(planes))
+    return np.sum(coefs * planes / h)
+
+
+def coefficients(deriv, acc):
+    """
+    Функция определения конечно-разностных коэффициентов
+    для произвольного порядка производной и количества плоскостей расчёта
+    """
+
+    # Определение сетки для коэффициентов
+    num_central = 2 * math.floor((deriv + 1) / 2) - 1 + acc
+    num_side = num_central // 2
+    offsets = list(range(-num_side, num_side + 1))
+
+    # Определение коэффициентов
+    center = _calc_coefs(deriv, offsets)
+    return center
+
+
+def _build_rhs(offsets, deriv):
+    """Построение правой матрицы для линейной системы уравнений"""
+    b = [0 for _ in offsets]
+    b[deriv] = math.factorial(deriv)
+
+    return np.array(b, dtype='float')
+
+
+def _build_matrix(offsets):
+    """Построение матрицы линейной системы уравнений для определения конечно-разностных коэффициентов"""
+    a = [([1 for _ in offsets])]
+    for i in range(1, len(offsets)):
+        a.append([j ** i for j in offsets])
+
+    return np.array(a, dtype='float')
+
+
+def _calc_coefs(deriv, offsets):
+    """Решение системы линейных уравнений для определения конечно-разностных коэффициентов"""
+
+    # Определение матриц - системы линейных уравнений
+    matrix = _build_matrix(offsets)
+    rhs = _build_rhs(offsets, deriv)
+
+    # Решение системы линейных уравнений
+    coefs = np.linalg.solve(matrix, rhs)
+
+    return coefs
 
 
 def central_4point(p_minus2, p_minus1, p_plus1, p_plus2, h: float = 1.):
@@ -46,4 +104,3 @@ def backward_2point(p_minus, p, h):
         return (p - p_minus) / h
     else:
         raise NotImplementedError("Implemented only for ndarrays")
-

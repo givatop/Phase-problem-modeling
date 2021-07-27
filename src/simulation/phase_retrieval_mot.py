@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import matplotlib.pyplot as plt
 
 from icecream import ic
 from src.propagation.utils.math import units
@@ -51,5 +52,7 @@ for focal_len in focal_lens:
 
                 solver = FFTSolver(paths, dz, wavelength, px_size, bc)
                 unwrapped_phase = solver.solve(threshold)
+                plt.imshow(unwrapped_phase)
+                plt.show()
                 pass
 
