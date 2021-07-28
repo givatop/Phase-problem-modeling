@@ -8,8 +8,10 @@ def central_finite_difference(planes: tuple, h: float = 1., deriv: int = 1):
     https://en.wikipedia.org/wiki/Finite_difference_coefficient#cite_note-fornberg-1
     https://github.com/maroba/findiff/tree/20194621fc2d54a10057cd6c3a9888eee67ab1f6
     """
-    # todo: нужно убрать центральный нулевой коэффициент, иначе не будет работать
     coefs = coefficients(deriv, len(planes))
+
+    # Удаление коэффициента, соответствующего нулевому члену
+    coefs = np.delete(coefs, len(coefs)//2)
     return np.sum(coefs * planes / h)
 
 
@@ -26,6 +28,7 @@ def coefficients(deriv, acc):
 
     # Определение коэффициентов
     center = _calc_coefs(deriv, offsets)
+
     return center
 
 
