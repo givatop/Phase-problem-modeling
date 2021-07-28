@@ -1,3 +1,4 @@
+from typing import Union
 import numpy as np
 
 
@@ -119,21 +120,57 @@ def logistic_1d(x, a=1., w=1., x0=0.):
     return res
 
 
+def sin_1d(
+        x: np.ndarray,
+        a: Union[float, int] = 1.,
+        x0: Union[float, int] = 0.,
+        y0: Union[float, int] = 0.,
+        T: Union[float, int] = 2 * np.pi,
+        **kwargs
+) -> np.ndarray:
+    """
+    1-мерная синусоида
+    :param x: координатная сетка
+    :param a: амплитуда
+    :param x0: смещение по оси X
+    :param y0: смещение по оси Y
+    :param T: период
+    :param clip: вырезать от left до rigth (default один период)
+    :param left: default 0
+    :param right: default T (вырезать полпериода right = T/2)
+    :return:
+    """
+    result = a * np.sin( (x - x0) / (T / (2 * np.pi)) )
+
+    clip = kwargs.get('clip', False)
+    if clip:
+        # get boundaries
+        left = kwargs.get('left', 0)
+        right = kwargs.get('right', T)
+        # create masks
+        left_mask = x - x0 > left
+        right_mask = x - x0 < right
+        # multiply masks
+        result *= left_mask * right_mask
+
+    return result + y0
+
+
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    MODE = 2  # 1D | 2D
+    MODE = 1  # 1D | 2D
     SHIFT_GRID = 0  # =1 то независимо от значений (x0; y0) центр функции будет в (0, 0)
 
     # Параметры исходной функции
-    a = 5
-    x0 = 0.
-    y0 = 0.
+    a = 1
+    x0 = -1.5
+    y0 = a
     wx = 1.
     wy = 1.
 
     # Параметры сеток
-    xleft = -2
+    xleft = -np.pi * 2
     xright = -xleft
     xnum = 1000
     dx = 1 / xnum
@@ -151,38 +188,16 @@ if __name__ == '__main__':
         # x = np.linspace(xleft, xright, xnum, endpoint=False)
         x = np.arange(xleft, xright, dx)
         # f = lambda _x: triangle_1d(_x, a=a, x0=x0, w=wx) - a
-        f = lambda _x: gauss_1d(_x, a=a, x0=x0, w=wx)
-        y = f(x)
-
-        from scipy.misc import derivative
-        # dydx3 = derivative(f, x, dx=dx, order=3)
-        # dydx5 = derivative(f, x, dx=dx, order=5)
-        # dydx7 = derivative(f, x, dx=dx, order=7)
-
-        from numpy import gradient
-
-        grad = gradient(y, x)
-
-        from numpy.fft import fft, ifft, ifftshift, fftshift, fftfreq
-
-        N = int((np.abs(xleft) + np.abs(xright)) / dx)
-        if N != x.size:
-            raise ValueError("N != x.size")
-        nu = fftfreq(N, dx)
-        kx = 1j * 2 * np.pi * nu
-        grad_fft = ifft(kx * fft(y)).real
+        # y = f(x)
+        T = 1
+        y = sin_1d(x, a=a, x0=x0, y0=y0, T=T, clip=True, right=T*3)
 
         if SHIFT_GRID:
             x -= x0
         ax.plot(x, y, label='y=f(x)')
-        # ax.plot(x, dydx3, '-*', label='y=f\'(x) order=3 scipy')
-        # ax.plot(x, dydx5, '-*', label='y=f\'(x) order=5 scipy')
-        # ax.plot(x, dydx7, '-*', label='y=f\'(x) order=7 scipy')
-        ax.plot(x, grad, '-', label='y=f\'(x) numpy')
-        ax.plot(x, grad_fft, '-', label='y=f\'(x) fft')
         ax.legend()
         ax.grid()
-        # ax.text(xleft, a-.65, f"A = {a}\nx0 = {x0}\nw = {wx}")
+
     # 2-мерный график
     if MODE == 2:
         ax = plt.axes(projection='3d')
