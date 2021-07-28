@@ -1,11 +1,84 @@
 import numpy as np
 
-from typing import Tuple
+from typing import Tuple, Optional, List
 from numpy.fft import fftshift
-from src.propagation.utils.tie.solver import TIESolver
+from abc import ABC, abstractmethod
+
+from src.propagation.utils.tie.boundary_conditions import BoundaryConditions, apply_volkov_scheme
+from src.propagation.utils.math.derivative.finite_difference import central_2point, central_finite_difference
 from src.propagation.utils.tie.boundary_conditions import BoundaryConditions, clip
 from src.propagation.model.areas.grid import CartesianGrid
 from src.propagation.utils.math.derivative.fourier import gradient_2d, ilaplacian_2d
+
+
+class TIESolver(ABC):
+    """
+    Абстрактный класс для решения TIE
+    """
+
+    def __init__(self, intensities: List[np.ndarray], dz: float, wavelength: Optional[float], bc: BoundaryConditions):
+        """
+        :param intensities: интенсивности
+        :param dz: шаг, м
+        :param wavelength: длина волны когерентного излучения, м (None для частично-когерентного случая)
+        :param bc: граничные условия
+        """
+
+        if len(intensities) > 2:
+            raise NotImplementedError(f'Expect 2 intensities, instead got {len(intensities)}')
+
+        self._boundary_condition = bc
+        self._intensities = tuple(apply_volkov_scheme(i, bc) for i in intensities)
+        self._dz = dz
+        self._wavelength = wavelength
+        self._axial_derivative = central_2point(*self._intensities, dz)
+
+    @abstractmethod
+    def solve(self, threshold) -> np.ndarray:
+        """
+        :param threshold:
+        :return: unwrapped phase
+        """
+        pass
+
+    def add_threshold(self, threshold: float):
+        """
+        Пороговая обработка
+        :param threshold:
+        :return: Бинарная маска
+        """
+        if threshold == 0. or 0.0 in self.ref_intensity:
+            raise ValueError(f'Нельзя делить на нулевые значения в интенсивности.')
+
+        mask = self.ref_intensity < threshold
+
+        # intensity = self.ref_intensity.copy()  # todo этот менто изменяет опорную интенсивность!!!
+        self.ref_intensity[mask] = threshold
+        return mask
+
+    @property
+    def intensities(self):
+        return self._intensities
+
+    @property
+    def ref_intensity(self):
+        return self._intensities[0]
+
+    @property
+    def dz(self):
+        return self._dz
+
+    @property
+    def wavelength(self):
+        return self._wavelength
+
+    @property
+    def axial_derivative(self):
+        return self._axial_derivative
+
+    @property
+    def boundary_condition(self):
+        return self._boundary_condition
 
 
 class FFTSolver(TIESolver):
@@ -14,19 +87,19 @@ class FFTSolver(TIESolver):
     D. Paganin and K. A. Nugent, Phys. Rev. Lett. 80, 2586 (1998).
     """
 
-    def __init__(self, paths, dz, wavelength, pixel_size, bc=BoundaryConditions.NONE):
-        super().__init__(paths, dz, wavelength, bc)
-        self.__pixel_size = pixel_size
-        self.__kx, self.__ky = self.get_frequency_coefs()
-        # todo метод solve находится вне конструктура чтобы можно было заменить paths без удаления объекта
+    def __init__(self, intensities, dz, wavelength, pixel_size, bc=BoundaryConditions.NONE):
+        super().__init__(intensities, dz, wavelength, bc)
+        self._pixel_size = pixel_size
+        self._kx, self._ky = self._get_frequency_coefs()
+        # todo метод solve находится вне конструктура чтобы можно было заменить intensities без удаления объекта
 
     def solve(self, threshold) -> np.ndarray:
-        wave_number = 2 * np.pi / self.wavelenth
+        wave_number = 2 * np.pi / self.wavelength
         eps = 2.2204e-16  # from MatLab 2.2204e-16
         reg_param = eps / self.pixel_size ** 4
 
         # Умножение на волновое число
-        phase = -wave_number * self.axial_derivative
+        phase = - wave_number * self.axial_derivative
 
         # Первые Лапласиан и градиент
         phase = ilaplacian_2d(phase, self.kx, self.ky, reg_param, return_spacedomain=False)
@@ -45,7 +118,7 @@ class FFTSolver(TIESolver):
         phase = clip(phase, self.boundary_condition)
         return phase
 
-    def get_frequency_coefs(self) -> Tuple[np.ndarray, np.ndarray]:
+    def _get_frequency_coefs(self) -> Tuple[np.ndarray, np.ndarray]:
         """
         Расчет частотных коэффициентов
         :return:
@@ -60,12 +133,12 @@ class FFTSolver(TIESolver):
 
     @property
     def pixel_size(self):
-        return self.__pixel_size
+        return self._pixel_size
 
     @property
     def kx(self):
-        return self.__kx
+        return self._kx
 
     @property
     def ky(self):
-        return self.__ky
+        return self._ky

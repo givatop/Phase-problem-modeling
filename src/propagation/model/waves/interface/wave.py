@@ -69,3 +69,4 @@ class Wave(Propagable, ABC):
     @property
     def wavelength(self) -> float:
         return self._wavelength
+

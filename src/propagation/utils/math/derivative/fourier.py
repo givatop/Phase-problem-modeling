@@ -5,7 +5,7 @@ from numpy import ndarray, real
 Первоисточник: D. Paganin "Coherent X-Ray Imaging" p.299-300 2006
 """
 
-norm = None
+NORM = None
 
 
 def gradient_2d(f_x: ndarray,
@@ -23,10 +23,10 @@ def gradient_2d(f_x: ndarray,
     :return: array-like градиент от функции f
     """
     if space_domain:
-        f_x = fft2(f_x, norm=norm)
-        f_y = fft2(f_y, norm=norm)
+        f_x = fft2(f_x, norm=NORM)
+        f_y = fft2(f_y, norm=NORM)
 
-    return real(ifft2(f_x * kx, norm=norm)), real(ifft2(f_y * ky, norm=norm))
+    return real(ifft2(f_x * kx, norm=NORM)), real(ifft2(f_y * ky, norm=NORM))
 
 
 def ilaplacian_2d(f: ndarray,
@@ -43,10 +43,10 @@ def ilaplacian_2d(f: ndarray,
     :param return_spacedomain:
     :return: array-like градиент от функции f
     """
-    res = fft2(f, norm=norm) * (kx**2 + ky**2) / (reg_param + (kx**2 + ky**2)**2)
+    res = fft2(f, norm=NORM) * (kx ** 2 + ky ** 2) / (reg_param + (kx ** 2 + ky ** 2) ** 2)
 
     if return_spacedomain:
-        res = real(ifft2(res, norm=norm))
+        res = real(ifft2(res, norm=NORM))
 
     return res
 
