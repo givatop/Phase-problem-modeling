@@ -1,13 +1,11 @@
 import numpy as np
 
-from typing import Tuple
+from typing import Tuple, Optional, List
 from numpy.fft import fftshift
 from abc import ABC, abstractmethod
-from typing import List, Union
 
-from src.propagation.presenter.loader import load_files
 from src.propagation.utils.tie.boundary_conditions import BoundaryConditions, apply_volkov_scheme
-from src.propagation.utils.math.derivative.finite_difference import central_2point
+from src.propagation.utils.math.derivative.finite_difference import central_2point, central_finite_difference
 from src.propagation.utils.tie.boundary_conditions import BoundaryConditions, clip
 from src.propagation.model.areas.grid import CartesianGrid
 from src.propagation.utils.math.derivative.fourier import gradient_2d, ilaplacian_2d
@@ -18,27 +16,21 @@ class TIESolver(ABC):
     Абстрактный класс для решения TIE
     """
 
-    def __init__(self, paths: Union[List[str], List[np.ndarray]], dz: float, wavelength: Union[float, None], bc: BoundaryConditions):
+    def __init__(self, intensities: List[np.ndarray], dz: float, wavelength: Optional[float], bc: BoundaryConditions):
         """
-        :param paths: список с путям к файлам интенсивностей
+        :param intensities: интенсивности
         :param dz: шаг, м
         :param wavelength: длина волны когерентного излучения, м (None для частично-когерентного случая)
         :param bc: граничные условия
         """
 
-        if len(paths) > 2:
-            raise NotImplementedError(f'Expect 2 intensities, instead got {len(paths)}')
+        if len(intensities) > 2:
+            raise NotImplementedError(f'Expect 2 intensities, instead got {len(intensities)}')
 
-        if isinstance(paths[0], str):
-            self._intensities = load_files(paths)
-        elif isinstance(paths[0], np.ndarray):
-            self._intensities = paths
-        self._intensities = [apply_volkov_scheme(i, bc) for i in self._intensities]
-
+        self._boundary_condition = bc
+        self._intensities = tuple(apply_volkov_scheme(i, bc) for i in intensities)
         self._dz = dz
         self._wavelength = wavelength
-        self._boundary_condition = bc
-
         self._axial_derivative = central_2point(*self._intensities, dz)
 
     @abstractmethod
@@ -95,11 +87,11 @@ class FFTSolver(TIESolver):
     D. Paganin and K. A. Nugent, Phys. Rev. Lett. 80, 2586 (1998).
     """
 
-    def __init__(self, paths, dz, wavelength, pixel_size, bc=BoundaryConditions.NONE):
-        super().__init__(paths, dz, wavelength, bc)
+    def __init__(self, intensities, dz, wavelength, pixel_size, bc=BoundaryConditions.NONE):
+        super().__init__(intensities, dz, wavelength, bc)
         self._pixel_size = pixel_size
         self._kx, self._ky = self._get_frequency_coefs()
-        # todo метод solve находится вне конструктура чтобы можно было заменить paths без удаления объекта
+        # todo метод solve находится вне конструктура чтобы можно было заменить intensities без удаления объекта
 
     def solve(self, threshold) -> np.ndarray:
         wave_number = 2 * np.pi / self.wavelength

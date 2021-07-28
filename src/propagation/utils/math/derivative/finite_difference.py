@@ -2,7 +2,7 @@ import math
 import numpy as np
 
 
-def central_finite_difference(planes: tuple, h: float = 1., deriv: int = 1):
+def central_finite_difference(planes: tuple, h: float = 1., deriv: int = 1) -> np.ndarray:
     """
     Central finite difference
     https://en.wikipedia.org/wiki/Finite_difference_coefficient#cite_note-fornberg-1
@@ -12,10 +12,12 @@ def central_finite_difference(planes: tuple, h: float = 1., deriv: int = 1):
 
     # Удаление коэффициента, соответствующего нулевому члену
     coefs = np.delete(coefs, len(coefs)//2)
-    return np.sum(coefs * planes / h)
+
+    result = tuple(plane * coefs[count] / h for count, plane in enumerate(planes))
+    return np.sum(planes) # todo: тут нужно сложить две волны номрально
 
 
-def coefficients(deriv, acc):
+def coefficients(deriv: int, acc: int) -> np.ndarray:
     """
     Функция определения конечно-разностных коэффициентов
     для произвольного порядка производной и количества плоскостей расчёта
@@ -32,7 +34,7 @@ def coefficients(deriv, acc):
     return center
 
 
-def _build_rhs(offsets, deriv):
+def _build_rhs(offsets: list, deriv: int) -> np.ndarray:
     """Построение правой матрицы для линейной системы уравнений"""
     b = [0 for _ in offsets]
     b[deriv] = math.factorial(deriv)
@@ -40,7 +42,7 @@ def _build_rhs(offsets, deriv):
     return np.array(b, dtype='float')
 
 
-def _build_matrix(offsets):
+def _build_matrix(offsets: list) -> np.ndarray:
     """Построение матрицы линейной системы уравнений для определения конечно-разностных коэффициентов"""
     a = [([1 for _ in offsets])]
     for i in range(1, len(offsets)):
@@ -49,7 +51,7 @@ def _build_matrix(offsets):
     return np.array(a, dtype='float')
 
 
-def _calc_coefs(deriv, offsets):
+def _calc_coefs(deriv: int, offsets: list) -> np.ndarray:
     """Решение системы линейных уравнений для определения конечно-разностных коэффициентов"""
 
     # Определение матриц - системы линейных уравнений

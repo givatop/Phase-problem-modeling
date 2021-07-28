@@ -1,11 +1,11 @@
 import os
-import numpy as np
-import matplotlib.pyplot as plt
 
-from icecream import ic
+import matplotlib.pyplot as plt
+import numpy as np
+
+from src.propagation.presenter.loader import load_files
 from src.propagation.utils.math import units
 from src.propagation.utils.tie import FFTSolver, BoundaryConditions
-
 
 # основные параметры для синтеза волны
 bc = BoundaryConditions.NONE
@@ -49,8 +49,9 @@ for focal_len in focal_lens:
                 fn1 = os.path.join(filepath, f'z_{z1:.3f}mm.npy')
                 fn2 = os.path.join(filepath, f'z_{z2:.3f}mm.npy')
                 paths = [fn1, fn2]
+                intensities = load_files(paths)
 
-                solver = FFTSolver(paths, dz, wavelength, px_size, bc)
+                solver = FFTSolver(intensities, dz, wavelength, px_size, bc)
                 unwrapped_phase = solver.solve(threshold)
                 plt.imshow(unwrapped_phase)
                 plt.show()
