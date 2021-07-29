@@ -5,7 +5,7 @@ from numpy.fft import fftshift
 from abc import ABC, abstractmethod
 
 from src.propagation.utils.tie.boundary_conditions import BoundaryConditions, apply_volkov_scheme
-from src.propagation.utils.math.derivative.finite_difference import central_2point, central_finite_difference
+from src.propagation.utils.math.derivative.finite_difference import central_finite_difference
 from src.propagation.utils.tie.boundary_conditions import BoundaryConditions, clip
 from src.propagation.model.areas.grid import CartesianGrid
 from src.propagation.utils.math.derivative.fourier import gradient_2d, ilaplacian_2d
@@ -31,7 +31,7 @@ class TIESolver(ABC):
         self._intensities = tuple(apply_volkov_scheme(i, bc) for i in intensities)
         self._dz = dz
         self._wavelength = wavelength
-        self._axial_derivative = central_2point(*self._intensities, dz)
+        self._axial_derivative = central_finite_difference(self._intensities, dz)
 
     @abstractmethod
     def solve(self, threshold) -> np.ndarray:

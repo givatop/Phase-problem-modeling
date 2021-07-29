@@ -13,8 +13,8 @@ def central_finite_difference(planes: tuple, h: float = 1., deriv: int = 1) -> n
     # Удаление коэффициента, соответствующего нулевому члену
     coefs = np.delete(coefs, len(coefs)//2)
 
-    result = tuple(plane * coefs[count] / h for count, plane in enumerate(planes))
-    return np.sum(planes) # todo: тут нужно сложить две волны номрально
+    result = list(plane * coefs[count] / h for count, plane in enumerate(planes))
+    return sum(result)
 
 
 def coefficients(deriv: int, acc: int) -> np.ndarray:
