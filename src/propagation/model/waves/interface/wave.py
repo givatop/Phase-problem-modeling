@@ -1,27 +1,23 @@
-from abc import ABC
-from typing import Union, Tuple
-
 import numpy as np
 from skimage.restoration import unwrap_phase
 
-from ...areas.aperture import Aperture
-from ...areas.grid import CartesianGrid
+from ...areas import Aperture, CartesianGrid
 from ...propagation.interface.propagate import Propagable
+from ....utils.optic.propagation_methods import angular_spectrum_propagation
 
 
-class Wave(Propagable, ABC):
+class Wave(Propagable):
     """
-    Интерфейс волны
+    Базовый класс волны
     """
-    def __init__(self, field: Union[np.ndarray, Tuple[np.ndarray, np.ndarray]], grid: CartesianGrid, wavelength: float):
+    def __init__(self, intensity: np.ndarray, phase: np.ndarray, grid: CartesianGrid, wavelength: float):
         self._grid = grid
         self._wavelength = wavelength
+        self._intensity, self._phase = intensity, phase
+        self._field = np.sqrt(intensity) * np.exp(-1j * phase)
 
-        if isinstance(field, np.ndarray):
-            self._field = field
-        elif len(field) == 2:
-            self._intensity, self._phase = field
-            self._field = np.sqrt(self._intensity) * np.exp(-1j * self._phase)
+    def propagate_on_distance(self, z: float, method=angular_spectrum_propagation, **kwargs):
+        method(self, z, **kwargs)
 
     def get_wrapped_phase(self, aperture: Aperture) -> np.ndarray:
         """

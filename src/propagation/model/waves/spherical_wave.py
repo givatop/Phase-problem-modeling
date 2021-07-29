@@ -41,9 +41,10 @@ class SphericalWave(Wave):
         k = 2 * np.pi / wavelength
         # задание распределения комлексной амплитуды поля
         radius_vector = np.sqrt(x_grid ** 2 + y_grid ** 2 + focal_len ** 2)
-        field = np.sqrt(intensity) * np.exp(-1j * k * radius_vector)
+        phase = radius_vector * k
+        # field = np.sqrt(intensity) * np.exp(-1j * phase)
 
-        super().__init__(field, grid, wavelength)
+        super().__init__(intensity, phase, grid, wavelength)
 
     def get_wavefront_radius(self, aperture: Aperture) -> float:
         """
