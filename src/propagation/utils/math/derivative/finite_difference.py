@@ -2,13 +2,13 @@ import math
 import numpy as np
 
 
-def central_finite_difference(planes: tuple, h: float = 1., deriv: int = 1) -> np.ndarray:
+def central_finite_difference(planes: tuple, h: float = 1., deriv_order: int = 1) -> np.ndarray:
     """
     Central finite difference
     https://en.wikipedia.org/wiki/Finite_difference_coefficient#cite_note-fornberg-1
     https://github.com/maroba/findiff/tree/20194621fc2d54a10057cd6c3a9888eee67ab1f6
     """
-    coefs = coefficients(deriv, len(planes))
+    coefs = coefficients_grid(deriv_order, len(planes))
 
     # Удаление коэффициента, соответствующего нулевому члену
     coefs = np.delete(coefs, len(coefs)//2)
@@ -17,19 +17,19 @@ def central_finite_difference(planes: tuple, h: float = 1., deriv: int = 1) -> n
     return sum(result)
 
 
-def coefficients(deriv: int, acc: int) -> np.ndarray:
+def coefficients_grid(deriv_order: int, accuracy: int) -> np.ndarray:
     """
     Функция определения конечно-разностных коэффициентов
     для произвольного порядка производной и количества плоскостей расчёта
     """
 
     # Определение сетки для коэффициентов
-    num_central = 2 * math.floor((deriv + 1) / 2) - 1 + acc
+    num_central = 2 * math.floor((deriv_order + 1) / 2) - 1 + accuracy
     num_side = num_central // 2
     offsets = list(range(-num_side, num_side + 1))
 
     # Определение коэффициентов
-    center = _calc_coefs(deriv, offsets)
+    center = _calc_coefs(deriv_order, offsets)
 
     return center
 
@@ -44,7 +44,7 @@ def _build_rhs(offsets: list, deriv: int) -> np.ndarray:
 
 def _build_matrix(offsets: list) -> np.ndarray:
     """Построение матрицы линейной системы уравнений для определения конечно-разностных коэффициентов"""
-    a = [([1 for _ in offsets])]
+    a = [([1 for _ in offsets])]  # todo Tuple cast????
     for i in range(1, len(offsets)):
         a.append([j ** i for j in offsets])
 
