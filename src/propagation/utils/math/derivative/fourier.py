@@ -55,68 +55,88 @@ if __name__ == '__main__':
     import numpy as np
     import matplotlib.pyplot as plt
     from numpy.fft import fft, ifft, ifftshift, fftfreq
-    from tools.optic.field import *
-    from tools.math.units import *
 
-    fig = plt.figure()
-    ax = fig.gca()
-    ax2 = ax.twinx()
+    from src.propagation.utils.optic.field import sin_1d, cos_1d
 
-    width = 2000
+    # width = 15 * np.pi
+    num = 1024
+    dx = 5.06 * 1e-2  # width/num
+    width = num * dx
     a = 1
-    r0 = 100e-3
-    wavelength = 659e-9
-    pixel_size = 5.04e-6
-    dx = pixel_size
-    wave_number = 2 * np.pi / wavelength
+    period = width / 6  # 2 * np.pi
+    x0 = width / 10
+    left = 0  # np.pi * 3
+    right = period*3.5  # period * 4.5
+    clip = 0
 
-    x0 = np.arange(-width / 2, width / 2) * pixel_size
-    x2 = np.arange(-width, width) * pixel_size
+    x = np.linspace(0, width, num, endpoint=False)
+    y = sin_1d(x, x0=x0, T=period, right=right, left=left, clip=clip)
 
-    for z in range(5, 6, 35):
-        for w in [750]:
+    # занулим край
+    # y[-1] = 0
+    # y[0] = 0
 
-            f = gauss_1d(x0, a=a, w=px2m(w)/4, x0=px2m(0))
-            aperture = rect_1d(x0, w=px2m(width - 10))
+    # Аналитическая производная от f'= a * (2pi / T) * cos( 2*2pi*(x-x0)/(T/2pi) )
+    y_grad_analitic = cos_1d(x, x0=x0, a=a * 2 * np.pi / period, T=period, right=right, left=left, clip=clip)
+    y_grad_np = np.gradient(y, dx)
+    y_grad_difference_np = abs(y_grad_analitic - y_grad_np)
 
-            # todo
-            # f2 = np.zeros((x0.size * 2))
-            # f2[:f.size] = f
-            # f2[f.size:] = f[::-1]
-            # f, x = f2, x2
-            x = x0
+    nu_x = fftfreq(num, dx)
+    kx = 1j * 2 * np.pi * nu_x
+    y_grad_fft = ifft(kx * fft(y)).real
+    y_grad_difference_fft = abs(y_grad_analitic - y_grad_fft)
 
-            r = np.sqrt(x ** 2 + r0 ** 2)
-            phase = wave_number * r
+    print(f'N = {num: >5} \t\t '
+          f'w = {width: >10} \t\t '
+          f'Numpy Error: {np.max(y_grad_difference_np): >15} \t\t '
+          f'FFT Error: {np.max(y_grad_difference_fft): >15}')
 
-            field = np.sqrt(f) * np.exp(-1j * phase)# * aperture
+    fig = plt.figure(figsize=[8.4, 6.8])  # 6.4, 4.8
+    ax1, ax2 = fig.add_subplot(2, 1, 1), fig.add_subplot(2, 1, 2)
 
-            nu_x = fftfreq(f.size, d=dx)
-            kx = 1j * 2 * np.pi * nu_x
-            exp_term = np.sqrt(1 - (wavelength * nu_x) ** 2)
-            h = np.exp(1j * wave_number * mm2m(z) * exp_term)
+    threshold = len(x)
+    ax1.plot(x[:threshold], y[:threshold], label='f1 = sin(x)')
+    ax1.plot(x[:threshold], y_grad_analitic[:threshold], label='f2 = cos(x)', linestyle='--')
+    ax1.plot(x[:threshold], y_grad_np[:threshold], label='f3 = np.gradient(sin(x))', linestyle='dotted')
+    ax1.plot(x[:threshold], y_grad_fft[:threshold], label='f4 = ifft(kx * fft(sin(x)))', linestyle='dotted')
 
-            field_z = ifft(fft(field) * h)
-            f_z, phase_z = np.abs(field_z) ** 2, np.angle(field_z)
+    ax2.plot(x, y_grad_difference_np, label='abs(f2 - f3)', linestyle='dotted')
+    ax2.plot(x, y_grad_difference_fft, label='abs(f2 - f4)', linestyle='--')
 
-            np_gradient = np.gradient(f_z, dx)
-            fft_gradient = ifft(fft(f_z) * kx)
-            fft_gradient_real = real(ifft(fft(f_z) * kx))
+    ax1.grid()
+    ax1.legend(prop={'size': 12}, bbox_to_anchor=(1.05, 1.0))  #, bbox_to_anchor=(.5, 1.7)
+    ax1.set_title(f'Grads. Width = {width:.5f}. Num = {num}. T = {period:.5f}')
 
-            error = np.abs(fft_gradient-np_gradient)
-            # error_real = np.abs(fft_gradient_real-np_gradient)
-            # error[error < 1e-20] = 1e-15
+    ax2.grid()
+    ax2.legend(prop={'size': 12}, bbox_to_anchor=(1.05, 1.0))  #, bbox_to_anchor=(1., 1.7)
+    ax2.set_yscale('log')
+    ax2.set_title('FFT error')
 
-            # ax.plot(x, np_gradient, label=f'dx = {dx} numpy')
-            # ax.plot(x, fft_gradient, label=f'dx = {dx} fft')
-            # ax2.plot(x, f_z, label=f'z {z} w {w}')
-            ax.plot(x, error, label=f'z = {z} mm; w = {w} px; {np.max(error)}')  # x[:width//2], error[:width//2]
-            # ax.plot(x, error_real, '--*', label=f'z = {z} mm; w = {w} px; {np.max(error_real)}')  # x[:width//2], error[:width//2]
-    # ax.set_yscale('log')
-    ax.set_yscale('symlog')
+    fig.tight_layout()
 
-    ax.grid(1)
-    ax.legend(prop={'size': 12})
-    # ax2.legend(prop={'size': 12})
-    ax.set_title('FFT error')
+    # fig2 = plt.figure(figsize=[8.4, 7.8])  #  6.4, 4.8
+    # ax3, ax4, ax5, ax6, ax7 = \
+    #     fig2.add_subplot(5, 1, 1), \
+    #     fig2.add_subplot(5, 1, 2), \
+    #     fig2.add_subplot(5, 1, 3), \
+    #     fig2.add_subplot(5, 1, 4), \
+    #     fig2.add_subplot(5, 1, 5),
+    #
+    # ax3.plot(ifftshift(nu_x), ifftshift(np.abs(fft(y))), label='Спектр амплитуд')
+    # ax3.plot(ifftshift(nu_x), ifftshift(np.abs(fft(y)*kx)), label='Спектр амплитуд * kx', linestyle='dotted')
+    # ax4.plot(ifftshift(nu_x), ifftshift(np.angle(fft(y))), label='Спектр фаз')
+    # ax4.plot(ifftshift(nu_x), ifftshift(np.angle(fft(y)*kx)), label='Спектр фаз * kx', linestyle='dotted')
+    # ax5.plot(ifftshift(nu_x), ifftshift(kx.imag), label='kx')
+    # ax6.plot(ifftshift(nu_x), np.abs(ifftshift(fft(y)).imag), label='fft(y).imag')
+    # ax6.plot(ifftshift(nu_x), np.abs(ifftshift(fft(y) * kx).imag), label='(fft(y) * kx).imag', linestyle='dotted')
+    # ax7.plot(ifftshift(nu_x), np.abs(ifftshift(fft(y)).real), label='fft(y).real')
+    # ax7.plot(ifftshift(nu_x), np.abs(ifftshift(fft(y) * kx).real), label='(fft(y) * kx).real', linestyle='dotted')
+    #
+    # [ax.legend() for ax in [ax3, ax4, ax5, ax6, ax7]]
+    # [ax.grid() for ax in [ax3, ax4, ax5, ax6, ax7]]
+    # [ax.set_yscale('log') for ax in [ax3]]
+    # # [ax.set_yscale('symlog') for ax in [ax6]]
+    #
+    # fig2.tight_layout()
+
     plt.show()
