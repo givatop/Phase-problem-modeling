@@ -1,9 +1,10 @@
+from typing import Callable
+
 import numpy as np
 from skimage.restoration import unwrap_phase
 
 from ...areas import Aperture, CartesianGrid
 from ...propagation.interface.propagate import Propagable
-from ....utils.optic.propagation_methods import angular_spectrum_propagation
 
 
 class Wave(Propagable):
@@ -16,7 +17,7 @@ class Wave(Propagable):
         self._intensity, self._phase = intensity, phase
         self._field = np.sqrt(intensity) * np.exp(-1j * phase)
 
-    def propagate_on_distance(self, z: float, method=angular_spectrum_propagation, **kwargs):
+    def propagate_on_distance(self, z: float, method: Callable, **kwargs):
         method(self, z, **kwargs)
 
     def get_wrapped_phase(self, aperture: Aperture) -> np.ndarray:
