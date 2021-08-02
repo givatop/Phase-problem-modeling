@@ -135,12 +135,48 @@ def sin_1d(
     :param x0: смещение по оси X
     :param y0: смещение по оси Y
     :param T: период
-    :param clip: вырезать от left до rigth (default один период)
+    :param clip: вырезать от left до right (default один период)
     :param left: default 0
     :param right: default T (вырезать полпериода right = T/2)
     :return:
     """
     result = a * np.sin( (x - x0) / (T / (2 * np.pi)) )
+
+    clip = kwargs.get('clip', False)
+    if clip:
+        # get boundaries
+        left = kwargs.get('left', 0)
+        right = kwargs.get('right', T)
+        # create masks
+        left_mask = x - x0 > left
+        right_mask = x - x0 < right
+        # multiply masks
+        result *= left_mask * right_mask
+
+    return result + y0
+
+
+def cos_1d(
+        x: np.ndarray,
+        a: Union[float, int] = 1.,
+        x0: Union[float, int] = 0.,
+        y0: Union[float, int] = 0.,
+        T: Union[float, int] = 2 * np.pi,
+        **kwargs
+) -> np.ndarray:
+    """
+    1-мерная косинусоида
+    :param x: координатная сетка
+    :param a: амплитуда
+    :param x0: смещение по оси X
+    :param y0: смещение по оси Y
+    :param T: период
+    :param clip: вырезать от left до right (default один период)
+    :param left: default 0
+    :param right: default T (вырезать полпериода right = T/2)
+    :return:
+    """
+    result = a * np.cos( (x - x0) / (T / (2 * np.pi)) )
 
     clip = kwargs.get('clip', False)
     if clip:
