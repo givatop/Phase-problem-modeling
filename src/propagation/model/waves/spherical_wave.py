@@ -6,7 +6,6 @@ from ...model.waves.interface.wave import Wave
 from ...utils.math.general import calc_amplitude
 from ...utils.math.general import calculate_radius
 from ...utils.optic.field import gauss_2d
-from ...utils.optic.propagation_methods import angular_spectrum_propagation
 
 from ...utils.math.units import (
     px2m,
