@@ -56,52 +56,60 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
     from numpy.fft import fft, ifft, ifftshift, fftfreq
 
-    from src.propagation.utils.optic.field import sin_1d, cos_1d
+    from src.propagation.utils.optic.field import sin_1d, cos_1d, triangle_1d, logistic_1d
 
-    # width = 15 * np.pi
+    # Координатная сетка
     num = 1024
     dx = 5.06 * 1e-2  # width/num
     width = num * dx
+    x = np.linspace(-width//2, width//2, num, endpoint=False)
+
+    # Параметры y(x)
     a = 1
-    period = width / 6  # 2 * np.pi
-    x0 = width / 10
+    period = width / 40  # 2 * np.pi
+    x0 = -period
     left = 0  # np.pi * 3
     right = period*3.5  # period * 4.5
     clip = 0
 
-    x = np.linspace(0, width, num, endpoint=False)
-    y = sin_1d(x, x0=x0, T=period, right=right, left=left, clip=clip)
+    # y(x)
+    y = logistic_1d(x, x0=x0, w=period) * logistic_1d(-x, x0=x0, w=period)
+    y = np.roll(y, 512)
+    # y = sin_1d(x, x0=x0, T=period, right=right, left=left, clip=clip)
 
-    # занулим край
-    # y[-1] = 0
-    # y[0] = 0
+    # y'(x)
+    # y_grad_analitic = cos_1d(x, x0=x0, a=a * 2 * np.pi / period, T=period, right=right, left=left, clip=clip)
 
-    # Аналитическая производная от f'= a * (2pi / T) * cos( 2*2pi*(x-x0)/(T/2pi) )
-    y_grad_analitic = cos_1d(x, x0=x0, a=a * 2 * np.pi / period, T=period, right=right, left=left, clip=clip)
+    # Numpy Gradient
     y_grad_np = np.gradient(y, dx)
-    y_grad_difference_np = abs(y_grad_analitic - y_grad_np)
+    # y_grad_difference_np = abs(y_grad_analitic - y_grad_np)
 
+    # FFT Gradient
     nu_x = fftfreq(num, dx)
     kx = 1j * 2 * np.pi * nu_x
     y_grad_fft = ifft(kx * fft(y)).real
-    y_grad_difference_fft = abs(y_grad_analitic - y_grad_fft)
+    # y_grad_difference_fft = abs(y_grad_analitic - y_grad_fft)
+
+    # Error
+    y_error = abs(y_grad_np - y_grad_fft)
 
     print(f'N = {num: >5} \t\t '
-          f'w = {width: >10} \t\t '
-          f'Numpy Error: {np.max(y_grad_difference_np): >15} \t\t '
-          f'FFT Error: {np.max(y_grad_difference_fft): >15}')
+          f'w = {width: >10} \t\t ')
+          # f'Numpy Error: {np.max(y_grad_difference_np): >15} \t\t '
+          # f'FFT Error: {np.max(y_grad_difference_fft): >15}')
 
     fig = plt.figure(figsize=[8.4, 6.8])  # 6.4, 4.8
     ax1, ax2 = fig.add_subplot(2, 1, 1), fig.add_subplot(2, 1, 2)
 
     threshold = len(x)
     ax1.plot(x[:threshold], y[:threshold], label='f1 = sin(x)')
-    ax1.plot(x[:threshold], y_grad_analitic[:threshold], label='f2 = cos(x)', linestyle='--')
+    # ax1.plot(x[:threshold], y_grad_analitic[:threshold], label='f2 = cos(x)', linestyle='--')
     ax1.plot(x[:threshold], y_grad_np[:threshold], label='f3 = np.gradient(sin(x))', linestyle='dotted')
     ax1.plot(x[:threshold], y_grad_fft[:threshold], label='f4 = ifft(kx * fft(sin(x)))', linestyle='dotted')
 
-    ax2.plot(x, y_grad_difference_np, label='abs(f2 - f3)', linestyle='dotted')
-    ax2.plot(x, y_grad_difference_fft, label='abs(f2 - f4)', linestyle='--')
+    # ax2.plot(x, y_grad_difference_np, label='abs(f2 - f3)', linestyle='dotted')
+    # ax2.plot(x, y_grad_difference_fft, label='abs(f2 - f4)', linestyle='--')
+    ax2.plot(x, y_error, label='|numpy - fft|', linestyle='--')
 
     ax1.grid()
     ax1.legend(prop={'size': 12}, bbox_to_anchor=(1.05, 1.0))  #, bbox_to_anchor=(.5, 1.7)
