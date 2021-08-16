@@ -1,11 +1,8 @@
 import os
 from datetime import datetime
-import numpy as np
-from skimage.restoration import unwrap_phase
-import tools.math.general as math
-from tools.optic.propagation import fresnel
-from tools.optic.field import circ
 
+import numpy as np
+from tools.optic.field import circ
 
 DATA_NOW = datetime.now().strftime('%d.%m.%y')
 TIME_NOW = datetime.now().strftime('%H_%M_%S')
