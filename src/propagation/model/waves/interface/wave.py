@@ -3,7 +3,8 @@ from typing import Callable
 import numpy as np
 from skimage.restoration import unwrap_phase
 
-from ...areas import Aperture, CartesianGrid
+from ...areas.aperture import Aperture
+from ...areas.grid import CartesianGrid
 from ...propagation.interface.propagate import Propagable
 
 
