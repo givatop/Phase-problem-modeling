@@ -8,7 +8,9 @@ from src.propagation.utils.math import units
 from src.propagation.utils.tie import FFTSolver, BoundaryConditions
 
 # основные параметры для синтеза волны
-bc = BoundaryConditions.NONE
+from src.propagation.utils.tie.dct_solver import DCTSolver
+
+bc = BoundaryConditions.NEUMANN
 threshold = np.exp(1) ** -2
 width, height = 512, 512
 wavelength = units.nm2m(632.8)
@@ -51,7 +53,8 @@ for focal_len in focal_lens:
                 paths = [fn1, fn2]
                 intensities = load_files(paths)
 
-                solver = FFTSolver(intensities, dz, wavelength, px_size, bc)
+                solver = DCTSolver(intensities, dz, wavelength, px_size, bc)
+                # unwrapped_phase = solver.solve(threshold)
                 unwrapped_phase = solver.solve(threshold)
                 plt.imshow(unwrapped_phase)
                 plt.show()
