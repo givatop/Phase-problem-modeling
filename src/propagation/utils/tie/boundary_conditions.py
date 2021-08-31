@@ -19,6 +19,9 @@ def apply_volkov_scheme(array: np.ndarray, condition: BoundaryConditions) -> np.
     :return: mirrored_array
     """
 
+    if condition == BoundaryConditions.NONE:
+        return array
+
     h, w = array.shape
     m_array = np.zeros((h * 2, w * 2), dtype=array.dtype)  # mirrored
 
@@ -36,9 +39,6 @@ def apply_volkov_scheme(array: np.ndarray, condition: BoundaryConditions) -> np.
 
     elif condition == BoundaryConditions.PERIODIC:
         raise NotImplementedError
-
-    elif condition == BoundaryConditions.NONE:
-        return array
 
     m_array[0: h:, 0: w:] = array
     m_array[h: 2 * h:, w: 2 * w:] = array_udlr  # право-низ
