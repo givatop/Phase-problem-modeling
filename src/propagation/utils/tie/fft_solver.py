@@ -8,7 +8,7 @@ from src.propagation.utils.tie.boundary_conditions import BoundaryConditions, ap
 from src.propagation.utils.math.derivative.finite_difference import central_finite_difference
 from src.propagation.utils.tie.boundary_conditions import BoundaryConditions, clip
 from src.propagation.model.areas.grid import CartesianGrid
-from src.propagation.utils.math.derivative.fourier import gradient_2d, ilaplacian_2d
+from src.propagation.utils.math.derivative.fourier import gradient_2d, ilaplacian_2d, ilaplacian_1d
 
 
 class TIESolver(ABC):
@@ -142,3 +142,100 @@ class FFTSolver(TIESolver):
     @property
     def ky(self):
         return self._ky
+
+
+class SimplifiedFFTSolver(TIESolver):
+    """
+    Решение TIE для случая uniform-intensity
+    D. Paganin and K. A. Nugent, Phys. Rev. Lett. 80, 2586 (1998).
+    """
+
+    def __init__(self, intensities, dz, wavelength, pixel_size, bc=BoundaryConditions.NONE):
+        super().__init__(intensities, dz, wavelength, bc)
+        self._pixel_size = pixel_size
+        self._kx, self._ky = self.get_frequency_coefs()
+
+    def solve(self, threshold) -> np.ndarray:
+        wave_number = 2 * np.pi / self.wavelength
+        eps = 2.2204e-16  # from MatLab 2.2204e-16
+        reg_param = eps / self.pixel_size ** 4
+
+        # Умножение на волновое число
+        phase = -wave_number * self.axial_derivative
+        phase /= self.ref_intensity
+        phase = ilaplacian_2d(phase, self.kx, self.ky, reg_param)
+
+        phase = clip(phase, self.boundary_condition)
+        return phase
+
+    def get_frequency_coefs(self) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Расчет частотных коэффициентов
+        :return:
+        """
+        area = CartesianGrid(*self.ref_intensity.shape, self.pixel_size)
+        nu_y_grid, nu_x_grid = area.grid
+
+        kx = 1j * 2 * np.pi * fftshift(nu_x_grid)
+        ky = 1j * 2 * np.pi * fftshift(nu_y_grid)
+
+        return kx, ky
+
+    @property
+    def pixel_size(self):
+        return self._pixel_size
+
+    @property
+    def kx(self):
+        return self._kx
+
+    @property
+    def ky(self):
+        return self._ky
+
+
+class SimplifiedFFTSolver1D(TIESolver):
+    """
+    Одномерное решение для равномерной интенстивности
+    """
+
+    def __init__(self, intensities, dz, wavelength, pixel_size, bc=BoundaryConditions.NONE):
+        if bc != BoundaryConditions.NONE:
+            raise NotImplementedError(f'Граничные условия для одномерного случая не реализованы!')
+        super().__init__(intensities, dz, wavelength, bc)
+        self._pixel_size = pixel_size
+        self._kx, _ = self.get_frequency_coefs()
+
+    def solve(self, threshold) -> np.ndarray:
+        wave_number = 2 * np.pi / self.wavelength
+        eps = 2.2204e-16  # from MatLab 2.2204e-16
+        reg_param = eps / self.pixel_size ** 4
+
+        # Умножение на волновое число
+        phase = -wave_number * self.axial_derivative
+        phase /= self.ref_intensity
+        phase = ilaplacian_1d(phase, self.kx, reg_param)
+
+        phase = clip(phase, self.boundary_condition)
+        return phase
+
+    def get_frequency_coefs(self) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Расчет частотных коэффициентов
+        :return:
+        """
+        area = CartesianGrid(*self.ref_intensity.shape, self.pixel_size)
+        nu_y_grid, nu_x_grid = area.grid
+
+        kx = 1j * 2 * np.pi * fftshift(nu_x_grid)
+        ky = 1j * 2 * np.pi * fftshift(nu_y_grid)
+
+        return kx, ky
+
+    @property
+    def pixel_size(self):
+        return self._pixel_size
+
+    @property
+    def kx(self):
+        return self._kx
