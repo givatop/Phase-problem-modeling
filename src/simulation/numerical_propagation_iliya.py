@@ -3,12 +3,17 @@ from icecream import ic
 from src.propagation.model.areas.aperture import Aperture
 from src.propagation.model.areas.grid import PolarGrid
 from src.propagation.model.areas.grid import CartesianGrid
-from src.propagation.presenter_depr.interface.wave_plotter import WavePlotter
-from src.propagation.presenter_depr.saver.saver import Saver
 from src.propagation.model.waves.spherical_wave import SphericalWave
 from src.propagation.utils.math.units import (nm2m, mm2m, um2m, m2mm, percent2decimal)
 from src.propagation.utils.math.general import *
 from src.propagation.utils.optic.propagation_methods import angular_spectrum_bl_propagation
+from src.propagation.presenter.presenter_interface import (
+    save_intensity_plot,
+    save_phase_plot,
+    save_phase_npy,
+    save_intensity_npy,
+    save_r_z_metadata,
+)
 
 # основные параметры для синтеза волны
 width, height = 1024, 1024
@@ -41,7 +46,6 @@ for focal_len in focal_lens:
             f'f_{m2mm(focal_len)} ' \
             f'w_{gaussian_width_param} ' \
             f'{width}x{height}'
-        saver = Saver(folder_name)
 
         for z in distances:
             # создание сферической волны
@@ -59,7 +63,7 @@ for focal_len in focal_lens:
             ic(m2mm(z), r)
 
             # построение графиков для снапшотов
-            WavePlotter.write_r_z(r, m2mm(z), saver)
+            save_r_z_metadata(folder_name, 'r(z).txt', r, m2mm(z))
             # WavePlotter.save_phase(field, aperture, z, saver, save_npy=True)
             # WavePlotter.save_intensity(field, z, saver, save_npy=True)
 
