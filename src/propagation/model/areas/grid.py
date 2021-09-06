@@ -53,10 +53,13 @@ class CartesianGrid(Grid):
     def __init__(self, height, width, pixel_size=5.04e-6):
         super().__init__(height, width, pixel_size)
 
-        grid = px2m(np.mgrid[
-            -self.height / 2:self.height / 2,
-            -self.width / 2:self.width / 2
-        ])
+        grid = px2m(
+            np.mgrid[
+                -self.height / 2:self.height / 2,
+                -self.width / 2:self.width / 2
+            ],
+            px_size_m=pixel_size
+        )
 
         self._grid = Coordinate_grid(*grid)
 
