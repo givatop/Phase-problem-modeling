@@ -24,6 +24,7 @@ class TIESolver(ABC):
         :param bc: граничные условия
         """
 
+        # todo добавить проверку на одинаковоть размеров матриц, иначе конечные суммы падают с неочевидной ошибкой
         if len(intensities) > 2:
             raise NotImplementedError(f'Expect 2 intensities, instead got {len(intensities)}')
 
@@ -47,7 +48,7 @@ class TIESolver(ABC):
         :param threshold:
         :return: Бинарная маска
         """
-        if threshold == 0. or 0.0 in self.ref_intensity:
+        if threshold == 0. and 0.0 in self.ref_intensity:
             raise ValueError(f'Нельзя делить на нулевые значения в интенсивности.')
 
         mask = self.ref_intensity < threshold
