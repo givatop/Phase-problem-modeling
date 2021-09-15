@@ -1,7 +1,6 @@
 import os
 import sys
 import argparse
-from typing import List
 
 
 from icecream import ic
@@ -12,7 +11,6 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 sys.path.append(r'C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-problem-modeling')
 from src.propagation.utils.math.units import m2um, m2mm
-
 
 parser = argparse.ArgumentParser(description='Propagate initial wave on desired distances')
 
@@ -57,7 +55,7 @@ parser.add_argument(
     type=str,
     default='gray'
 )
-parser.add_argument( # todo add grid
+parser.add_argument(
     '--px_size',
     type=float,
     required=True,
@@ -110,13 +108,13 @@ parser.add_argument(
 # Output
 parser.add_argument(
     '--show_plot',
-    type=bool,
-    default=True,
+    type=int,
+    default=1,
 )
 parser.add_argument(
     '--save_plot',
-    type=bool,
-    default=True,
+    type=int,
+    default=1,
 )
 
 args = parser.parse_args()
@@ -171,7 +169,17 @@ fig.suptitle(figure_title)
 array = np.load(filepath)
 
 # Grid
-height, width = array.shape
+if array.ndim == 1:
+    height, width = 1, array.shape[0]
+elif array.ndim == 2:
+    height, width = array.shape
+else:
+    ValueError(f'Unknown shape: {array.shape}')
+
+x = np.arange(-width // 2, width // 2)
+y = np.arange(-height // 2, height // 2)
+X, Y = np.meshgrid(x, y)
+
 extent = list(map(
     lambda size_in_px: m2mm(size_in_px * px_size),
     [-width // 2, width // 2, height // 2, -height // 2]
@@ -184,11 +192,16 @@ if mode == 'complex_amplitude':
 
     # Intensity
     intensity = np.abs(array) ** 2
-    img1 = ax1.imshow(intensity, extent=extent, cmap=cmap)
-    divider1 = make_axes_locatable(ax1)
-    cax1 = divider1.append_axes("right", size="5%", pad=0.05)
-    cbar1 = plt.colorbar(img1, cax=cax1)
-    cbar1.ax.set_ylabel(intensity_cbar_ylabel)
+
+    if array.ndim == 1:
+        ax1.plot(x, intensity)
+    else:
+        img1 = ax1.imshow(intensity, extent=extent, cmap=cmap)
+        divider1 = make_axes_locatable(ax1)
+        cax1 = divider1.append_axes("right", size="5%", pad=0.05)
+        cbar1 = plt.colorbar(img1, cax=cax1)
+        cbar1.ax.set_ylabel(intensity_cbar_ylabel)
+
     ax1.grid(add_grid)
     ax1.title.set_text(intensity_title)
     ax1.set_xlabel(intensity_xlabel)
@@ -196,11 +209,16 @@ if mode == 'complex_amplitude':
 
     # Phase
     phase = unwrap_phase(np.angle(array))
-    img2 = ax2.imshow(phase, extent=extent, cmap=cmap)
-    divider2 = make_axes_locatable(ax2)
-    cax2 = divider2.append_axes("right", size="5%", pad=0.05)
-    cbar2 = plt.colorbar(img2, cax=cax2)
-    cbar2.ax.set_ylabel(phase_cbar_ylabel)
+
+    if array.ndim == 1:
+        ax2.plot(x, phase)
+    else:
+        img2 = ax2.imshow(phase, extent=extent, cmap=cmap)
+        divider2 = make_axes_locatable(ax2)
+        cax2 = divider2.append_axes("right", size="5%", pad=0.05)
+        cbar2 = plt.colorbar(img2, cax=cax2)
+        cbar2.ax.set_ylabel(phase_cbar_ylabel)
+
     ax2.grid(add_grid)
     ax2.title.set_text(phase_title)
     ax2.set_xlabel(phase_xlabel)
@@ -209,11 +227,15 @@ if mode == 'complex_amplitude':
 
 elif mode == 'tie_phase':
     ax = fig.gca()
-    img = ax.imshow(array, extent=extent, cmap=cmap)
-    divider = make_axes_locatable(ax)
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    cbar = plt.colorbar(img, cax=cax)
-    cbar.ax.set_ylabel(phase_cbar_ylabel)
+
+    if array.ndim == 1:
+        ax.plot(x, array)
+    else:
+        img = ax.imshow(array, extent=extent, cmap=cmap)
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="5%", pad=0.05)
+        cbar = plt.colorbar(img, cax=cax)
+        cbar.ax.set_ylabel(phase_cbar_ylabel)
     ax.grid(add_grid)
     ax.title.set_text(phase_title)
     ax.set_xlabel(phase_xlabel)
@@ -222,10 +244,11 @@ elif mode == 'tie_phase':
 
 fig.tight_layout()
 
-if args.show_plot:
-    plt.show()
 if args.save_plot:
     init_filename = os.path.splitext(os.path.basename(filepath))[0]
     filename = f'{init_filename} {mode}.png'
     save_path = os.path.join(save_folder, filename)
     fig.savefig(save_path)
+
+if args.show_plot:
+    plt.show()
