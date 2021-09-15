@@ -22,7 +22,7 @@ for	%%f in (%*) do call :loop %%f
 rem путь к файлу
 set file_path=%1
 rem папка куда сохраняем
-set save_folder="%~dp1\%~n1 images"
+set save_folder="%~dp1\"
 
 
 echo running...
