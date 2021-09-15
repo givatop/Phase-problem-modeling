@@ -1,12 +1,12 @@
 echo wave params
-set dz=1e-3
-set wavelength=555e-6
-set px_size=5.04e-6
+set dz=10e-3
+set wavelength=555e-9
+set px_size=5e-6
 set i1_path=%1
 set i2_path=%2
 
 echo propagation params
-set solver="fft_2d"
+set solver="fft_1d"
 set bc="None"
 set threshold=0.1
 

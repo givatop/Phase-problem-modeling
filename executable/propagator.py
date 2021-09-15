@@ -70,6 +70,12 @@ parser.add_argument(
     required=True,
     help='Путь к папке, куда будут сохраняться файлы'
 )
+parser.add_argument(
+    '--separate_save',
+    type=int,
+    default=1,
+    help='Путь к папке, куда будут сохраняться файлы'
+)
 # endregion
 # region Парсинг в переменные и вывод в консоль
 args = parser.parse_args()
@@ -85,7 +91,16 @@ if not os.path.exists(save_folder):
     os.mkdir(save_folder)
 
 complex_field = np.load(wave_path)
-height, width = complex_field.shape
+
+# Grid
+if complex_field.ndim == 1:
+    ONE_DIMENSION = True
+    height, width = 1, complex_field.shape[0]
+elif complex_field.ndim == 2:
+    height, width = complex_field.shape
+else:
+    ValueError(f'Unknown shape: {complex_field.shape}')
+
 distances = np.arange(start, stop + step, step)
 if method == 'fresnel': method = fresnel
 elif method == 'angular_spectrum': method = angular_spectrum_propagation  # todo это не будет работать
@@ -113,8 +128,18 @@ for distance in distances:
     print(save_path)
     np.save(save_path, wave_z)
 
-    # Сохранение файла метаданных
-    filename += '.metadata'
+    # Раздельное сохранение интенсивности и фазы
+    intensity = np.abs(wave_z) ** 2
+    filename = f'intensity z = {m2mm(distance):.3f}.npy'
+    save_path = os.path.join(save_folder, filename)
+    np.save(save_path, intensity)
+    phase = np.unwrap(np.angle(wave_z))
+    filename = f'phase z = {m2mm(distance):.3f}.npy'
+    save_path = os.path.join(save_folder, filename)
+    np.save(save_path, phase)
+
+    # Сохранение файла метаданных.
+    filename = f'z = {m2mm(distance):.3f}.npy.metadata'
     save_path = os.path.join(save_folder, filename)
     with open(save_path, 'a') as file:
         for k, v in vars(args).items():
