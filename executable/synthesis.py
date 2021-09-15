@@ -4,10 +4,12 @@
 """
 
 import os
+from datetime import date
+
 import numpy as np
 
 from src.propagation.presenter.loader import load_image
-from src.propagation.utils.math.units import (nm2m, mm2m, um2m, m2mm, px2m)
+from src.propagation.utils.math.units import (nm2m, mm2m, um2m, m2mm, px2m, m2nm, m2um)
 from src.propagation.utils.optic import (
     rect_1d,
     rect_2d,
@@ -28,16 +30,21 @@ IS_PHASE_FROM_IMAGE = False
 i_path = None
 p_path = None
 metadata = {}
-folder = r'C:\Users\IGritsenko\Documents'
-filename = 'test_complex_field.npy'
+folder = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\1. Проверка корректности FFT1d-решения'
+filename = 'i=0.5 phi=sphere 1D complex_field.npy'
 
 
 # region Grid Params
-width, height = 1024, 1024
-Y, X = np.mgrid[
-        -height // 2: height // 2,
-        -width // 2: width // 2,
-    ]
+width, height = 1024, 1
+px_size = um2m(5)
+wavelength = nm2m(555)
+x = np.arange(-width // 2, width // 2)
+y = np.arange(-height // 2, height // 2)
+X, Y = np.meshgrid(x, y)
+# Y, X = np.mgrid[
+#         -height // 2: height // 2,
+#         -width // 2: width // 2,
+#     ]
 # endregion
 
 # region Intensity
@@ -45,18 +52,21 @@ if IS_INTENSITY_FROM_IMAGE:
     intensity = load_image(i_path)
 else:
     i_amplitude = 0.5
-    i_wx, i_wy = width/2, height/2
+    i_wx, i_wy = width/10, height/2
     i_x0, i_y0 = 0, 0
     intensity = i_amplitude
+    # intensity = gauss_1d(x, a=i_amplitude, w=i_wx, x0=i_x0)
 # endregion
 # region Phase
 if IS_PHASE_FROM_IMAGE:
     phase = load_image(p_path)
 else:
     p_amplitude = 1.
-    p_wx, p_wy = width/2, height/2
-    p_x0, p_y0 = 0, 0
-    phase = gauss_2d(X, Y, wx=p_wx, wy=p_wy, a=p_amplitude)
+    p_wx, p_wy = width/4, height/2
+    p_x0, p_y0 = p_wx // 4, 0
+    focus = mm2m(100)
+    phase = np.sqrt(px2m(x, px_size_m=px_size) ** 2 + focus ** 2) * 2 * np.pi / wavelength
+    # phase = sin_1d(x, a=p_amplitude, T=p_wx, x0=p_x0)
 # endregion
 
 # region Complex Field
@@ -70,26 +80,29 @@ np.save(filepath, complex_field)
 filename += '.metadata'
 filepath = os.path.join(folder, filename)
 
-metadata['width, пкс'] = width
-metadata['height, пкс'] = height
+metadata['date'] = date.today().strftime("%d/%m/%Y")
+metadata['width, px'] = width
+metadata['height, px'] = height
+metadata['wavelength, nm'] = m2nm(wavelength)
+metadata['px_size, um'] = m2um(px_size)
 
 if IS_INTENSITY_FROM_IMAGE:
     metadata['i_path'] = i_path
 else:
-    metadata['i_amplitude, пкс'] = i_amplitude
-    metadata['i_wx, пкс'] = i_wx
-    metadata['i_wy, пкс'] = i_wy
-    metadata['i_x0, пкс'] = i_x0
-    metadata['i_y0, пкс'] = i_y0
+    metadata['i_amplitude, px'] = i_amplitude
+    metadata['i_wx, px'] = i_wx
+    metadata['i_wy, px'] = i_wy
+    metadata['i_x0, px'] = i_x0
+    metadata['i_y0, px'] = i_y0
 
 if IS_PHASE_FROM_IMAGE:
     metadata['p_path'] = p_path
 else:
     metadata['p_amplitude, пкс'] = p_amplitude
-    metadata['p_wx, пкс'] = p_wx
-    metadata['p_wy, пкс'] = p_wy
-    metadata['p_x0, пкс'] = p_x0
-    metadata['p_y0, пкс'] = p_y0
+    metadata['p_wx, px'] = p_wx
+    metadata['p_wy, px'] = p_wy
+    metadata['p_x0, px'] = p_x0
+    metadata['p_y0, px'] = p_y0
 
 with open(filepath, 'w') as file:
     for k, v in metadata.items():
