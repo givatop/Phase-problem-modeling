@@ -1,10 +1,10 @@
 import numpy as np
-from numpy.fft import fft2, ifft2, ifftshift
+from numpy.fft import fft2, ifft2, ifftshift, fft, ifft
 
 from src.propagation.model.waves.interface.wave import Wave
 from src.propagation.utils.math import units
 from src.propagation.utils.math.general import get_slice
-from src.propagation.utils.optic.field import rect_2d
+from src.propagation.utils.optic.field import rect_2d, rect_1d
 
 
 def angular_spectrum_propagation(wave: Wave, z: float, **kwargs):
@@ -98,39 +98,71 @@ def angular_spectrum_band_limited(
     """
     # Увеличение транспаранта в 2 раза для трансформации линейной свертки в циклическую
     # (периодические граничные условия)
-    height = 2 * complex_field.shape[0]
-    width = 2 * complex_field.shape[1]
+    if complex_field.ndim == 2:
+        height = 2 * complex_field.shape[0]
+        width = 2 * complex_field.shape[1]
 
-    # Индексы для "старого" поля
-    left = int(width * .25)
-    right = int(width * .75)
-    top = int(height * .25)
-    bottom = int(height * .75)
+        # Индексы для "старого" поля
+        left = int(width * .25)
+        right = int(width * .75)
+        top = int(height * .25)
+        bottom = int(height * .75)
 
-    # Вписываем "старое" поле в новое
-    new_field = np.zeros((height, width), dtype=complex_field.dtype)
-    new_field[top:bottom, left:right] = complex_field
+        # Вписываем "старое" поле в новое
+        new_field = np.zeros((height, width), dtype=complex_field.dtype)
+        new_field[top:bottom, left:right] = complex_field
 
-    # Сетка в частотной области
-    nu_x = np.arange(-width / 2, width / 2) / (width * px_size)
-    nu_y = np.arange(-height / 2, height / 2) / (height * px_size)
-    nu_x_grid, nu_y_grid = np.meshgrid(nu_x, nu_y)
-    nu_x_grid, nu_y_grid = ifftshift(nu_x_grid), ifftshift(nu_y_grid)
-    nu_z_grid = np.sqrt(wavelength ** -2 - nu_x_grid ** 2 - nu_y_grid ** 2)
-    nu_z_grid[nu_x_grid ** 2 + nu_y_grid ** 2 > wavelength ** -2] = 0
+        # Сетка в частотной области
+        nu_x = np.arange(-width / 2, width / 2) / (width * px_size)
+        nu_y = np.arange(-height / 2, height / 2) / (height * px_size)
+        nu_x_grid, nu_y_grid = np.meshgrid(nu_x, nu_y)
+        nu_x_grid, nu_y_grid = ifftshift(nu_x_grid), ifftshift(nu_y_grid)
+        nu_z_grid = np.sqrt(wavelength ** -2 - nu_x_grid ** 2 - nu_y_grid ** 2)
+        nu_z_grid[nu_x_grid ** 2 + nu_y_grid ** 2 > wavelength ** -2] = 0
 
-    # Расчет граничных частот U/V_limit
-    dnu_x = 1 / (width * px_size)
-    dnu_y = 1 / (height * px_size)
-    nu_x_limit = 1 / (np.sqrt((2 * dnu_x * distance) ** 2 + 1) * wavelength)
-    nu_y_limit = 1 / (np.sqrt((2 * dnu_y * distance) ** 2 + 1) * wavelength)
+        # Расчет граничных частот U/V_limit
+        dnu_x = 1 / (width * px_size)
+        dnu_y = 1 / (height * px_size)
+        nu_x_limit = 1 / (np.sqrt((2 * dnu_x * distance) ** 2 + 1) * wavelength)
+        nu_y_limit = 1 / (np.sqrt((2 * dnu_y * distance) ** 2 + 1) * wavelength)
 
-    # Передаточная функция (угловой спектр)
-    h_clipper = rect_2d(nu_x_grid, nu_y_grid, wx=2 * nu_x_limit, wy=2 * nu_y_limit)
-    h = np.exp(1j * 2 * np.pi * nu_z_grid * distance) * h_clipper
+        # Передаточная функция (угловой спектр)
+        h_clipper = rect_2d(nu_x_grid, nu_y_grid, wx=2 * nu_x_limit, wy=2 * nu_y_limit)
+        h = np.exp(1j * 2 * np.pi * nu_z_grid * distance) * h_clipper
 
-    # обратное преобразование Фурье
-    return ifft2(fft2(new_field) * h)[top:bottom, left:right]
+        # обратное преобразование Фурье
+        return ifft2(fft2(new_field) * h)[top:bottom, left:right]
+
+    elif complex_field.ndim == 1:
+        width = 2 * complex_field.shape[0]
+
+        # Индексы для "старого" поля
+        left = int(width * .25)
+        right = int(width * .75)
+
+        # Вписываем "старое" поле в новое
+        new_field = np.zeros((width,), dtype=complex_field.dtype)
+        new_field[left:right] = complex_field
+
+        # Сетка в частотной области
+        nu_x = np.arange(-width / 2, width / 2) / (width * px_size)
+        nu_x = ifftshift(nu_x)
+        nu_z = np.sqrt(wavelength ** -2 - nu_x ** 2)
+        nu_z[nu_x ** 2 > wavelength ** -2] = 0
+
+        # Расчет граничных частот U/V_limit
+        dnu_x = 1 / (width * px_size)
+        nu_x_limit = 1 / (np.sqrt((2 * dnu_x * distance) ** 2 + 1) * wavelength)
+
+        # Передаточная функция (угловой спектр)
+        h_clipper = rect_1d(nu_x, w=2 * nu_x_limit)
+        h = np.exp(1j * 2 * np.pi * nu_z * distance) * h_clipper
+
+        # обратное преобразование Фурье
+        return ifft(fft(new_field) * h)[left:right]
+
+    else:
+        raise ValueError(f'Incorrect number of dimensions: {complex_field.ndim}')
 
 
 def rayleigh_sommerfeld_propagation_1D(wave: Wave, z: float):
@@ -236,161 +268,13 @@ def fresnel(field: np.ndarray, propagate_distance: float,
 
 
 if __name__ == '__main__':
-    import matplotlib.pyplot as plt
-    from numpy.fft import fft, ifft, ifftshift, fftfreq
+    path = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\1. Проверка корректности FFT1d-решения\phi=sphere i=gauss 1D complex_field.npy'
+    array = np.load(path)
 
-    from src.propagation.utils.optic.field import sin_1d, cos_1d, triangle_1d, logistic_1d, rect_1d
-    from src.propagation.utils.math.units import (nm2m, mm2m, um2m, m2mm, rad2mm)
-    from src.propagation.utils.math.derivative.fourier import gradient_2d, ilaplacian_2d, ilaplacian_1d
+    distance = 1e-3
+    px_size = 5e-6
+    wavelength = 555e-9
+    array_z = angular_spectrum_band_limited(array, distance, wavelength, px_size)
 
-    # Параметры волны
-    wavelength = um2m(0.5)
-    k = 2 * np.pi / wavelength
-    focus = mm2m(100)
-    z = mm2m(5)
-    fields = []
-
-    # Координатная сетка
-    num = 1024
-    dx = um2m(5)
-    width = num * dx
-    x = np.linspace(-width/2, width/2, num, endpoint=False)
-
-    # Параметры y(x)
-    a = .5
-    period = width / 2
-    # x0 = 0
-    x0 = -width / 4
-    left = 0
-    right = period*3.5
-    clip = 0
-    phase_amplitude = 3.14
-
-    # Параметры вывода
-    precise = 1
-
-    # Формируем поле z = 0
-    i0 = a * np.ones(x.shape)
-    # i0 = logistic_1d(x, a=a, x0=x0, w=period) * logistic_1d(-x, a=a, x0=x0, w=period)
-    phi0 = phase_amplitude * logistic_1d(x, x0=x0, w=period) * logistic_1d(-x, x0=x0, w=period)
-    phi0 -= phase_amplitude / 2
-    # phi0 = k * np.sqrt(x**2 + focus**2)
-    field0 = np.sqrt(i0) * np.exp(-1j * phi0)
-    phi0 = np.angle(field0)
-    phi0_unwrapped = np.unwrap(phi0)
-
-    # FFT grid
-    nu_x = fftfreq(num, dx)
-    kx = 1j * 2 * np.pi * nu_x
-    field0_spectrum = fft(field0)
-    exp_term = np.sqrt(1 - (wavelength * nu_x) ** 2)
-
-    # Прореживание данных
-    cut_step = 1
-    x = m2mm(x[::cut_step])
-    i0 = i0[::cut_step]
-    phi0 = phi0[::cut_step]
-
-    # Распространение
-    start = 10
-    step = 1
-    for step in [10]:  # .1, .5, 1, 2, 4, 8, 16, 32, 64
-        fields = []
-
-        stop = start + 2 * step + step/10
-        for z in map(mm2m, np.arange(start, stop, step)):
-            h = np.exp(1j * k * z * exp_term)
-            field_z = ifft(field0_spectrum * h)
-
-            # Добавляем компоненты поля в список fields
-            i_z = np.abs(field_z) ** 2
-            phi_z = np.angle(field_z)
-            phi_z_unwrapped = np.unwrap(phi_z)
-            fields.append([i_z, phi_z_unwrapped, z])
-
-        # 1D TIE
-        i1, phi1, z1 = fields[0]
-        i_ref, phi_ref, _ = fields[1]
-        i2, phi2, z2 = fields[-1]
-
-        didz = (i2 - i1) / (z2 - z1)
-
-        phase1 = -k * didz
-        phase2 = phase1 / i1
-        phase = ilaplacian_1d(phase2, kx)
-
-        # TIE Error
-        if len(fields) != 3:
-            raise ValueError('Нужно 3 интенсивности')
-
-        delta = max(phi_ref) - max(phase)
-        error = abs(phase + delta - phi_ref)
-
-        # TIE details plot
-        fig2 = plt.figure(figsize=(7.4, 7.8))
-        ax4, ax5, ax6, ax7 = \
-            fig2.add_subplot(4, 1, 1), \
-            fig2.add_subplot(4, 1, 2), \
-            fig2.add_subplot(4, 1, 3), \
-            fig2.add_subplot(4, 1, 4)
-
-        ax4.plot(x, didz, '-')
-        ax4.set_title('didz')
-        ax5.plot(x, phase1, '-')
-        ax5.set_title('-k * didz')
-        ax6.plot(x, phase2, '-')
-        ax6.set_title('-k * didz / i1')
-        ax7.plot(x, phase, '-')
-        ax7.set_title('ilaplacian')
-
-        # Print
-        print(f'dz: {m2mm(z2 - z1):.{precise}f} mm', f'max = {max(error):.1e}')
-
-        # Графики
-        fig = plt.figure(figsize=(8.4, 5.8))
-        ax1, ax2, ax3 = fig.add_subplot(3, 1, 1), fig.add_subplot(3, 1, 2), fig.add_subplot(3, 1, 3)
-
-        ax1.plot(x, i0, '-', label=f'z=0 mm')
-        ax2.plot(x, phi0_unwrapped, '-', label=f'z=0 mm; a = {phase_amplitude} rad')
-
-        for i_z, phi_z_unwrapped, z in fields:
-
-            # Прореживание данных
-            i_z = i_z[::cut_step]
-            phi_z_unwrapped = phi_z_unwrapped[::cut_step]
-
-            ax1.plot(x, i_z, ':', label=f'z={m2mm(z):.{precise}f} mm')
-            ax2.plot(x, phi_z_unwrapped, ':', label=f'z={m2mm(z):.{precise}f} mm')
-
-        ax2.plot(x, phase, ':', label=f'TIE dz={m2mm(z2 - z1):.{precise}f} mm')
-        ax3.plot(x, error, '-', label=f'max = {max(error):.1e}')
-
-        [ax.grid() for ax in [ax1, ax2, ax3, ax4, ax5, ax6, ax7]]
-        [ax.legend(loc='upper right') for ax in [ax1, ax2, ax3]]
-
-        ax1.set_title(f'Intensity')
-        ax1.set_xlabel('mm')
-        ax1.set_ylabel('a.u.')
-
-        ax2.set_title(f'Phase')
-        ax2.set_xlabel('mm')
-        ax2.set_ylabel('rad')
-        ax2.set_ylim((-3.14, 3.14))
-
-        ax3.set_title(f'Error')
-
-        # [ax.set_yscale('log') for ax in [ax4, ax5]]
-
-        fig.suptitle(f'Angular Spectrum Propagation')
-        fig.tight_layout()
-
-        fig2.suptitle(f'TIE detailed')
-        fig2.tight_layout()
-
-        # fig.savefig(f'i phi dz={m2mm(z2 - z1):.{precise}f} mm.png', bbox_inches='tight', pad_inches=0.1)
-        # fig2.savefig(f'tie dz={m2mm(z2 - z1):.{precise}f} mm.png', bbox_inches='tight', pad_inches=0.1)
-
-        # plt.close(fig)
-        # plt.close(fig2)
-
-    plt.show()
+    save_path = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\1. Проверка корректности FFT1d-решения\sine phase 1D complex_field propagation'
+    np.save(save_path + f'test.npy', array_z)
