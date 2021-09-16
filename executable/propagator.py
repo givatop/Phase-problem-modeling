@@ -74,7 +74,7 @@ parser.add_argument(
     '--separate_save',
     type=int,
     default=1,
-    help='Путь к папке, куда будут сохраняться файлы'
+    help='Созранить интенсивность и фазу как отдельные файлы'
 )
 # endregion
 # region Парсинг в переменные и вывод в консоль
@@ -123,7 +123,7 @@ for distance in distances:
     wave_z = method(complex_field, distance, wavelength, px_size)
 
     # Сохранение файла с волной
-    filename = f'z = {m2mm(distance):.3f}.npy'
+    filename = f'z={m2mm(distance):.3f}.npy'
     save_path = os.path.join(save_folder, filename)
     print(save_path)
     np.save(save_path, wave_z)

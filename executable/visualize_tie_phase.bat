@@ -28,6 +28,6 @@ set save_folder="%~dp1\"
 echo running...
 %python% %visualizer% --file_path %file_path% --save_folder %save_folder% --mode %mode% --dpi %dpi% --figsize %figsize_width% %figsize_height% --px_size %px_size% --cmap %cmap%
 
-pause
+rem pause
 
 exit /b

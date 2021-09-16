@@ -109,18 +109,16 @@ elif bc == 'None': bc = BoundaryConditions.NONE
 
 threshold = args.threshold
 
-
 # todo DEBUGGING
 # wavelength = 555e-6
 # px_size = 5e-6
-# dz = 1e33
-# i1_path = r'C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-problem-modeling\check\FFTSolver\field z = 0.010.png'
-# i2_path = r'C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-problem-modeling\check\FFTSolver\field z = -0.010.png'
-# save_folder = 'TIE'
-# Solver = FFTSolver
+# dz = 1e-3
+# i1_path = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\1. Проверка корректности FFT1d-решения\phi=sphere i=gauss 1D complex_field propagation\intensity z = 0.000.npy'
+# i2_path = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\1. Проверка корректности FFT1d-решения\phi=sphere i=gauss 1D complex_field propagation\intensity z = 10.000.npy'
+# save_folder = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\1. Проверка корректности FFT1d-решения\phi=sphere i=gauss 1D complex_field propagation'
+# Solver = FFTSolver1D
 # bc = BoundaryConditions.NONE
 # threshold = .1
-
 
 ic(args)
 ic(wavelength)
@@ -144,7 +142,7 @@ retrieved_phase = solver.solve(threshold)
 # Сохранение файла с волной
 i1_filename = os.path.splitext(os.path.basename(i1_path))[0]
 i2_filename = os.path.splitext(os.path.basename(i2_path))[0]
-filename = f'{i1_filename} {i2_filename} dz={m2mm(dz):.3f}mm.npy'
+filename = f'TIE {i1_filename} {i2_filename} dz={m2mm(dz):.3f}mm.npy'
 save_path = os.path.join(save_folder, filename)
 ic(save_path)
 np.save(save_path, retrieved_phase)

@@ -11,7 +11,7 @@ set bc="None"
 set threshold=0.1
 
 echo saving params
-set save_folder="%~dp1\%~n1 TIE"
+set save_folder="%~dp1\"
 
 echo path to python
 set python="C:\Users\IGritsenko\.virtualenvs\Phase-problem-modeling-VD4lAbA6\Scripts\python.exe"

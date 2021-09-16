@@ -246,7 +246,7 @@ fig.tight_layout()
 
 if args.save_plot:
     init_filename = os.path.splitext(os.path.basename(filepath))[0]
-    filename = f'{init_filename} {mode}.png'
+    filename = f'{init_filename}.png'
     save_path = os.path.join(save_folder, filename)
     fig.savefig(save_path)
 
