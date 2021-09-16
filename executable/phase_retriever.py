@@ -134,6 +134,8 @@ ic(threshold)
 
 # Load Files
 intensities = load_files([i1_path, i2_path])
+if np.complex in [intensity.dtype for intensity in intensities]:
+    raise TypeError('one or more of the intensities has complex dtype')
 
 # TIE
 solver = Solver(intensities, dz, wavelength, px_size, bc=bc)
