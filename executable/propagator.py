@@ -143,7 +143,7 @@ for distance in distances:
     # Сохранение файла метаданных.
     filename = f'z = {m2mm(distance):.3f}.npy.metadata'
     save_path = os.path.join(save_folder, filename)
-    with open(save_path, 'a') as file:
+    with open(save_path, 'w') as file:
         for k, v in vars(args).items():
             file.write(f'{k}: {v}\n')
         file.write(f'distance: {m2mm(distance):.3f}\n')
