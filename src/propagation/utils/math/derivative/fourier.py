@@ -32,6 +32,22 @@ def gradient_2d(f_x: ndarray,
     return real(ifft2(f_x * kx, norm=NORM)), real(ifft2(f_y * ky, norm=NORM))
 
 
+def gradient_1d(f: ndarray,
+                k: ndarray,
+                space_domain: bool = True) -> ndarray:
+    """
+    Градиент через FFT
+    :param f: array-like
+    :param k: частотный коэффициент 1j * 2*np.pi * fftshift(nu_x_grid)
+    :param space_domain:
+    :return: array-like градиент от функции f
+    """
+    if space_domain:
+        f = fft(f, norm=NORM)
+
+    return real(ifft(f * k, norm=NORM))
+
+
 def ilaplacian_2d(f: ndarray,
                   kx: ndarray,
                   ky: ndarray,

@@ -1,14 +1,14 @@
 import numpy as np
 
 from typing import Tuple, Optional, List
-from numpy.fft import fftshift
+from numpy.fft import fftshift, fftfreq
 from abc import ABC, abstractmethod
 
 from src.propagation.utils.tie.boundary_conditions import BoundaryConditions, apply_volkov_scheme
 from src.propagation.utils.math.derivative.finite_difference import central_finite_difference
 from src.propagation.utils.tie.boundary_conditions import BoundaryConditions, clip
-from src.propagation.model.areas.grid import CartesianGrid
-from src.propagation.utils.math.derivative.fourier import gradient_2d, ilaplacian_2d, ilaplacian_1d
+from src.propagation.model.areas.grid import CartesianGrid, FrequencyGrid
+from src.propagation.utils.math.derivative.fourier import gradient_2d, ilaplacian_2d, ilaplacian_1d, gradient_1d
 
 
 class TIESolver(ABC):
@@ -143,6 +143,66 @@ class FFTSolver(TIESolver):
     @property
     def ky(self):
         return self._ky
+
+
+class FFTSolver1D(TIESolver):
+    """
+    Решение TIE методом Фурье.
+    D. Paganin and K. A. Nugent, Phys. Rev. Lett. 80, 2586 (1998).
+    """
+
+    def __init__(self, intensities, dz, wavelength, pixel_size, bc=BoundaryConditions.NONE):
+        super().__init__(intensities, dz, wavelength, bc)
+        self._pixel_size = pixel_size
+        self._kx = 1j * 2 * np.pi * fftfreq(intensities[0].shape[0], d=pixel_size)
+
+    def solve(self, threshold) -> np.ndarray:
+        wave_number = 2 * np.pi / self.wavelength
+
+        # Умножение на волновое число
+        phase = - wave_number * self.axial_derivative
+
+        # Первые Лапласиан и градиент
+        phase = ilaplacian_1d(phase, self.kx, return_spacedomain=False)
+        phase = gradient_1d(phase, self.kx, space_domain=False)
+
+        # Деление на опорную интенсивность
+        mask = self.add_threshold(threshold)
+        print(phase.dtype, self.ref_intensity.dtype)
+        phase /= self.ref_intensity
+        phase[mask] = 0
+
+        # Вторые Лапласиан и градиент
+        phase = gradient_1d(phase, self.kx)  # todo убрать 2 лишних fft
+        phase = ilaplacian_1d(phase, self.kx)
+
+        phase = clip(phase, self.boundary_condition)
+        return phase
+
+    # def _get_frequency_coefs(self) -> Tuple[np.ndarray, np.ndarray]:
+    #     """
+    #     Расчет частотных коэффициентов
+    #     :return:
+    #     """
+    #     area = FrequencyGrid(*self.ref_intensity.shape, self.pixel_size)
+    #     nu_y_grid, nu_x_grid = area.grid
+    #
+    #     kx = 1j * 2 * np.pi * fftshift(nu_x_grid)
+    #     ky = 1j * 2 * np.pi * fftshift(nu_y_grid)
+    #
+    #     return kx, ky
+
+    @property
+    def pixel_size(self):
+        return self._pixel_size
+
+    @property
+    def kx(self):
+        return self._kx
+
+    # @property
+    # def ky(self):
+    #     return self._ky
 
 
 class SimplifiedFFTSolver(TIESolver):

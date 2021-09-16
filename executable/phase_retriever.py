@@ -10,6 +10,7 @@ from src.propagation.presenter.loader import load_files
 from src.propagation.utils.math.units import m2mm
 from src.propagation.utils.tie import (
     FFTSolver,
+    FFTSolver1D,
     BoundaryConditions,
     SimplifiedFFTSolver,
     SimplifiedFFTSolver1D,
@@ -94,9 +95,9 @@ if not os.path.exists(save_folder):
 
 Solver = args.solver
 if Solver == 'fft_2d': Solver = FFTSolver
+elif Solver == 'fft_1d': Solver = FFTSolver1D
 elif Solver == 'simplified_fft1d': Solver = SimplifiedFFTSolver1D
 elif Solver == 'simplified_fft2d': Solver = SimplifiedFFTSolver
-elif Solver == 'fft_1d': raise NotImplementedError
 elif Solver == 'dct_2d': raise NotImplementedError
 else: raise ValueError(f'There\'s no \"{Solver}\" solver')
 
