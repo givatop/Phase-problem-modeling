@@ -128,15 +128,17 @@ for distance in distances:
     print(save_path)
     np.save(save_path, wave_z)
 
-    # Раздельное сохранение интенсивности и фазы
-    intensity = np.abs(wave_z) ** 2
-    filename = f'intensity z = {m2mm(distance):.3f}.npy'
-    save_path = os.path.join(save_folder, filename)
-    np.save(save_path, intensity)
-    phase = np.unwrap(np.angle(wave_z))
-    filename = f'phase z = {m2mm(distance):.3f}.npy'
-    save_path = os.path.join(save_folder, filename)
-    np.save(save_path, phase)
+    if args.separate_save:
+        # save intensity
+        intensity = np.abs(wave_z) ** 2
+        filename = f'i z={m2mm(distance):.3f}.npy'
+        save_path = os.path.join(save_folder, filename)
+        np.save(save_path, intensity)
+        # save phase
+        phase = np.unwrap(np.angle(wave_z))
+        filename = f'phi z={m2mm(distance):.3f}.npy'
+        save_path = os.path.join(save_folder, filename)
+        np.save(save_path, phase)
 
     # Сохранение файла метаданных.
     filename = f'z = {m2mm(distance):.3f}.npy.metadata'
