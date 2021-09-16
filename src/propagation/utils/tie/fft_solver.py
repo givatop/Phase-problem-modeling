@@ -303,3 +303,23 @@ class SimplifiedFFTSolver1D(TIESolver):
     @property
     def kx(self):
         return self._kx
+
+
+if __name__ == '__main__':
+    import os
+
+    path = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\1. Проверка корректности FFT1d-решения\phi=sphere i=gauss 1D complex_field propagation'
+    fn1 = 'intensity z = 0.000.npy'
+    fn2 = 'intensity z = 10.000.npy'
+
+    dz = 10e-3
+    px_size = 5e-6
+    wavelength = 555e-9
+    threshold = 0.1
+
+    i1 = np.load(os.path.join(path, fn1))
+    i2 = np.load(os.path.join(path, fn2))
+
+    solver = FFTSolver1D([i1, i2], dz, wavelength, px_size)
+    phase = solver.solve(threshold)
+    np.save(os.path.join(path, f'TIE phase.npy'), phase)
