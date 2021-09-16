@@ -124,6 +124,7 @@ class FFTSolver(TIESolver):
         Расчет частотных коэффициентов
         :return:
         """
+        raise NotImplementedError
         area = CartesianGrid(*self.ref_intensity.shape, self.pixel_size)
         nu_y_grid, nu_x_grid = area.grid
 
@@ -234,6 +235,7 @@ class SimplifiedFFTSolver(TIESolver):
         Расчет частотных коэффициентов
         :return:
         """
+        raise NotImplementedError
         area = CartesianGrid(*self.ref_intensity.shape, self.pixel_size)
         nu_y_grid, nu_x_grid = area.grid
 
@@ -285,6 +287,7 @@ class SimplifiedFFTSolver1D(TIESolver):
         Расчет частотных коэффициентов
         :return:
         """
+        raise NotImplementedError
         area = CartesianGrid(*self.ref_intensity.shape, self.pixel_size)
         nu_y_grid, nu_x_grid = area.grid
 
