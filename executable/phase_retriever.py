@@ -152,7 +152,10 @@ np.save(save_path, retrieved_phase)
 # Сохранение файла метаданных
 filename += '.metadata'
 save_path = os.path.join(save_folder, filename)
-with open(save_path, 'a') as file:
+
+if len(save_path) > 260:
+    raise ValueError(f'Длина имени файла превышает допустимую: len(save_path) = {len(save_path)}; допустимая - 260')
+
+with open(save_path, 'w') as file:
     for k, v in vars(args).items():
         file.write(f'{k}: {v}\n')
-    file.write(f'dz: {m2mm(dz):.3f} mm\n')
