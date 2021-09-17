@@ -169,7 +169,6 @@ class FFTSolver1D(TIESolver):
 
         # Деление на опорную интенсивность
         mask = self.add_threshold(threshold)
-        print(phase.dtype, self.ref_intensity.dtype)
         phase /= self.ref_intensity
         phase[mask] = 0
 

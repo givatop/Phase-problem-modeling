@@ -98,7 +98,7 @@ else:
 if IS_PHASE_FROM_IMAGE:
     metadata['p_path'] = p_path
 else:
-    metadata['p_amplitude, пкс'] = p_amplitude
+    metadata['p_amplitude, px'] = p_amplitude
     metadata['p_wx, px'] = p_wx
     metadata['p_wy, px'] = p_wy
     metadata['p_x0, px'] = p_x0

@@ -22,4 +22,4 @@ set propagator="C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-proble
 echo running...
 %python% %propagator% --wavelength %wavelength%  --px_size %px_size% --wave_path %wave_path% --start %start% --stop %stop% --step %step% --method %method% --save_folder %save_folder% --separate_save %separate_save%
 
-pause
+rem pause

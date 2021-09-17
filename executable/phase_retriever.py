@@ -110,7 +110,7 @@ elif bc == 'None': bc = BoundaryConditions.NONE
 threshold = args.threshold
 
 # todo DEBUGGING
-# wavelength = 555e-6
+# wavelength = 555e-9
 # px_size = 5e-6
 # dz = 1e-3
 # i1_path = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\1. Проверка корректности FFT1d-решения\phi=sphere i=gauss 1D complex_field propagation\intensity z = 0.000.npy'
@@ -138,6 +138,7 @@ if np.complex in [intensity.dtype for intensity in intensities]:
     raise TypeError('one or more of the intensities has complex dtype')
 
 # TIE
+ic(dz)
 solver = Solver(intensities, dz, wavelength, px_size, bc=bc)
 retrieved_phase = solver.solve(threshold)
 
