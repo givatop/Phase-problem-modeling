@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 sys.path.append(r'C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-problem-modeling')
-from src.propagation.utils.math.units import m2um, m2mm
+from src.propagation.utils.math.units import m2um, m2mm, px2mm
 
 parser = argparse.ArgumentParser(description='Propagate initial wave on desired distances')
 
@@ -176,14 +176,11 @@ elif array.ndim == 2:
 else:
     ValueError(f'Unknown shape: {array.shape}')
 
-x = np.arange(-width // 2, width // 2)
-y = np.arange(-height // 2, height // 2)
+x = px2mm(np.arange(-width // 2, width // 2))
+y = px2mm(np.arange(-height // 2, height // 2))
 X, Y = np.meshgrid(x, y)
 
-extent = list(map(
-    lambda size_in_px: m2mm(size_in_px * px_size),
-    [-width // 2, width // 2, height // 2, -height // 2]
-))
+extent = [-width // 2, width // 2, height // 2, -height // 2]
 ic(width, height, extent)
 
 
