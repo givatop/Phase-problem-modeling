@@ -27,6 +27,7 @@ from src.propagation.utils.optic import (
 
 IS_INTENSITY_FROM_IMAGE = False
 IS_PHASE_FROM_IMAGE = False
+ADD_NOISE = True
 i_path = None
 p_path = None
 metadata = {}
@@ -68,6 +69,19 @@ else:
     phase = np.sqrt(px2m(x, px_size_m=px_size) ** 2 + focus ** 2) * 2 * np.pi / wavelength
     # phase = sin_1d(x, a=p_amplitude, T=p_wx, x0=p_x0)
 # endregion
+
+# noise
+if ADD_NOISE:
+    # params
+    mean = 0.0
+    standard_deviation = 0.01
+    # make some noise
+    noise = np.random.normal(mean, standard_deviation, size=intensity.shape)
+    intensity += noise
+    # write to metadata
+    metadata['ADD_NOISE'] = ADD_NOISE
+    metadata['mean'] = mean
+    metadata['standard_deviation'] = standard_deviation
 
 # region Complex Field
 complex_field = np.sqrt(intensity) * np.exp(-1j * phase)
