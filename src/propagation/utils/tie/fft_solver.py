@@ -32,7 +32,7 @@ class TIESolver(ABC):
         self._intensities = tuple(apply_volkov_scheme(i, bc) for i in intensities)
         self._dz = dz
         self._wavelength = wavelength
-        self._axial_derivative = central_finite_difference(self._intensities, dz)
+        self._axial_derivative = central_finite_difference(self._intensities, dz/2)
 
     @abstractmethod
     def solve(self, threshold) -> np.ndarray:
