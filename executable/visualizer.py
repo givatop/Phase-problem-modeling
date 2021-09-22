@@ -180,7 +180,12 @@ x = px2mm(np.arange(-width // 2, width // 2))
 y = px2mm(np.arange(-height // 2, height // 2))
 X, Y = np.meshgrid(x, y)
 
-extent = [-width // 2, width // 2, height // 2, -height // 2]
+extent = list(
+    map(
+        lambda v: px2mm(v, px_size_m=px_size),
+        [-width // 2, width // 2, height // 2, -height // 2]
+    )
+)
 ic(width, height, extent)
 
 
