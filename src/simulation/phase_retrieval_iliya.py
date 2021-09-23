@@ -3,7 +3,7 @@ import numpy as np
 
 from icecream import ic
 from src.propagation.utils.math import units
-from src.propagation.utils.tie import FFTSolver, BoundaryConditions
+from src.propagation.utils.tie import FFTSolver2D, BoundaryConditions
 
 
 # основные параметры для синтеза волны
@@ -49,6 +49,6 @@ for focal_len in focal_lens:
                 fn2 = os.path.join(filepath, f'z_{z2:.3f}mm.npy')
                 paths = [fn1, fn2]
 
-                solver = FFTSolver(paths, dz, wavelength, px_size, bc)
+                solver = FFTSolver2D(paths, dz, wavelength, px_size, bc)
                 unwrapped_phase = solver.solve(threshold)
                 pass

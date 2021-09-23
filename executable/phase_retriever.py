@@ -9,7 +9,7 @@ sys.path.append(r'C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-prob
 from src.propagation.presenter.loader import load_files
 from src.propagation.utils.math.units import m2mm
 from src.propagation.utils.tie import (
-    FFTSolver,
+    FFTSolver2D,
     FFTSolver1D,
     BoundaryConditions,
     SimplifiedFFTSolver,
@@ -94,7 +94,7 @@ if not os.path.exists(save_folder):
     os.mkdir(save_folder)
 
 Solver = args.solver
-if Solver == 'fft_2d': Solver = FFTSolver
+if Solver == 'fft_2d': Solver = FFTSolver2D
 elif Solver == 'fft_1d': Solver = FFTSolver1D
 elif Solver == 'simplified_fft1d': Solver = SimplifiedFFTSolver1D
 elif Solver == 'simplified_fft2d': Solver = SimplifiedFFTSolver

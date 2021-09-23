@@ -8,7 +8,7 @@ sys.path.append(r'C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-prob
 from src.propagation.presenter.loader import load_files
 from src.propagation.utils.math.units import m2mm, mm2m
 from src.propagation.utils.tie import (
-    FFTSolver,
+    FFTSolver2D,
     FFTSolver1D,
     BoundaryConditions,
     SimplifiedFFTSolver,

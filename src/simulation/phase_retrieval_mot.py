@@ -5,7 +5,7 @@ import numpy as np
 
 from src.propagation.presenter.loader import load_files
 from src.propagation.utils.math import units
-from src.propagation.utils.tie import FFTSolver, BoundaryConditions
+from src.propagation.utils.tie import FFTSolver2D, BoundaryConditions
 
 # основные параметры для синтеза волны
 from src.propagation.utils.tie.dct_solver import DCTSolver

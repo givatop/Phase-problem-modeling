@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from src.propagation.utils.math import units
-from src.propagation.utils.tie import FFTSolver, BoundaryConditions
+from src.propagation.utils.tie import FFTSolver2D, BoundaryConditions
 from src.propagation.utils.math.units import (nm2m, mm2m, um2m, m2mm, m2um, percent2decimal)
 from src.propagation.presenter.loader import load_image
 
@@ -50,7 +50,7 @@ for dz in dzs:
 
         Y, X = np.mgrid[0:intensities[0].shape[0], 0:intensities[0].shape[1]]
 
-        solver = FFTSolver(intensities, dz, wavelength, px_size, bc)
+        solver = FFTSolver2D(intensities, dz, wavelength, px_size, bc)
         unwrapped_phase = solver.solve(threshold)
 
         fig = plt.figure()

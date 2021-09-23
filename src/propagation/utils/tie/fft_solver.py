@@ -82,7 +82,7 @@ class TIESolver(ABC):
         return self._boundary_condition
 
 
-class FFTSolver(TIESolver):
+class FFTSolver2D(TIESolver):
     """
     Решение TIE методом Фурье.
     D. Paganin and K. A. Nugent, Phys. Rev. Lett. 80, 2586 (1998).
