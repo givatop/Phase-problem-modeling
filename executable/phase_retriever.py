@@ -1,13 +1,14 @@
 import os
 import sys
 import argparse
+import re
 
 import numpy as np
 from icecream import ic
 
 sys.path.append(r'C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-problem-modeling')
 from src.propagation.presenter.loader import load_files
-from src.propagation.utils.math.units import m2mm
+from src.propagation.utils.math.units import m2mm, mm2m
 from src.propagation.utils.tie import (
     FFTSolver2D,
     FFTSolver1D,
@@ -15,6 +16,8 @@ from src.propagation.utils.tie import (
     SimplifiedFFTSolver,
     SimplifiedFFTSolver1D,
 )
+
+Z_VALUE_PATTERN = r'z=([-]?\d+\.\d+)\.\w+$'
 
 parser = argparse.ArgumentParser(description='Retrieve Phase via Transport-of-Intensity Equation')
 
@@ -87,6 +90,12 @@ args = parser.parse_args()
 wavelength = args.wavelength
 px_size = args.px_size
 dz = args.dz
+if dz == 0:
+    z1 = re.findall(Z_VALUE_PATTERN, args.i1_path)[0]
+    z2 = re.findall(Z_VALUE_PATTERN, args.i2_path)[0]
+    z1 = mm2m(float(z1))
+    z2 = mm2m(float(z2))
+    dz = z2 - z1 if z2 > z1 else z1 - z2
 i1_path = args.i1_path
 i2_path = args.i2_path
 save_folder = args.save_folder
