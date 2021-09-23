@@ -1,7 +1,7 @@
 import numpy as np
 
 from typing import Tuple, Optional, List
-from numpy.fft import fftshift, fftfreq
+from numpy.fft import fftshift, fftfreq, fft2, ifft2
 from abc import ABC, abstractmethod
 
 from src.propagation.utils.tie.boundary_conditions import BoundaryConditions, apply_volkov_scheme
@@ -96,25 +96,66 @@ class FFTSolver2D(TIESolver):
 
     def solve(self, threshold) -> np.ndarray:
         wave_number = 2 * np.pi / self.wavelength
-        eps = 2.2204e-16  # from MatLab 2.2204e-16
-        reg_param = eps / self.pixel_size ** 4
 
-        # Умножение на волновое число
         phase = - wave_number * self.axial_derivative
 
-        # Первые Лапласиан и градиент
-        phase = ilaplacian_2d(phase, self.kx, self.ky, reg_param, return_spacedomain=False)
-        phase_x, phase_y = gradient_2d(phase, phase, self.kx, self.ky, space_domain=False)
+        # 1. Обратный Лапласиан
+        zero_k_mask = (self.kx == 0) & (self.ky == 0)
+        self.kx[zero_k_mask] = 1. + 0*1j
+        self.ky[zero_k_mask] = 1. + 0*1j
+        phase = fft2(phase)
+        phase = phase / (self.kx ** 2 + self.ky ** 2)
+        phase[zero_k_mask] = 0. + 0*1j
+        self.kx[zero_k_mask] = 0. + 0*1j
+        self.ky[zero_k_mask] = 0. + 0*1j
 
-        # Деление на опорную интенсивность
-        mask = self.add_threshold(threshold)
+        # 2. Градиенты
+        phase_x = ifft2(phase * self.kx).real
+        phase_y = ifft2(phase * self.ky).real
+
+        # 3. Деление на опорную интенсивность
+        if 0 in self.ref_intensity:
+            raise ValueError(f'Zero value occurred in reference intensity')
         phase_x /= self.ref_intensity
         phase_y /= self.ref_intensity
-        phase_x[mask], phase_y[mask] = 0, 0
 
-        # Вторые Лапласиан и градиент
-        phase_x, phase_y = gradient_2d(phase_x, phase_y, self.kx, self.ky)
-        phase = ilaplacian_2d(phase_x + phase_y, self.kx, self.ky, reg_param)
+        # 4. Градиент
+        phase_x = fft2(phase_x) * self.kx
+        phase_y = fft2(phase_y) * self.ky
+
+        # 5. Обратный Лапласиан
+        self.kx[zero_k_mask] = 1. + 0*1j
+        self.ky[zero_k_mask] = 1. + 0*1j
+        phase_x = phase_x / (self.kx ** 2 + self.ky ** 2)
+        phase_y = phase_y / (self.kx ** 2 + self.ky ** 2)
+        phase_x[zero_k_mask] = 0. + 0*1j
+        phase_y[zero_k_mask] = 0. + 0*1j
+        self.kx[zero_k_mask] = 0. + 0*1j
+        self.ky[zero_k_mask] = 0. + 0*1j
+        phase_x = ifft2(phase_x).real
+        phase_y = ifft2(phase_y).real
+
+        phase = phase_x + phase_y
+
+        # eps = 2.2204e-16  # from MatLab 2.2204e-16
+        # reg_param = eps / self.pixel_size ** 4
+
+        # # Умножение на волновое число
+        # phase = - wave_number * self.axial_derivative
+        #
+        # # Первые Лапласиан и градиент
+        # phase = ilaplacian_2d(phase, self.kx, self.ky, reg_param, return_spacedomain=False)
+        # phase_x, phase_y = gradient_2d(phase, phase, self.kx, self.ky, space_domain=False)
+        #
+        # # Деление на опорную интенсивность
+        # mask = self.add_threshold(threshold)
+        # phase_x /= self.ref_intensity
+        # phase_y /= self.ref_intensity
+        # phase_x[mask], phase_y[mask] = 0, 0
+        #
+        # # Вторые Лапласиан и градиент
+        # phase_x, phase_y = gradient_2d(phase_x, phase_y, self.kx, self.ky)
+        # phase = ilaplacian_2d(phase_x + phase_y, self.kx, self.ky, reg_param)
 
         phase = clip(phase, self.boundary_condition)
         return phase
@@ -124,12 +165,13 @@ class FFTSolver2D(TIESolver):
         Расчет частотных коэффициентов
         :return:
         """
-        raise NotImplementedError
-        area = CartesianGrid(*self.ref_intensity.shape, self.pixel_size)
-        nu_y_grid, nu_x_grid = area.grid
+        h, w = self.ref_intensity.shape
+        nu_x = fftfreq(w, d=self.pixel_size)
+        nu_y = fftfreq(h, d=self.pixel_size)
+        nu_x_grid, nu_y_grid = np.meshgrid(nu_x, nu_y)
 
-        kx = 1j * 2 * np.pi * fftshift(nu_x_grid)
-        ky = 1j * 2 * np.pi * fftshift(nu_y_grid)
+        kx = 1j * 2 * np.pi * nu_x_grid
+        ky = 1j * 2 * np.pi * nu_y_grid
 
         return kx, ky
 
@@ -307,11 +349,11 @@ class SimplifiedFFTSolver1D(TIESolver):
 if __name__ == '__main__':
     import os
 
-    path = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\1. Проверка корректности FFT1d-решения\phi=sphere i=gauss 1D complex_field propagation'
-    fn1 = 'intensity z = 0.000.npy'
-    fn2 = 'intensity z = 10.000.npy'
+    path = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\2. FFT 2D\i=rect0.5 phi=sphere propagation'
+    fn1 = 'i z=-0.005.npy'
+    fn2 = 'i z=0.005.npy'
 
-    dz = 10e-3
+    dz = 10e-6
     px_size = 5e-6
     wavelength = 555e-9
     threshold = 0.1
@@ -319,6 +361,6 @@ if __name__ == '__main__':
     i1 = np.load(os.path.join(path, fn1))
     i2 = np.load(os.path.join(path, fn2))
 
-    solver = FFTSolver1D([i1, i2], dz, wavelength, px_size)
+    solver = FFTSolver2D([i1, i2], dz, wavelength, px_size)
     phase = solver.solve(threshold)
     np.save(os.path.join(path, f'TIE phase.npy'), phase)
