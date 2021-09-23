@@ -1,7 +1,7 @@
 import os
 import sys
 import argparse
-
+import re
 
 from icecream import ic
 import numpy as np
@@ -12,6 +12,12 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 sys.path.append(r'C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-problem-modeling')
 from src.propagation.utils.math.units import m2um, m2mm, px2mm
 
+
+Z_VALUE_PATTERN = r'z=([-]?\d+\.\d+)\.\w+$'
+DZ_VALUE_PATTERN = r'dz=([-]?\d+\.\d+)mm\.\w+$'
+
+
+# region Arguments
 parser = argparse.ArgumentParser(description='Propagate initial wave on desired distances')
 parser.add_argument(
     '--mode',
@@ -24,6 +30,11 @@ parser.add_argument(
     '--file_path',
     type=str,
     required=True,
+)
+parser.add_argument(
+    '--true_phase_file_path',
+    type=str,
+    required=False,
 )
 parser.add_argument(
     '--save_folder',
@@ -164,6 +175,8 @@ ic(phase_ylabel)
 ic(intensity_cbar_ylabel)
 ic(phase_cbar_ylabel)
 
+# endregion
+
 # Initial
 fig = plt.figure(dpi=dpi, figsize=figsize)
 # fig.suptitle(figure_title) todo
@@ -241,13 +254,61 @@ elif mode == 'PHASE':
     ax.title.set_text(phase_title)
     ax.set_xlabel(phase_xlabel)
     ax.set_ylabel(phase_ylabel)
+    ax.set_xlim([None, None])
+    ax.set_ylim([None, None])
+elif mode == 'ERROR':
+    true_phase = np.load(args.true_phase_file_path)
+    retrieved_phase = array
+    corrected_retrieved_phase = retrieved_phase + (true_phase.max() - retrieved_phase.max())
+    phase_error = abs(true_phase - corrected_retrieved_phase)
+
+    z = float(re.findall(Z_VALUE_PATTERN, args.true_phase_file_path)[0])
+    dz = float(re.findall(DZ_VALUE_PATTERN, args.file_path)[0])
+
+    if retrieved_phase.ndim == 1:
+        ax1, ax2 = fig.add_subplot(2, 1, 1), fig.add_subplot(2, 1, 2)
+
+        ax1.plot(x, true_phase, '*', label=f'True z={z:.3f} mm')
+        ax1.plot(x, corrected_retrieved_phase, label=f'Retrieved by TIE dz={dz:.3f} mm')
+        ax1.title.set_text('Phase')
+        ax1.legend()
+
+        ax2.plot(x, phase_error)
+        ax2.title.set_text('Absolute Error')
+    else:
+        # todo нужны сечения
+        ax1, ax2 = fig.add_subplot(1, 2, 1), fig.add_subplot(1, 2, 2)
+
+        img = ax1.imshow(retrieved_phase, extent=extent, cmap=cmap)
+        divider = make_axes_locatable(ax1)
+        cax = divider.append_axes("right", size="5%", pad=0.05)
+        cbar = plt.colorbar(img, cax=cax)
+        cbar.ax.set_ylabel(phase_cbar_ylabel)
+        ax1.title.set_text(f'Phase Retrieved by TIE dz={dz:.3f} mm')
+
+        img = ax2.imshow(phase_error, extent=extent, cmap=cmap)
+        divider = make_axes_locatable(ax2)
+        cax = divider.append_axes("right", size="5%", pad=0.05)
+        cbar = plt.colorbar(img, cax=cax)
+        cbar.ax.set_ylabel(phase_cbar_ylabel)
+        ax2.title.set_text('Absolute Error')
+
+    [ax.grid(add_grid) for ax in [ax1, ax2]]
+    # [ax.title.set_text(phase_title) for ax in [ax1, ax2]]
+    [ax.set_xlabel(phase_xlabel) for ax in [ax1, ax2]]
+    [ax.set_ylabel(phase_ylabel) for ax in [ax1, ax2]]
+    # ax.set_xlim([None, None])
+    # ax.set_ylim([None, None])
 
 
 fig.tight_layout()
 
 if args.save_plot:
     init_filename = os.path.splitext(os.path.basename(filepath))[0]
-    filename = f'{init_filename}.png'
+    if mode == 'ERROR':
+        filename = f'{init_filename} {mode}.png'
+    else:
+        filename = f'{init_filename}.png'
     save_path = os.path.join(save_folder, filename)
     fig.savefig(save_path)
 
