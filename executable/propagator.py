@@ -4,6 +4,7 @@ import argparse
 
 import numpy as np
 from icecream import ic
+from skimage.restoration import unwrap_phase
 
 sys.path.append(r'C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-problem-modeling')
 from src.propagation.utils.math.units import m2mm
@@ -135,7 +136,7 @@ for distance in distances:
         save_path = os.path.join(save_folder, filename)
         np.save(save_path, intensity)
         # save phase
-        phase = np.unwrap(np.angle(wave_z))
+        phase = unwrap_phase(np.angle(wave_z))
         filename = f'phi z={m2mm(distance):.3f}.npy'
         save_path = os.path.join(save_folder, filename)
         np.save(save_path, phase)
