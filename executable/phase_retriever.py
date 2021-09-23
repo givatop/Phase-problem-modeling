@@ -95,7 +95,12 @@ if dz == 0:
     z2 = re.findall(Z_VALUE_PATTERN, args.i2_path)[0]
     z1 = mm2m(float(z1))
     z2 = mm2m(float(z2))
-    dz = z2 - z1 if z2 > z1 else z1 - z2
+    if z2 > z1:
+        dz = z2 - z1
+    else:
+        dz = z1 - z2
+        args.i1_path, args.i2_path = args.i2_path, args.i1_path
+
 i1_path = args.i1_path
 i2_path = args.i2_path
 save_folder = args.save_folder
@@ -129,7 +134,7 @@ threshold = args.threshold
 # bc = BoundaryConditions.NONE
 # threshold = .1
 
-ic(args)
+# ic(args)
 ic(wavelength)
 ic(px_size)
 ic(dz)
@@ -147,7 +152,6 @@ if np.complex in [intensity.dtype for intensity in intensities]:
     raise TypeError('one or more of the intensities has complex dtype')
 
 # TIE
-ic(dz)
 solver = Solver(intensities, dz, wavelength, px_size, bc=bc)
 retrieved_phase = solver.solve(threshold)
 
