@@ -13,11 +13,10 @@ sys.path.append(r'C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-prob
 from src.propagation.utils.math.units import m2um, m2mm, px2mm
 
 parser = argparse.ArgumentParser(description='Propagate initial wave on desired distances')
-
 parser.add_argument(
     '--mode',
     type=str,
-    choices=['complex_amplitude', 'slice', 'error', 'tie_phase'],
+    choices=['CA', 'SLICE', 'PHASE', 'ERROR'],
     required=True,
     help='Режим'
 )
@@ -62,8 +61,8 @@ parser.add_argument(
 )
 parser.add_argument(
     '--add_grid',
-    type=bool,
-    default=True,
+    type=int,
+    default=1,
 )
 parser.add_argument(
     '--intensity_title',
@@ -105,6 +104,7 @@ parser.add_argument(
     type=str,
     default='rad',
 )
+
 # Output
 parser.add_argument(
     '--show_plot',
@@ -118,6 +118,7 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
+
 
 # Setup
 mode = args.mode
@@ -165,7 +166,7 @@ ic(phase_cbar_ylabel)
 
 # Initial
 fig = plt.figure(dpi=dpi, figsize=figsize)
-fig.suptitle(figure_title)
+# fig.suptitle(figure_title) todo
 array = np.load(filepath)
 
 # Grid
@@ -189,7 +190,7 @@ extent = list(
 ic(width, height, extent)
 
 
-if mode == 'complex_amplitude':
+if mode == 'CA':
     ax1, ax2 = fig.add_subplot(1, 2, 1), fig.add_subplot(1, 2, 2)
 
     # Intensity
@@ -225,9 +226,7 @@ if mode == 'complex_amplitude':
     ax2.title.set_text(phase_title)
     ax2.set_xlabel(phase_xlabel)
     ax2.set_ylabel(phase_ylabel)
-
-
-elif mode == 'tie_phase':
+elif mode == 'PHASE':
     ax = fig.gca()
 
     if array.ndim == 1:
