@@ -286,7 +286,7 @@ elif mode == 'ERROR':
         # todo нужны сечения
         ax1, ax2 = fig.add_subplot(1, 2, 1), fig.add_subplot(1, 2, 2)
 
-        img = ax1.imshow(retrieved_phase, extent=extent, cmap=cmap)
+        img = ax1.imshow(retrieved_phase, extent=extent, cmap=cmap, vmin=None, vmax=None)
         divider = make_axes_locatable(ax1)
         cax = divider.append_axes("right", size="5%", pad=0.05)
         cbar = plt.colorbar(img, cax=cax)
@@ -295,7 +295,7 @@ elif mode == 'ERROR':
         ax1.set_xlabel("x, mm")
         ax1.set_ylabel("y, mm")
 
-        img = ax2.imshow(phase_error, extent=extent, cmap=cmap)
+        img = ax2.imshow(phase_error, extent=extent, cmap=cmap, vmin=0, vmax=4)
         divider = make_axes_locatable(ax2)
         cax = divider.append_axes("right", size="5%", pad=0.05)
         cbar = plt.colorbar(img, cax=cax)
