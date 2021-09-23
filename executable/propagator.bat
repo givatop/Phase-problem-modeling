@@ -1,22 +1,24 @@
-echo wave params
+@echo off
+
+rem wave params
 set wavelength=555e-9
 set px_size=5e-6
 set wave_path=%1
 
-echo propagation params
-set start=0e-3
-set stop=100e-3
-set step=10e-3
+rem propagation params
+set start=-0.000004
+set stop=0.000004
+set step=1e-6
 set method="angular_spectrum_band_limited"
 
-echo saving params
+rem saving params
 set save_folder="%~dp1\%~n1 propagation"
 set separate_save=1
 
-echo path to python
+rem path to python
 set python="C:\Users\IGritsenko\.virtualenvs\Phase-problem-modeling-VD4lAbA6\Scripts\python.exe"
 
-echo path to propagator.py
+rem path to propagator.py
 set propagator="C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-problem-modeling\executable\propagator.py"
 
 echo running...

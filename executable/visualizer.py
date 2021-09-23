@@ -16,9 +16,9 @@ from src.propagation.utils.math.units import m2um, m2mm, px2mm
 Z_VALUE_PATTERN = r'z=([-]?\d+\.\d+)\.\w+$'
 DZ_VALUE_PATTERN = r'dz=([-]?\d+\.\d+)mm\.\w+$'
 
-
 # region Arguments
 parser = argparse.ArgumentParser(description='Propagate initial wave on desired distances')
+
 parser.add_argument(
     '--mode',
     type=str,
@@ -78,12 +78,12 @@ parser.add_argument(
 parser.add_argument(
     '--intensity_title',
     type=str,
-    default='I(x,y)',
+    default='Intensity',
 )
 parser.add_argument(
     '--phase_title',
     type=str,
-    default='Phi(x,y)',
+    default='Phase',
 )
 parser.add_argument(
     '--intensity_xlabel',
@@ -175,8 +175,6 @@ ic(phase_ylabel)
 ic(intensity_cbar_ylabel)
 ic(phase_cbar_ylabel)
 
-# endregion
-
 # Initial
 fig = plt.figure(dpi=dpi, figsize=figsize)
 # fig.suptitle(figure_title) todo
@@ -202,6 +200,7 @@ extent = list(
 )
 ic(width, height, extent)
 
+# endregion
 
 if mode == 'CA':
     ax1, ax2 = fig.add_subplot(1, 2, 1), fig.add_subplot(1, 2, 2)
@@ -244,18 +243,22 @@ elif mode == 'PHASE':
 
     if array.ndim == 1:
         ax.plot(x, array)
+        ax.set_xlabel(phase_xlabel)
+        ax.set_ylabel(phase_ylabel)
+        ax.title.set_text(phase_title)
     else:
         img = ax.imshow(array, extent=extent, cmap=cmap)
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("right", size="5%", pad=0.05)
         cbar = plt.colorbar(img, cax=cax)
         cbar.ax.set_ylabel(phase_cbar_ylabel)
+        ax.set_xlabel("x, mm")
+        ax.set_ylabel("y, mm")
+        ax.title.set_text('2D Phase')
+
     ax.grid(add_grid)
-    ax.title.set_text(phase_title)
-    ax.set_xlabel(phase_xlabel)
-    ax.set_ylabel(phase_ylabel)
-    ax.set_xlim([None, None])
-    ax.set_ylim([None, None])
+    # ax.set_xlim([None, None])
+    # ax.set_ylim([None, None])
 elif mode == 'ERROR':
     true_phase = np.load(args.true_phase_file_path)
     retrieved_phase = array
@@ -275,6 +278,10 @@ elif mode == 'ERROR':
 
         ax2.plot(x, phase_error)
         ax2.title.set_text('Absolute Error')
+
+        [ax.set_xlabel(phase_xlabel) for ax in [ax1, ax2]]
+        [ax.set_ylabel(phase_ylabel) for ax in [ax1, ax2]]
+
     else:
         # todo нужны сечения
         ax1, ax2 = fig.add_subplot(1, 2, 1), fig.add_subplot(1, 2, 2)
@@ -285,6 +292,8 @@ elif mode == 'ERROR':
         cbar = plt.colorbar(img, cax=cax)
         cbar.ax.set_ylabel(phase_cbar_ylabel)
         ax1.title.set_text(f'Phase Retrieved by TIE dz={dz:.3f} mm')
+        ax1.set_xlabel("x, mm")
+        ax1.set_ylabel("y, mm")
 
         img = ax2.imshow(phase_error, extent=extent, cmap=cmap)
         divider = make_axes_locatable(ax2)
@@ -292,11 +301,11 @@ elif mode == 'ERROR':
         cbar = plt.colorbar(img, cax=cax)
         cbar.ax.set_ylabel(phase_cbar_ylabel)
         ax2.title.set_text('Absolute Error')
+        ax2.set_xlabel("x, mm")
+        ax2.set_ylabel("y, mm")
 
     [ax.grid(add_grid) for ax in [ax1, ax2]]
     # [ax.title.set_text(phase_title) for ax in [ax1, ax2]]
-    [ax.set_xlabel(phase_xlabel) for ax in [ax1, ax2]]
-    [ax.set_ylabel(phase_ylabel) for ax in [ax1, ax2]]
     # ax.set_xlim([None, None])
     # ax.set_ylim([None, None])
 

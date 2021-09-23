@@ -26,4 +26,4 @@ if "%~1" neq "" (
   goto :loop
 )
 
-pause
+rem pause

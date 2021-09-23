@@ -14,9 +14,9 @@ from src.propagation.utils.optic.propagation_methods import (
     fresnel
 )
 
+# region Arguments
 parser = argparse.ArgumentParser(description='Propagate initial wave on desired distances')
 
-# region Физические параметры волны
 parser.add_argument(
     '--wavelength',
     type=float,
@@ -35,8 +35,6 @@ parser.add_argument(
     required=True,
     help='Путь к .npy-файлу с волной'
 )
-# endregion
-# region Параметры распространения
 parser.add_argument(
     '--start',
     type=float,
@@ -63,8 +61,6 @@ parser.add_argument(
     required=False,
     help='Метод распространения'
 )
-# endregion
-# region Параметры сохранения
 parser.add_argument(
     '--save_folder',
     type=str,
@@ -77,8 +73,7 @@ parser.add_argument(
     default=1,
     help='Созранить интенсивность и фазу как отдельные файлы'
 )
-# endregion
-# region Парсинг в переменные и вывод в консоль
+
 args = parser.parse_args()
 wavelength = args.wavelength
 px_size = args.px_size
@@ -126,7 +121,7 @@ for distance in distances:
     # Сохранение файла с волной
     filename = f'z={m2mm(distance):.3f}.npy'
     save_path = os.path.join(save_folder, filename)
-    print(save_path)
+    ic(save_path)
     np.save(save_path, wave_z)
 
     if args.separate_save:
