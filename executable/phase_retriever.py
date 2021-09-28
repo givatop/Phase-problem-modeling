@@ -7,6 +7,8 @@ import numpy as np
 from icecream import ic
 
 sys.path.append(r'C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-problem-modeling')
+sys.path.append(r'/Users/megamot/Programming/Python/Phase-problem-modeling')
+
 from src.propagation.presenter.loader import load_files
 from src.propagation.utils.math.units import m2mm, mm2m
 from src.propagation.utils.tie import (

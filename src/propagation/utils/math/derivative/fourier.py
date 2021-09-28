@@ -146,7 +146,8 @@ def dct_ilaplacian_2d(f: ndarray,
     :param return_spacedomain:
     :return: array-like градиент от функции f
     """
-    res = _dctn(f) * lambda_mn
+    res = _dctn(f) / lambda_mn
+    # res = _dctn(f)
 
     if return_spacedomain:
         res = _idctn(res)

@@ -4,6 +4,7 @@
 """
 
 import os
+import platform
 from datetime import date
 
 import numpy as np
@@ -24,16 +25,16 @@ from src.propagation.utils.optic import (
     cos_1d,
 )
 
-
 IS_INTENSITY_FROM_IMAGE = False
 IS_PHASE_FROM_IMAGE = False
-ADD_NOISE = True
+ADD_NOISE = False
 i_path = None
 p_path = None
 metadata = {}
-folder = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\1. Проверка корректности FFT1d-решения'
-filename = 'i=0.5 phi=sphere 1D complex_field.npy'
+folder = '/Users/megamot/Programming/Python/Phase-problem-modeling/data/executable_synthesis' if platform.system() == 'Darwin' \
+        else r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\1. Проверка корректности FFT1d-решения'
 
+filename = 'i=0.5 phi=sphere 1D complex_field.npy'
 
 # region Grid Params
 width, height = 1024, 1
@@ -53,7 +54,7 @@ if IS_INTENSITY_FROM_IMAGE:
     intensity = load_image(i_path)
 else:
     i_amplitude = 0.5
-    i_wx, i_wy = width/10, height/2
+    i_wx, i_wy = width / 10, height / 2
     i_x0, i_y0 = 0, 0
     intensity = i_amplitude
     # intensity = gauss_1d(x, a=i_amplitude, w=i_wx, x0=i_x0)
@@ -63,7 +64,7 @@ if IS_PHASE_FROM_IMAGE:
     phase = load_image(p_path)
 else:
     p_amplitude = 1.
-    p_wx, p_wy = width/4, height/2
+    p_wx, p_wy = width / 4, height / 2
     p_x0, p_y0 = p_wx // 4, 0
     focus = mm2m(100)
     phase = np.sqrt(px2m(x, px_size_m=px_size) ** 2 + focus ** 2) * 2 * np.pi / wavelength

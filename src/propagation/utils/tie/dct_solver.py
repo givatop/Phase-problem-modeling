@@ -28,7 +28,7 @@ class DCTSolver(TIESolver):
         phase = - wave_number * self.axial_derivative
 
         # Первые Лапласиан и градиент
-        phase = dct_ilaplacian_2d(phase, self.lambda_mn, return_spacedomain=False)
+        phase = dct_ilaplacian_2d(phase, lambda_mn=self.lambda_mn, return_spacedomain=False)
         phase_x, phase_y = dct_gradient_2d(phase, phase, space_domain=False)
 
         # Деление на опорную интенсивность
