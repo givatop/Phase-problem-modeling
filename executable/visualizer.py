@@ -277,7 +277,7 @@ elif mode == 'ERROR':
         ax1.legend()
 
         ax2.plot(x, phase_error)
-        ax2.title.set_text('Absolute Error')
+        ax2.title.set_text(f'Absolute Error max = {np.max(phase_error):.5f} rad')
 
         [ax.set_xlabel(phase_xlabel) for ax in [ax1, ax2]]
         [ax.set_ylabel(phase_ylabel) for ax in [ax1, ax2]]

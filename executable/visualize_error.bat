@@ -24,6 +24,7 @@ set save_plot=1
 if "%~1" neq "" (
   echo %~1
   %python% %visualizer% --file_path "%~1" --true_phase_file_path %true_phase_file_path% --save_folder "%~dp1\" --mode %mode% --dpi %dpi% --figsize %figsize_width% %figsize_height% --px_size %px_size% --cmap %cmap% --show_plot %show_plot% --save_plot %save_plot% --phase_ylabel %phase_ylabel%
+  echo done
 
   shift
   goto :loop
