@@ -17,6 +17,7 @@ from src.propagation.utils.tie import (
     BoundaryConditions,
     SimplifiedFFTSolver,
     SimplifiedFFTSolver1D,
+    DCTSolver1D
 )
 
 Z_VALUE_PATTERN = r'z=([-]?\d+\.\d+)\.\w+$'
@@ -59,7 +60,7 @@ parser.add_argument(
 parser.add_argument(
     '--solver',
     type=str,
-    choices=['fft_1d', 'fft_2d', 'simplified_fft1d', 'simplified_fft2d', 'dct_2d'],
+    choices=['fft_1d', 'fft_2d', 'simplified_fft1d', 'simplified_fft2d', 'dct_2d', 'dct_1d'],
     default='fft_2d',
     required=False,
     help='Метод решения TIE'
@@ -114,6 +115,7 @@ if Solver == 'fft_2d': Solver = FFTSolver2D
 elif Solver == 'fft_1d': Solver = FFTSolver1D
 elif Solver == 'simplified_fft1d': Solver = SimplifiedFFTSolver1D
 elif Solver == 'simplified_fft2d': Solver = SimplifiedFFTSolver
+elif Solver == 'dct_1d': Solver = DCTSolver1D
 elif Solver == 'dct_2d': raise NotImplementedError
 else: raise ValueError(f'There\'s no \"{Solver}\" solver')
 

@@ -1,3 +1,4 @@
+import numpy as np
 from numpy.fft import fft2, ifft2, fft, ifft
 from numpy import ndarray, real
 from scipy.fftpack import dct, idct
@@ -147,9 +148,50 @@ def dct_ilaplacian_2d(f: ndarray,
     :return: array-like градиент от функции f
     """
     res = _dctn(f) / lambda_mn
-    # res = _dctn(f)
 
     if return_spacedomain:
         res = _idctn(res)
+
+    return res
+
+
+def dct_gradient_1d(f: ndarray, space_domain: bool = True) -> ndarray:
+    """
+    Возвращает сумму частных производных первого порядка (функция градиента) от функции f,
+    посчитанных при помощи двумерного косинусного преобразования.
+    :param f: array-like одномерная функция функция
+    :param space_domain:
+    :return: array-like градиент от функции f
+    """
+    if space_domain:
+        f = dct(f)
+
+    return idct(f)
+
+
+def dct_ilaplacian_1d(f: ndarray,
+                      lambda_mn: ndarray,
+                      return_spacedomain: bool = True
+                      ) -> ndarray:
+    """
+    Возвращает сумму частных производных минус второго порядка (обратный Лапласиан) от функции f,
+    посчитанных при помощи двумерного косинусного преобразования.
+    :param f: array-like одномерная функция
+    :param lambda_mn: float собственное число функции Грина
+    :param return_spacedomain:
+    :return: array-like градиент от функции f
+    """
+    # Create mask
+    mask = (lambda_mn == 0)
+    lambda_mn[mask] = 1
+    # Spectral Transformation
+    res = dct(f) / lambda_mn
+    # Correct result array
+    res[mask] = 0
+    # Correct lambda
+    lambda_mn[mask] = 0
+
+    if return_spacedomain:
+        res = idct(res)
 
     return res

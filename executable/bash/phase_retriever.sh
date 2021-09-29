@@ -6,9 +6,9 @@ wavelength=555e-9
 px_size=5e-6
 
 # propagation params
-solver="fft_1d"
+solver="dct_1d"
 bc="None"
-threshold=0.1
+threshold=0.135
 
 # saving params
 save_folder="/Users/megamot/Programming/Python/Phase-problem-modeling/data/executable_phases"
