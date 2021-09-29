@@ -7,8 +7,6 @@ from scipy.fftpack import dct, idct
 Первоисточник: D. Paganin "Coherent X-Ray Imaging" p.299-300 2006
 """
 
-NORM = None
-
 
 def gradient_2d(f_x: ndarray,
                 f_y: ndarray,
@@ -26,10 +24,10 @@ def gradient_2d(f_x: ndarray,
     :return: array-like градиент от функции f
     """
     if space_domain:
-        f_x = fft2(f_x, norm=NORM)
-        f_y = fft2(f_y, norm=NORM)
+        f_x = fft2(f_x)
+        f_y = fft2(f_y)
 
-    return real(ifft2(f_x * kx, norm=NORM)), real(ifft2(f_y * ky, norm=NORM))
+    return real(ifft2(f_x * kx)), real(ifft2(f_y * ky))
 
 
 def gradient_1d(f: ndarray,
@@ -43,9 +41,9 @@ def gradient_1d(f: ndarray,
     :return: array-like градиент от функции f
     """
     if space_domain:
-        f = fft(f, norm=NORM)
+        f = fft(f)
 
-    return real(ifft(f * k, norm=NORM))
+    return real(ifft(f * k))
 
 
 def ilaplacian_2d(f: ndarray,
@@ -64,10 +62,10 @@ def ilaplacian_2d(f: ndarray,
     :param return_spacedomain:
     :return: array-like градиент от функции f
     """
-    res = fft2(f, norm=NORM) * (kx ** 2 + ky ** 2) / (reg_param + (kx ** 2 + ky ** 2) ** 2)
+    res = fft2(f) * (kx ** 2 + ky ** 2) / (reg_param + (kx ** 2 + ky ** 2) ** 2)
 
     if return_spacedomain:
-        res = real(ifft2(res, norm=NORM))
+        res = real(ifft2(res))
 
     return res
 
@@ -88,14 +86,14 @@ def ilaplacian_1d(f: ndarray,
     mask = (kx == 0)
     kx[mask] = 1. + 0 * 1j
     # Spectral Transformation
-    res = fft(f, norm=NORM) / kx.T ** 2
+    res = fft(f) / kx ** 2
     # Correct result array
     res[mask] = 0. + 0 * 1j
     # Correct kx
     kx[mask] = 0. + 0 * 1j
 
     if return_spacedomain:
-        res = ifft(res, norm=NORM).real
+        res = ifft(res).real
 
     return res
 
