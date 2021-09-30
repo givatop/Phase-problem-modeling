@@ -27,7 +27,8 @@ from src.propagation.utils.optic import (
 
 IS_INTENSITY_FROM_IMAGE = False
 IS_PHASE_FROM_IMAGE = False
-ADD_NOISE = True
+ADD_NOISE = False
+ADD_APERTURE = False
 i_path = None
 p_path = None
 metadata = {}
@@ -83,8 +84,19 @@ if ADD_NOISE:
     metadata['mean'] = mean
     metadata['standard_deviation'] = standard_deviation
 
+# Aperture
+if ADD_APERTURE:
+    a_wx, a_wy = width // 2, height //2
+    a_x0, a_y0 = 0, 0
+    if intensity.ndim == 1:
+        aperture = rect_1d(x, a=1, w=a_wx, x0=a_x0)
+    elif intensity.ndim == 2:
+        aperture = rect_2d(x, y, a=1, wx=a_wx, wy=a_wy, x0=a_x0, y0=a_y0)
+else:
+    aperture = np.ones(intensity.shape)
+
 # region Complex Field
-complex_field = np.sqrt(intensity) * np.exp(-1j * phase)
+complex_field = np.sqrt(intensity) * np.exp(1j * phase) * aperture
 # endregion
 # region Save Complex Field
 filepath = os.path.join(folder, filename)
