@@ -209,7 +209,7 @@ class FFTSolver1D(TIESolver):
     def __init__(self, intensities, dz, wavelength, pixel_size, bc=BoundaryConditions.NONE):
         super().__init__(intensities, dz, wavelength, bc)
         self._pixel_size = pixel_size
-        self._kx = 1j * 2 * np.pi * fftfreq(intensities[0].shape[0], d=pixel_size)
+        self._kx = self._get_frequency_coefs()
 
     def solve(self, threshold) -> np.ndarray:
         wave_number = 2 * np.pi / self.wavelength
@@ -233,18 +233,8 @@ class FFTSolver1D(TIESolver):
         phase = clip(phase, self.boundary_condition)
         return phase
 
-    # def _get_frequency_coefs(self) -> Tuple[np.ndarray, np.ndarray]:
-    #     """
-    #     Расчет частотных коэффициентов
-    #     :return:
-    #     """
-    #     area = FrequencyGrid(*self.ref_intensity.shape, self.pixel_size)
-    #     nu_y_grid, nu_x_grid = area.grid
-    #
-    #     kx = 1j * 2 * np.pi * fftshift(nu_x_grid)
-    #     ky = 1j * 2 * np.pi * fftshift(nu_y_grid)
-    #
-    #     return kx, ky
+    def _get_frequency_coefs(self):
+        return 1j * 2 * np.pi * fftfreq(self.ref_intensity.shape[0], d=self.pixel_size)
 
     @property
     def pixel_size(self):
