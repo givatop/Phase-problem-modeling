@@ -192,21 +192,80 @@ def cos_1d(
     return result + y0
 
 
+def semicircle(
+    x: np.ndarray,
+    r: Union[int, float] = 1,
+    x0: Union[int, float] = 0,
+    y0: Union[int, float] = 0,
+    inverse: Union[bool, int] = False,
+):
+    """
+    Полуокружность
+    :param x:
+    :param r:
+    :param x0:
+    :param y0:
+    :param inverse:
+    :return:
+    """
+    mask = (r ** 2 - (x - x0) ** 2) < 0
+    semicircle = np.sqrt(r ** 2 - (x - x0) ** 2)
+    semicircle[mask] = 0
+    semicircle += y0
+
+    if inverse:
+        semicircle = -semicircle
+
+    return semicircle
+
+
+def hemisphere(
+    x: np.ndarray,
+    y: np.ndarray,
+    r: Union[int, float] = 1,
+    x0: Union[int, float] = 0,
+    y0: Union[int, float] = 0,
+    z0: Union[int, float] = 0,
+    inverse: Union[bool, int] = False,
+):
+    """
+    Полусфера
+    :param x:
+    :param y:
+    :param r:
+    :param x0:
+    :param y0:
+    :param z0:
+    :param inverse:
+    :return:
+    """
+    mask = (r ** 2 - (x - x0) ** 2 - (y - y0) ** 2) < 0
+    hemisphere = np.sqrt(r ** 2 - (x - x0) ** 2 - (y - y0) ** 2)
+    hemisphere[mask] = 0
+    hemisphere += z0
+
+    if inverse:
+        hemisphere = -hemisphere
+
+    return hemisphere
+
+
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    MODE = 1  # 1D | 2D
+    MODE = 2  # 1D | 2D
     SHIFT_GRID = 0  # =1 то независимо от значений (x0; y0) центр функции будет в (0, 0)
 
     # Параметры исходной функции
-    a = 1
-    x0 = -1.5
-    y0 = a
+    a = 5
+    x0 = 2
+    y0 = 4
+    z0 = 0
     wx = 1.
     wy = 1.
 
     # Параметры сеток
-    xleft = -np.pi * 2
+    xleft = -10
     xright = -xleft
     xnum = 1000
     dx = 1 / xnum
@@ -216,7 +275,7 @@ if __name__ == '__main__':
     ynum = 1000
     dy = dx
 
-    fig = plt.figure(figsize=(12, 5))
+    # fig = plt.figure(figsize=(12, 5))
 
     # 1-мерный график
     if MODE == 1:
@@ -226,7 +285,7 @@ if __name__ == '__main__':
         # f = lambda _x: triangle_1d(_x, a=a, x0=x0, w=wx) - a
         # y = f(x)
         T = 1
-        y = sin_1d(x, a=a, x0=x0, y0=y0, T=T, clip=True, right=T*3)
+        y = semicircle(x, x0=x0, y0=y0, inverse=1)
 
         if SHIFT_GRID:
             x -= x0
@@ -236,28 +295,22 @@ if __name__ == '__main__':
 
     # 2-мерный график
     if MODE == 2:
-        ax = plt.axes(projection='3d')
+        # ax = plt.axes(projection='3d')
         Y, X = np.mgrid[yleft:yright:ynum * 1j, xleft:xright:xnum * 1j]
-        # f = logistic_1d(X, w=0, x0=x0)
-        f = triangle_2d(X, Y, a, wx=wx, wy=wy, x0=x0, y0=y0)
-        # f = defocus(X, Y)
-        # f = gauss_2d(X, Y, a, wx=wx, wy=wy, x0=x0, y0=y0) - a
-        # f = triangle_1d(X, a, w=wx, x0=x0) - a
+
+        f = hemisphere(X, Y, r=a, x0=x0, y0=y0, z0=z0)
+
         if SHIFT_GRID:
             X -= x0
             Y -= y0
 
-        # from numpy import gradient
-        # grads = gradient(f, X[0, :], Y[:, 0])
-        # grad_x, grad_y = grads[0], grads[1]
+        extent = [xleft, xright, yright, yleft]
+        plt.imshow(f, cmap='jet', extent=extent)
+        plt.grid()
+        plt.colorbar()
 
-        mappable = ax.plot_surface(X, Y, f, cmap="jet", antialiased=0)
-        plt.colorbar(mappable)
-        # mappable = ax.plot_surface(X, Y, grad_x, cmap="gray", antialiased=True)
-        # plt.colorbar
-        # mappable = ax.plot_wireframe(X, Y, grad_y, rcount=20, ccount=20, antialiased=True)
+        # mappable = ax.plot_surface(X, Y, f, cmap="jet", antialiased=0)
         # plt.colorbar(mappable)
-        # ax.view_init(elev=-90, azim=90)  # Вид "сверху"
 
     # Настройки графика
     plt.xlabel('x')
