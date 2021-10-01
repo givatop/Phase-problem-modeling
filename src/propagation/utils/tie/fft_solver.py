@@ -16,7 +16,13 @@ class TIESolver(ABC):
     Абстрактный класс для решения TIE
     """
 
-    def __init__(self, intensities: List[np.ndarray], dz: float, wavelength: Optional[float], bc: BoundaryConditions):
+    def __init__(
+            self,
+            intensities: List[np.ndarray],
+            dz: float,
+            wavelength: Optional[float],
+            bc: BoundaryConditions,
+    ):
         """
         :param intensities: интенсивности
         :param dz: шаг, м
@@ -33,6 +39,8 @@ class TIESolver(ABC):
         self._dz = dz
         self._wavelength = wavelength
         self._axial_derivative = central_finite_difference(self._intensities, dz/2)
+
+        self._ref_intensity = self._intensities[0]
 
     @abstractmethod
     def solve(self, threshold) -> np.ndarray:
@@ -63,7 +71,11 @@ class TIESolver(ABC):
 
     @property
     def ref_intensity(self):
-        return self._intensities[0]
+        return self._ref_intensity
+
+    @ref_intensity.setter
+    def ref_intensity(self, value):
+        self._ref_intensity = value
 
     @property
     def dz(self):
