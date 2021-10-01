@@ -5,3 +5,4 @@ from .fft_solver import (
     SimplifiedFFTSolver,
     SimplifiedFFTSolver1D
 )
+from .dct_solver import DCTSolver1D

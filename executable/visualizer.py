@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 sys.path.append(r'C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-problem-modeling')
+sys.path.append(r'/Users/megamot/Programming/Python/Phase-problem-modeling')
 from src.propagation.utils.math.units import m2um, m2mm, px2mm
 
 

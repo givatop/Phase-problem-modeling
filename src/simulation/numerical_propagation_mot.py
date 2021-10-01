@@ -16,10 +16,12 @@ from src.propagation.utils.math import units
 from src.propagation.utils.math.general import *
 
 # основные параметры для синтеза волны
+from src.propagation.utils.optic.propagation_methods import angular_spectrum_bl_propagation
+
 width, height = 512, 512
 wavelength = units.nm2m(632.8)
 px_size = units.um2m(5.04)
-gaussian_width_params = [250]
+gaussian_width_params = [200]
 focal_lens = [100]
 focal_lens = list(map(units.mm2m, focal_lens))
 
@@ -28,7 +30,7 @@ thresholds = [np.exp(-2), units.percent2decimal(13), units.percent2decimal(0.5),
 t_num = 0
 
 # параметры для итерации при рапространении волны
-start = units.mm2m(0)
+start = units.mm2m(85)
 stop = units.mm2m(200)
 step = units.mm2m(1)
 distances = np.arange(start, stop + step, step)
@@ -49,7 +51,7 @@ for focal_len in focal_lens:
             field = SphericalWave(square_area_1, focal_len, gaussian_width_param, wavelength)
 
             # распространение волны на дистанцию z
-            field.propagate_on_distance(z, frequency_grid=freq_grid)
+            field.propagate_on_distance(z, method=angular_spectrum_bl_propagation)
             # todo мы теряем U(z=0) и на каждой итерации цикла приходится генерить её заново
 
             # определение апертуры для поиска радиуса волнового фронта

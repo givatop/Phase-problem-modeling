@@ -7,6 +7,8 @@ from icecream import ic
 from skimage.restoration import unwrap_phase
 
 sys.path.append(r'C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-problem-modeling')
+sys.path.append(r'/Users/megamot/Programming/Python/Phase-problem-modeling')
+
 from src.propagation.utils.math.units import m2mm
 from src.propagation.utils.optic.propagation_methods import (
     angular_spectrum_band_limited,
@@ -98,9 +100,12 @@ else:
     ValueError(f'Unknown shape: {complex_field.shape}')
 
 distances = np.arange(start, stop + step, step)
-if method == 'fresnel': method = fresnel
-elif method == 'angular_spectrum': method = angular_spectrum_propagation  # todo это не будет работать
-elif method == 'angular_spectrum_band_limited': method = angular_spectrum_band_limited
+if method == 'fresnel':
+    method = fresnel
+elif method == 'angular_spectrum':
+    method = angular_spectrum_propagation  # todo это не будет работать
+elif method == 'angular_spectrum_band_limited':
+    method = angular_spectrum_band_limited
 
 ic(wavelength)
 ic(px_size)
