@@ -2,6 +2,7 @@ import numpy as np
 from numpy.fft import fft2, ifft2, fft, ifft
 from numpy import ndarray, real
 from scipy.fftpack import dct, idct
+from numpy.linalg import inv
 
 """
 Псевдо-дифференциальные операторы, реализованные через FFT.
@@ -162,9 +163,9 @@ def dct_gradient_1d(f: ndarray, space_domain: bool = True) -> ndarray:
     :return: array-like градиент от функции f
     """
     if space_domain:
-        f = dct(f)
+        f = dct(f, norm='ortho')
 
-    return idct(f)
+    return idct(f, norm='ortho')
 
 
 def dct_ilaplacian_1d(f: ndarray,
@@ -183,13 +184,13 @@ def dct_ilaplacian_1d(f: ndarray,
     mask = (lambda_mn == 0)
     lambda_mn[mask] = 1
     # Spectral Transformation
-    res = dct(f) / lambda_mn
+    res = dct(f, norm='ortho') / lambda_mn
     # Correct result array
     res[mask] = 0
     # Correct lambda
     lambda_mn[mask] = 0
 
     if return_spacedomain:
-        res = idct(res)
+        res = idct(res, norm='ortho')
 
     return res
