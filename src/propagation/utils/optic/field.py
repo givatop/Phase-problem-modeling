@@ -195,6 +195,7 @@ def cos_1d(
 def semicircle(
     x: np.ndarray,
     r: Union[int, float] = 1,
+    sag: Union[int, float] = None,
     x0: Union[int, float] = 0,
     y0: Union[int, float] = 0,
     inverse: Union[bool, int] = False,
@@ -203,14 +204,28 @@ def semicircle(
     Полуокружность
     :param x:
     :param r:
+    :param sag: стрелка прогиба
     :param x0:
     :param y0:
     :param inverse:
     :return:
     """
+    if sag > r:
+        raise ValueError(f'sag {sag} greater than radius {r}')
+    if r <= 0:
+        raise ValueError(f'radius <= zero')
+
+    # маска, чтобы отсечь nan
     mask = (r ** 2 - (x - x0) ** 2) < 0
+    # уравнение полуокружности
     semicircle = np.sqrt(r ** 2 - (x - x0) ** 2)
+    # сдвиг по оси y, чтобы получить нужное значение стрелки прогиба
+    if sag:
+        semicircle -= r - sag
+        semicircle[semicircle < 0] = 0
+    # приравниваем все nan к 0
     semicircle[mask] = 0
+    # сдвиг по оси y
     semicircle += y0
 
     if inverse:

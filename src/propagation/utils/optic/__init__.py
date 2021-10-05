@@ -10,4 +10,6 @@ from .field import (
     logistic_1d,
     sin_1d,
     cos_1d,
+    hemisphere,
+    semicircle,
 )
