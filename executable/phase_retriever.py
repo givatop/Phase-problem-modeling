@@ -15,8 +15,6 @@ from src.propagation.utils.tie import (
     FFTSolver2D,
     FFTSolver1D,
     BoundaryConditions,
-    SimplifiedFFTSolver,
-    SimplifiedFFTSolver1D,
     DCTSolver1D
 )
 

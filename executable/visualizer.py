@@ -296,12 +296,12 @@ elif mode == 'ERROR':
         ax1.set_xlabel("x, mm")
         ax1.set_ylabel("y, mm")
 
-        img = ax2.imshow(phase_error, extent=extent, cmap=cmap, vmin=0, vmax=4)
+        img = ax2.imshow(phase_error, extent=extent, cmap=cmap, vmin=None, vmax=None)
         divider = make_axes_locatable(ax2)
         cax = divider.append_axes("right", size="5%", pad=0.05)
         cbar = plt.colorbar(img, cax=cax)
         cbar.ax.set_ylabel(phase_cbar_ylabel)
-        ax2.title.set_text('Absolute Error')
+        ax2.title.set_text(f'Absolute Error max = {np.max(phase_error):.5f} rad')
         ax2.set_xlabel("x, mm")
         ax2.set_ylabel("y, mm")
 

@@ -28,9 +28,10 @@ folder = '/Users/megamot/Programming/Python/Phase-problem-modeling/data/executab
 filename = 'i=0.5 phi=sphere 1D complex_field.npy'
 
 # region Grid Params
-width, height = 1024, 1
-px_size = um2m(5)
-wavelength = nm2m(555)
+width, height = 512, 512
+shape = [width] if height == 1 else [width, height]
+# px_size = um2m(5)
+# wavelength = nm2m(555)
 x = np.arange(-width // 2, width // 2)
 y = np.arange(-height // 2, height // 2)
 X, Y = np.meshgrid(x, y)
@@ -84,7 +85,7 @@ if ADD_APERTURE:
     elif intensity.ndim == 2:
         aperture = rect_2d(x, y, a=1, wx=a_wx, wy=a_wy, x0=a_x0, y0=a_y0)
 else:
-    aperture = np.ones(intensity.shape)
+    aperture = np.ones(shape)
 
 # region Complex Field
 complex_field = np.sqrt(intensity) * np.exp(1j * phase) * aperture
