@@ -34,6 +34,16 @@ def calculate_sagitta(r, l):
     return r - np.sqrt(r ** 2 - (l / 2) ** 2)
 
 
+def calculate_chord(radius, sag):
+    """
+    Расчет хорды по известному радиусу и стрелке прогиба
+    :param radius: радиус окружности
+    :param sag: стрелка прогиба
+    :return: chord
+    """
+    return 2 * np.sqrt(2 * radius * sag - sag ** 2)
+
+
 def calc_amplitude(array):
     return np.abs(np.max(array)) + np.abs(np.min(array))
 
