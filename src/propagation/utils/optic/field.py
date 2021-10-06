@@ -238,6 +238,7 @@ def hemisphere(
     x: np.ndarray,
     y: np.ndarray,
     r: Union[int, float] = 1,
+    sag: Union[int, float] = None,
     x0: Union[int, float] = 0,
     y0: Union[int, float] = 0,
     z0: Union[int, float] = 0,
@@ -248,14 +249,25 @@ def hemisphere(
     :param x:
     :param y:
     :param r:
+    :param sag: стрелка прогиба
     :param x0:
     :param y0:
     :param z0:
     :param inverse:
     :return:
     """
+    if sag > r:
+        raise ValueError(f'sag {sag} greater than radius {r}')
+    if r <= 0:
+        raise ValueError(f'radius <= zero')
+
     mask = (r ** 2 - (x - x0) ** 2 - (y - y0) ** 2) < 0
     hemisphere = np.sqrt(r ** 2 - (x - x0) ** 2 - (y - y0) ** 2)
+
+    if sag:
+        hemisphere -= r - sag
+        hemisphere[hemisphere < 0] = 0
+
     hemisphere[mask] = 0
     hemisphere += z0
 
@@ -268,13 +280,13 @@ def hemisphere(
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    MODE = 2  # 1D | 2D
+    MODE = 1  # 1D | 2D
     SHIFT_GRID = 0  # =1 то независимо от значений (x0; y0) центр функции будет в (0, 0)
 
     # Параметры исходной функции
-    a = 5
-    x0 = 2
-    y0 = 4
+    a = 0.5
+    x0 = 2.5
+    y0 = 7
     z0 = 0
     wx = 1.
     wy = 1.
@@ -300,7 +312,7 @@ if __name__ == '__main__':
         # f = lambda _x: triangle_1d(_x, a=a, x0=x0, w=wx) - a
         # y = f(x)
         T = 1
-        y = semicircle(x, x0=x0, y0=y0, inverse=1)
+        y = semicircle(x, r=a, sag=.1, x0=x0, y0=y0, inverse=0)
 
         if SHIFT_GRID:
             x -= x0
