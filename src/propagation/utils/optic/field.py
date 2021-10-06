@@ -277,6 +277,14 @@ def hemisphere(
     return hemisphere
 
 
+def lens_1d(x, focus):
+    return np.sqrt(x ** 2 + focus ** 2)
+
+
+def lens_2d(x, y, focus):
+    return np.sqrt(x ** 2 + y ** 2 + focus ** 2)
+
+
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 

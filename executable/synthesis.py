@@ -11,19 +11,9 @@ import numpy as np
 
 from src.propagation.presenter.loader import load_image
 from src.propagation.utils.math.units import (nm2m, mm2m, um2m, m2mm, px2m, m2nm, m2um)
-from src.propagation.utils.optic import (
-    rect_1d,
-    rect_2d,
-    circ,
-    circ_cartesian,
-    triangle_1d,
-    triangle_2d,
-    gauss_1d,
-    gauss_2d,
-    logistic_1d,
-    sin_1d,
-    cos_1d,
-)
+from src.propagation.utils.math.general import calculate_chord
+import src.propagation.utils.optic as optic
+
 
 IS_INTENSITY_FROM_IMAGE = False
 IS_PHASE_FROM_IMAGE = False

@@ -12,4 +12,6 @@ from .field import (
     cos_1d,
     hemisphere,
     semicircle,
+    lens_1d,
+    lens_2d,
 )
