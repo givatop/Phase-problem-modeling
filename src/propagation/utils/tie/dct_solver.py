@@ -72,21 +72,10 @@ class DCTSolver1D(TIESolver):
     def __init__(self, intensities, dz, wavelength, pixel_size, bc=BoundaryConditions.NONE):
         super().__init__(intensities, dz, wavelength, bc)
         self._pixel_size = pixel_size
-        # self._lambda_mn = np.array(
-        #     [(- np.pi ** 2) * (i / intensities[0].shape[0] ** 2) for i in range(intensities[0].shape[0])]
-        # )
-        # self._lambda_mn = np.array(
-        #     [- (np.pi * n / intensities[0].shape[0]) ** 2 for n in range(intensities[0].shape[0])]
-        # )
-        # self._lambda_mn = np.array(
-        #     [2 - 2 * np.cos(2 * k * np.pi / intensities[0].shape[0]) for k in range(intensities[0].shape[0])]
-        # )
-        # self._lambda_mn = np.array(
-        #     [1/np.sqrt(2) if i == 0 else 1 for i in range(intensities[0].shape[0])]
-        # )
+
         self._lambda_mn = np.array(
-            [(i * np.pi / intensities[0].shape[0]) ** 2 for i in range(intensities[0].shape[0])]
-        )
+            [np.pi * i for i in range(intensities[0].shape[0])]
+        ) / (intensities[0].shape[0] * self._pixel_size)
 
     def solve(self, threshold):
         wave_number = 2 * np.pi / self.wavelength
