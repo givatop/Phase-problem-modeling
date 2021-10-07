@@ -11,6 +11,7 @@ import numpy as np
 
 from src.propagation.presenter.loader import load_image
 from src.propagation.utils.math.general import calculate_chord
+import src.propagation.utils.math.units as units
 import src.propagation.utils.optic as optic
 
 
@@ -18,6 +19,7 @@ IS_INTENSITY_FROM_IMAGE = False
 IS_PHASE_FROM_IMAGE = False
 ADD_NOISE = False
 ADD_APERTURE = False
+ADD_TILT = False
 i_path = None
 p_path = None
 metadata = {}
@@ -67,10 +69,6 @@ if ADD_NOISE:
     # make some noise
     noise = np.random.normal(mean, standard_deviation, size=intensity.shape)
     intensity += noise
-    # write to metadata
-    metadata['ADD_NOISE'] = ADD_NOISE
-    metadata['mean'] = mean
-    metadata['standard_deviation'] = standard_deviation
 
 # Aperture
 if ADD_APERTURE:
@@ -85,6 +83,14 @@ else:
 
 # Complex Field
 complex_field = np.sqrt(intensity) * np.exp(1j * phase) * aperture
+
+# Tilt
+if ADD_TILT:
+    distance = units.mm2m(100)
+    shift = units.px2m(width // 2, px_size_m=px_size)
+    alpha = np.arctan(shift / distance)
+    theta = units.degree2rad(45)
+    complex_field = optic.add_tilt(X, Y, complex_field, wavelength, alpha, theta)
 
 # Save
 filepath = os.path.join(folder, filename)
@@ -118,6 +124,16 @@ else:
     metadata['radius, px'] = radius
     metadata['sag, px'] = sag
     metadata['chord, px'] = chord
+
+if ADD_NOISE:
+    metadata['noise: mean'] = mean
+    metadata['noise: standard_deviation'] = standard_deviation
+
+if ADD_TILT:
+    metadata['tilt: distance, m'] = distance
+    metadata['tilt: shift, m'] = shift
+    metadata['tilt: alpha, rad'] = alpha
+    metadata['tilt: theta, rad'] = theta
 
 with open(filepath, 'w') as file:
     for k, v in metadata.items():
