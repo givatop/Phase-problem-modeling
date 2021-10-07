@@ -34,6 +34,8 @@ shape = [width] if height == 1 else [width, height]
 x = np.arange(-width // 2, width // 2)
 y = np.arange(-height // 2, height // 2)
 X, Y = np.meshgrid(x, y)
+px_size = units.um2m(5)
+wavelength = units.nm2m(555)
 
 # Intensity
 if IS_INTENSITY_FROM_IMAGE:
@@ -52,14 +54,25 @@ else:
     p_amplitude = 1
     p_wx, p_wy = width / 4, height / 2
     p_x0, p_y0 = 0, 0
+
+    # Полу-окружности/-сферы
     radius = 350_000
     sag = 0.01
     chord = calculate_chord(radius, sag)
-    phase = \
-        optic.hemisphere(X, Y, sag=sag, r=radius, x0=-chord * 0.5, y0=-chord * 0.75) + \
-        optic.hemisphere(X, Y, sag=sag, r=radius, x0=-chord * 0.5, y0= chord * 0.75) + \
-        optic.hemisphere(X, Y, sag=sag, r=radius, x0= width * 0.5 - chord * 0.5, y0=-chord * 0.75) + \
-        optic.hemisphere(X, Y, sag=sag, r=radius, x0= width * 0.5 - chord * 0.5, y0= chord * 0.75)
+    # phase = \
+    #     optic.hemisphere(X, Y, sag=sag, r=radius, x0=-chord * 0.5, y0=-chord * 0.75) + \
+    #     optic.hemisphere(X, Y, sag=sag, r=radius, x0=-chord * 0.5, y0= chord * 0.75) + \
+    #     optic.hemisphere(X, Y, sag=sag, r=radius, x0= width * 0.5 - chord * 0.5, y0=-chord * 0.75) + \
+    #     optic.hemisphere(X, Y, sag=sag, r=radius, x0= width * 0.5 - chord * 0.5, y0= chord * 0.75)
+
+    # Линзы
+    focus = units.mm2m(100)
+    phase = optic.lens_2d(
+        units.px2m(X, px_size_m=px_size),
+        units.px2m(Y, px_size_m=px_size),
+        focus,
+        wavelength=wavelength,
+    )
 
 # Noise
 if ADD_NOISE:
@@ -93,6 +106,8 @@ if ADD_TILT:
     complex_field = optic.add_tilt(X, Y, complex_field, wavelength, alpha, theta)
 
 # Save
+if not os.path.exists(folder):
+    os.mkdir(folder)
 filepath = os.path.join(folder, filename)
 np.save(filepath, complex_field)
 
