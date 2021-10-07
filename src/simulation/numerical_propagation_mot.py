@@ -18,7 +18,7 @@ from src.propagation.utils.math.general import *
 # основные параметры для синтеза волны
 from src.propagation.utils.optic.propagation_methods import angular_spectrum_bl_propagation
 
-width, height = 512, 512
+width, height = 1024, 1024
 wavelength = units.nm2m(632.8)
 px_size = units.um2m(5.04)
 gaussian_width_params = [200]
