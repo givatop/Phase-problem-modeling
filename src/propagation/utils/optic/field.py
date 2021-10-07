@@ -277,9 +277,20 @@ def hemisphere(
     return hemisphere
 
 
-def lens_1d(x, focus):
-    return np.sqrt(x ** 2 + focus ** 2)
+def lens_1d(x, focus, wavelength, converge=True):
+    k = 2 * np.pi / wavelength
+    lens = k * np.sqrt(x ** 2 + focus ** 2)
+    if converge:
+        lens *= -1
+    return lens
 
+
+def lens_2d(x, y, focus, wavelength, converge=True):
+    k = 2 * np.pi / wavelength
+    lens = k * np.sqrt(x ** 2 + y ** 2 + focus ** 2)
+    if converge:
+        lens *= -1
+    return lens
 
 
 def add_tilt(x, y, complex_amplitude, wavelength, alpha, theta=0):
