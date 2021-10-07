@@ -12,10 +12,11 @@ sys.path.append(r'/Users/megamot/Programming/Python/Phase-problem-modeling')
 from src.propagation.presenter.loader import load_files
 from src.propagation.utils.math.units import m2mm, mm2m
 from src.propagation.utils.tie import (
-    FFTSolver2D,
     FFTSolver1D,
+    FFTSolver2D,
+    DCTSolver1D,
+    DCTSolver2D,
     BoundaryConditions,
-    DCTSolver1D
 )
 
 Z_VALUE_PATTERN = r'z=([-]?\d+\.\d+)\.\w+$'
@@ -58,7 +59,7 @@ parser.add_argument(
 parser.add_argument(
     '--solver',
     type=str,
-    choices=['fft_1d', 'fft_2d', 'simplified_fft1d', 'simplified_fft2d', 'dct_2d', 'dct_1d'],
+    choices=['fft_1d', 'fft_2d', 'dct_2d', 'dct_1d'],
     default='fft_2d',
     required=False,
     help='Метод решения TIE'
@@ -101,6 +102,7 @@ if dz == 0:
     else:
         dz = z1 - z2
         args.i1_path, args.i2_path = args.i2_path, args.i1_path
+args.dz = dz
 
 i1_path = args.i1_path
 i2_path = args.i2_path
@@ -109,12 +111,10 @@ if not os.path.exists(save_folder):
     os.mkdir(save_folder)
 
 Solver = args.solver
-if Solver == 'fft_2d': Solver = FFTSolver2D
-elif Solver == 'fft_1d': Solver = FFTSolver1D
-elif Solver == 'simplified_fft1d': Solver = SimplifiedFFTSolver1D
-elif Solver == 'simplified_fft2d': Solver = SimplifiedFFTSolver
+if Solver == 'fft_1d': Solver = FFTSolver1D
+elif Solver == 'fft_2d': Solver = FFTSolver2D
 elif Solver == 'dct_1d': Solver = DCTSolver1D
-elif Solver == 'dct_2d': raise NotImplementedError
+elif Solver == 'dct_2d': Solver = DCTSolver2D
 else: raise ValueError(f'There\'s no \"{Solver}\" solver')
 
 bc = args.bc

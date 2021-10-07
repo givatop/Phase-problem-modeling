@@ -5,7 +5,10 @@ set wavelength=555e-9
 set px_size=5e-6
 
 rem propagation params
-set solver="fft_2d"
+rem 'fft_1d', 'fft_2d', 'dct_2d', 'dct_1d'
+set solver="dct_1d"
+
+rem # 'PBC', 'NBC', 'DBC', 'None'
 set bc="None"
 set threshold=0.1
 
