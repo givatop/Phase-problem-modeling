@@ -78,12 +78,46 @@ def m2px(m, px_size_m=5.04e-6):
     return m / px_size_m
 
 
+# Градусная мера
+def degree2rad(degree):
+    return degree * pi / 180
+
+
+# Градусная мера
+def rad2degree(rad):
+    return rad * 180 / pi
+
+
+def radians(value):
+    return value
+
+
+def degree(value):
+    return value
+
+
+def m(value):
+    return value
+
+
+def mm(value):
+    return value
+
+
+def um(value):
+    return value
+
+
+def nm(value):
+    return value
+
+
+def px(value):
+    return value
+
+
 if __name__ == '__main__':
-    wave_len = 0.5e-6
-    k = 2 * pi / wave_len
-
-    print(rad2mm(2 * pi, wave_len))
-    print(rad2m(2 * pi, wave_len))
-
-    print(px2mm(1))
-    print(px2m(1))
+    print(degree2rad(180))
+    print(degree2rad(360))
+    print(rad2degree(pi))
+    print(rad2degree(4 * pi))
