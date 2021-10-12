@@ -2,19 +2,20 @@ from typing import Union
 import numpy as np
 
 
-def rect_1d(x, a=1., w=1., x0=0.):
+def rect_1d(x, a=1., w=1., x0=0., y0=0):
     """
     Возвращает 1-мерную прямоугольную функцию
     :param x: np.ndarray координатная сетка
     :param a: Union[float, int] амплитуда
     :param w: Union[float, int] ширина
-    :param x0: Union[float, int] смещение относительно нуля координат
+    :param x0: Union[float, int] смещение относительно нуля координат по оси X
+    :param y0: Union[float, int] смещение относительно нуля координат по оси Y
     :return: np.ndarray
     """
-    return a * (np.abs((x - x0) / w) < 0.5)
+    return a * (np.abs((x - x0) / w) < 0.5) + y0
 
 
-def rect_2d(x, y, a=1., wx=1., wy=1., x0=0., y0=0.):
+def rect_2d(x, y, a=1., wx=1., wy=1., x0=0., y0=0., z0=0):
     """
     Возвращает 2-мерную прямоугольную функцию
     :param x: np.ndarray 2-мерная координатная сетка по оси X
@@ -24,9 +25,10 @@ def rect_2d(x, y, a=1., wx=1., wy=1., x0=0., y0=0.):
     :param wy: Union[float, int] ширина по оси Y
     :param x0: Union[float, int] смещение относительно нуля координат по оси X
     :param y0: Union[float, int] смещение относительно нуля координат по оси Y
+    :param z0: Union[float, int] смещение относительно нуля координат по оси Z
     :return: np.ndarray
     """
-    return a * (rect_1d(x, w=wx, x0=x0) * rect_1d(y, w=wy, x0=y0))
+    return a * (rect_1d(x, w=wx, x0=x0) * rect_1d(y, w=wy, x0=y0)) + z0
 
 
 def circ(r, a=1., w=1., r0=0.):
