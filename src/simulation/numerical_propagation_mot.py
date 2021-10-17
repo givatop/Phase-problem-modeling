@@ -18,10 +18,10 @@ from src.propagation.utils.math.general import *
 # основные параметры для синтеза волны
 from src.propagation.utils.optic.propagation_methods import angular_spectrum_bl_propagation
 
-width, height = 1024, 1024
-wavelength = units.nm2m(632.8)
-px_size = units.um2m(5.04)
-gaussian_width_params = [200]
+width, height = 512, 512
+wavelength = units.nm2m(555)
+px_size = units.um2m(5)
+gaussian_width_params = [250]
 focal_lens = [100]
 focal_lens = list(map(units.mm2m, focal_lens))
 
@@ -30,9 +30,9 @@ thresholds = [np.exp(-2), units.percent2decimal(13), units.percent2decimal(0.5),
 t_num = 0
 
 # параметры для итерации при рапространении волны
-start = units.mm2m(85)
-stop = units.mm2m(200)
-step = units.mm2m(1)
+start = units.mm2m(-0.005)
+stop = units.mm2m(0.005)
+step = units.mm2m(0.001)
 distances = np.arange(start, stop + step, step)
 
 # матрица в квадратичных координатах

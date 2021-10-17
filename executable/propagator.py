@@ -7,7 +7,7 @@ from icecream import ic
 from skimage.restoration import unwrap_phase
 
 sys.path.append(r'C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-problem-modeling')
-sys.path.append(r'/Users/megamot/Programming/Python/Phase-problem-modeling')
+sys.path.append(r'/Users/m.konoplyov/Programming/Python/Phase-problem-modeling')
 
 from src.propagation.utils.math.units import m2mm
 from src.propagation.utils.optic.propagation_methods import (
@@ -124,7 +124,7 @@ for distance in distances:
     wave_z = method(complex_field, distance, wavelength, px_size)
 
     # Сохранение файла с волной
-    filename = f'z={m2mm(distance):.3f}.npy'
+    filename = f'2D z={m2mm(distance):.3f}.npy'
     save_path = os.path.join(save_folder, filename)
     ic(save_path)
     np.save(save_path, wave_z)
