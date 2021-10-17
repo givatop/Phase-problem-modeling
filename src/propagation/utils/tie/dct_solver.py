@@ -1,4 +1,9 @@
+from typing import Tuple
+
+from scipy.fftpack import dct, idct
 import numpy as np
+from numpy.fft import fftfreq
+from ..math.derivative.fourier import _dctn, _idctn
 from src.propagation.utils.math.derivative.fourier import (
     dct_ilaplacian_2d,
     dct_gradient_2d,
@@ -19,49 +24,79 @@ class DCTSolver2D(TIESolver):
     """
 
     def __init__(self, intensities, dz, wavelength, pixel_size, bc=BoundaryConditions.NONE):
-        super().__init__(intensities, dz, wavelength, bc)
+        super().__init__(intensities, -dz, wavelength, bc)
         self._pixel_size = pixel_size
-        self._lambda_mn = self._get_lambda_mn()
+        self._kx, self._ky = self._get_frequency_coefs()
 
     def solve(self, threshold):
         wave_number = 2 * np.pi / self.wavelength
 
-        # Умножение на волновое число
         phase = - wave_number * self.axial_derivative
 
-        # Первые Лапласиан и градиент
-        phase = dct_ilaplacian_2d(phase, lambda_mn=self.lambda_mn, return_spacedomain=False)
-        phase_x, phase_y = dct_gradient_2d(phase, phase, space_domain=False)
+        # 1. Обратный Лапласиан
+        zero_k_mask = (self.kx == 0) & (self.ky == 0)
+        self.kx[zero_k_mask] = 1
+        self.ky[zero_k_mask] = 1
+        phase = _dctn(phase)
+        phase = phase / (self.kx ** 2 + self.ky ** 2)
+        phase[zero_k_mask] = 0
+        self.kx[zero_k_mask] = 0
+        self.ky[zero_k_mask] = 0
 
-        # Деление на опорную интенсивность
-        mask = self.add_threshold(threshold)
+        # 2. Градиенты
+        phase_x = _idctn(phase * self.kx)
+        phase_y = _idctn(phase * self.ky)
+
+        # 3. Деление на опорную интенсивность
+        if 0 in self.ref_intensity:
+            raise ValueError(f'Zero value occurred in reference intensity')
         phase_x /= self.ref_intensity
         phase_y /= self.ref_intensity
-        phase_x[mask], phase_y[mask] = 0, 0
 
-        # Вторые Лапласиан и градиент
-        phase_x, phase_y = dct_gradient_2d(phase_x, phase_y)
-        phase = dct_ilaplacian_2d(phase_x + phase_y, lambda_mn=self.lambda_mn)
+        # 4. Градиент
+        phase_x = _dctn(phase_x) * self.kx
+        phase_y = _dctn(phase_y) * self.ky
+
+        # 5. Обратный Лапласиан
+        self.kx[zero_k_mask] = 1
+        self.ky[zero_k_mask] = 1
+        phase_x = phase_x / (self.kx ** 2 + self.ky ** 2)
+        phase_y = phase_y / (self.kx ** 2 + self.ky ** 2)
+        phase_x[zero_k_mask] = 0
+        phase_y[zero_k_mask] = 0
+        self.kx[zero_k_mask] = 0
+        self.ky[zero_k_mask] = 0
+        phase_x = _idctn(phase_x)
+        phase_y = _idctn(phase_y)
+
+        phase = phase_x + phase_y
 
         phase = clip(phase, self.boundary_condition)
-
         return phase
 
-    def _get_lambda_mn(self):
-        """ Расчет собственного значения функции Грина """
-        return - np.pi ** 2 * \
-               (
-                       self.ref_intensity[0] ** 2 / (self.ref_intensity[0] * 2) ** 2 +
-                       self.ref_intensity[1] ** 2 / (self.ref_intensity[1] * 2) ** 2
-               )
+    def _get_frequency_coefs(self) -> Tuple[np.ndarray, np.ndarray]:
+        """ Расчет частотных коэффициентов """
+        h, w = self.ref_intensity.shape
+        nu_x = fftfreq(w, d=self.pixel_size)
+        nu_y = fftfreq(h, d=self.pixel_size)
+        nu_x_grid, nu_y_grid = np.meshgrid(nu_x, nu_y)
+
+        kx = np.pi * nu_x_grid
+        ky = np.pi * nu_y_grid
+
+        return kx, ky
 
     @property
     def pixel_size(self):
         return self._pixel_size
 
     @property
-    def lambda_mn(self):
-        return self._lambda_mn
+    def kx(self):
+        return self._kx
+
+    @property
+    def ky(self):
+        return self._ky
 
 
 class DCTSolver1D(TIESolver):
@@ -70,12 +105,9 @@ class DCTSolver1D(TIESolver):
     """
 
     def __init__(self, intensities, dz, wavelength, pixel_size, bc=BoundaryConditions.NONE):
-        super().__init__(intensities, dz, wavelength, bc)
+        super().__init__(intensities, -dz, wavelength, bc)
         self._pixel_size = pixel_size
-
-        self._lambda_mn = np.array(
-            [np.pi * i for i in range(intensities[0].shape[0])]
-        ) / (intensities[0].shape[0] * self._pixel_size)
+        self._k = np.pi * fftfreq(intensities[0].shape[0], self._pixel_size)
 
     def solve(self, threshold):
         wave_number = 2 * np.pi / self.wavelength
@@ -84,8 +116,8 @@ class DCTSolver1D(TIESolver):
         phase = - wave_number * self.axial_derivative
 
         # Первые Лапласиан и градиент
-        phase = dct_ilaplacian_1d(phase, lambda_mn=self.lambda_mn, return_spacedomain=False)
-        phase = dct_gradient_1d(phase, space_domain=False)
+        phase = dct_ilaplacian_1d(phase, k=self.k, return_spacedomain=False)
+        phase = dct_gradient_1d(phase, k=self.k, space_domain=False)
 
         # Деление на опорную интенсивность
         mask = self.add_threshold(threshold)
@@ -93,8 +125,8 @@ class DCTSolver1D(TIESolver):
         phase[mask] = 0
 
         # Вторые Лапласиан и градиент
-        phase = dct_gradient_1d(phase)
-        phase = dct_ilaplacian_1d(phase, lambda_mn=self.lambda_mn)
+        phase = dct_gradient_1d(phase, k=self.k)
+        phase = dct_ilaplacian_1d(phase, k=self.k)
 
         phase = clip(phase, self.boundary_condition)
 
@@ -105,5 +137,6 @@ class DCTSolver1D(TIESolver):
         return self._pixel_size
 
     @property
-    def lambda_mn(self):
-        return self._lambda_mn
+    def k(self):
+        return self._k
+
