@@ -117,8 +117,6 @@ def _idctn(x, norm='ortho'):
 def dct_gradient_2d(
         f_x: ndarray,
         f_y: ndarray,
-        kx: ndarray,
-        ky: ndarray,
         space_domain: bool = True
 ) -> (ndarray, ndarray):
     """
@@ -126,8 +124,6 @@ def dct_gradient_2d(
     посчитанных при помощи двумерного косинусного преобразования.
     :param f_x: array-like двумерная функция
     :param f_y: array-like двумерная функция
-    :param kx: частотный коэффициент np.pi * fftshift(nu_x_grid)
-    :param ky: частотный коэффициент np.pi * fftshift(nu_y_grid)
     :param space_domain:
     :return: array-like градиент от функции f
     """
@@ -135,26 +131,22 @@ def dct_gradient_2d(
         f_x = _dctn(f_x)
         f_y = _dctn(f_y)
 
-    return _idctn(f_x * kx), _idctn(f_y * ky)
+    return _idctn(f_x), _idctn(f_y)
 
 
 def dct_ilaplacian_2d(f: ndarray,
-                      kx: ndarray,
-                      ky: ndarray,
-                      reg_param: float,
+                      lambda_mn: float,
                       return_spacedomain: bool = True
                       ) -> ndarray:
     """
     Возвращает сумму частных производных минус второго порядка (обратный Лапласиан) от функции f,
     посчитанных при помощи двумерного косинусного преобразования.
     :param f: array-like двумерная функция
-    :param kx: частотный коэффициент np.pi * fftshift(nu_x_grid)
-    :param ky: частотный коэффициент np.pi * fftshift(nu_y_grid)
-    :param reg_param: нужен, чтобы избежать деления на ноль
+    :param lambda_mn: float собственное число функции Грина
     :param return_spacedomain:
     :return: array-like градиент от функции f
     """
-    res = _dctn(f) * (kx ** 2 + ky ** 2) / (reg_param + (kx ** 2 + ky ** 2) ** 2)
+    res = _dctn(f) / lambda_mn
 
     if return_spacedomain:
         res = _idctn(res)
@@ -162,45 +154,43 @@ def dct_ilaplacian_2d(f: ndarray,
     return res
 
 
-def dct_gradient_1d(f: ndarray, k: ndarray, space_domain: bool = True) -> ndarray:
+def dct_gradient_1d(f: ndarray, space_domain: bool = True) -> ndarray:
     """
     Возвращает сумму частных производных первого порядка (функция градиента) от функции f,
     посчитанных при помощи двумерного косинусного преобразования.
     :param f: array-like одномерная функция функция
-    :param k: float частотная сетка
     :param space_domain:
     :return: array-like градиент от функции f
     """
     if space_domain:
         f = dct(f, norm='ortho')
 
-    return idct(f * k, norm='ortho')
+    return idct(f, norm='ortho')
 
 
 def dct_ilaplacian_1d(f: ndarray,
-                      k: ndarray,
+                      lambda_mn: ndarray,
                       return_spacedomain: bool = True
                       ) -> ndarray:
     """
     Возвращает сумму частных производных минус второго порядка (обратный Лапласиан) от функции f,
     посчитанных при помощи двумерного косинусного преобразования.
     :param f: array-like одномерная функция
-    :param k: float собственное число функции Грина
+    :param lambda_mn: float собственное число функции Грина
     :param return_spacedomain:
     :return: array-like градиент от функции f
     """
     # Create mask
-    mask = (k == 0)
-    k[mask] = 1
+    mask = (lambda_mn == 0)
+    lambda_mn[mask] = 1
     # Spectral Transformation
-    res = dct(f, norm='ortho') / k ** 2
+    res = dct(f, norm='ortho') / lambda_mn
     # Correct result array
     res[mask] = 0
     # Correct lambda
-    k[mask] = 0
+    lambda_mn[mask] = 0
 
     if return_spacedomain:
         res = idct(res, norm='ortho')
 
     return res
-
