@@ -23,10 +23,10 @@ ADD_TILT = False
 i_path = None
 p_path = None
 metadata = {}
-folder = '/Users/megamot/Programming/Python/Phase-problem-modeling/data/executable_synthesis' if platform.system() == 'Darwin' \
+folder = '/Users/m.konoplyov/Programming/Python/Phase-problem-modeling/data/executable_synthesis' if platform.system() == 'Darwin' \
         else r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\1. Проверка корректности FFT1d-решения'
 
-filename = 'i=0.5 phi=sphere 1D complex_field.npy'
+filename = 'i=0.5 phi=sphere 2D complex_field.npy'
 
 # Grid Params
 width, height = 512, 512
