@@ -23,6 +23,11 @@ def rad2m(rad, wave_len_m):
     return rad / wave_num
 
 
+def m2rad(m, wave_len_m):
+    wave_num = 2 * pi / wave_len_m
+    return m * wave_num
+
+
 # В миллиметры
 def m2mm(m):
     return m * 1e+3
