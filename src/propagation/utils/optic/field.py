@@ -295,10 +295,28 @@ def lens_2d(x, y, focus, wavelength, converge=True):
     return lens
 
 
-def add_tilt(x, y, complex_amplitude, wavelength, alpha, theta=0):
+def add_tilt_1d(x, complex_amplitude, wavelength, alpha, theta=0):
     """
     Added tilt to complex amplitude
     David Voelz. Computational Fourier Optics. A MATLAB® Tutorial. SPIE PRESS. p.89
+    :param x:
+    :param complex_amplitude: initial field
+    :param wavelength: [meter]
+    :param alpha: tilt angle [rad]
+    :param theta: rotation along XY angle [rad]
+    :return:
+    """
+    k = 2 * np.pi / wavelength
+    tilt = x * np.cos(theta) * np.tan(alpha)
+    return complex_amplitude * np.exp(1j * k * tilt)
+
+
+def add_tilt_2d(x, y, complex_amplitude, wavelength, alpha, theta=0):
+    """
+    Added tilt to complex amplitude
+    David Voelz. Computational Fourier Optics. A MATLAB® Tutorial. SPIE PRESS. p.89
+    :param x:
+    :param y:
     :param complex_amplitude: initial field
     :param wavelength: [meter]
     :param alpha: tilt angle [rad]

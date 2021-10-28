@@ -14,5 +14,6 @@ from .field import (
     semicircle,
     lens_1d,
     lens_2d,
-    add_tilt,
+    add_tilt_1d,
+    add_tilt_2d,
 )
