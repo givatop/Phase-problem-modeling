@@ -8,6 +8,7 @@ import platform
 from datetime import date
 
 import numpy as np
+from icecream import ic
 
 from src.propagation.presenter.loader import load_image
 from src.propagation.utils.math.general import calculate_chord
@@ -99,11 +100,15 @@ complex_field = np.sqrt(intensity) * np.exp(1j * phase) * aperture
 
 # Tilt
 if ADD_TILT:
-    distance = units.mm2m(100)
-    shift = units.px2m(width // 2, px_size_m=px_size)
+    distance = units.mm2m(1)
+    shift = units.px2m(10, px_size_m=px_size)
     alpha = np.arctan(shift / distance)
-    theta = units.degree2rad(45)
-    complex_field = optic.add_tilt(X, Y, complex_field, wavelength, alpha, theta)
+    # alpha = units.degree2rad(0.00005)
+    theta = units.degree2rad(0)
+    if intensity.ndim == 1:
+        complex_field = optic.add_tilt_1d(x, complex_field, wavelength, alpha, theta)
+    else:
+        complex_field = optic.add_tilt_2d(X, Y, complex_field, wavelength, alpha, theta)
 
 # Save
 if not os.path.exists(folder):
@@ -149,6 +154,17 @@ if ADD_TILT:
     metadata['tilt: shift, m'] = shift
     metadata['tilt: alpha, rad'] = alpha
     metadata['tilt: theta, rad'] = theta
+    metadata['tilt: alpha, degree'] = units.rad2degree(alpha)
+    metadata['tilt: theta, degree'] = units.rad2degree(theta)
+    ic(distance)
+    ic(shift)
+    print('radians:')
+    ic(alpha)
+    ic(theta)
+    print('degree:')
+    ic(units.rad2degree(alpha))
+    ic(units.rad2degree(theta))
+
 
 with open(filepath, 'w') as file:
     for k, v in metadata.items():
