@@ -72,6 +72,26 @@ parser.add_argument(
     required=True,
 )
 parser.add_argument(
+    '--intensity_ylim_min',
+    type=float,
+    default=None,
+)
+parser.add_argument(
+    '--intensity_ylim_max',
+    type=float,
+    default=None,
+)
+parser.add_argument(
+    '--phase_ylim_min',
+    type=float,
+    default=None,
+)
+parser.add_argument(
+    '--phase_ylim_max',
+    type=float,
+    default=None,
+)
+parser.add_argument(
     '--add_grid',
     type=int,
     default=1,
@@ -222,6 +242,7 @@ if mode == 'CA':
     ax1.title.set_text(intensity_title)
     ax1.set_xlabel(intensity_xlabel)
     ax1.set_ylabel(phase_ylabel)
+    ax1.set_ylim([args.intensity_ylim_min, args.intensity_ylim_max])
 
     # Phase
     phase = unwrap_phase(np.angle(array))
@@ -239,6 +260,7 @@ if mode == 'CA':
     ax2.title.set_text(phase_title)
     ax2.set_xlabel(phase_xlabel)
     ax2.set_ylabel(phase_ylabel)
+    ax2.set_ylim([args.phase_ylim_min, args.phase_ylim_max])
 elif mode == 'PHASE':
     ax = fig.gca()
 

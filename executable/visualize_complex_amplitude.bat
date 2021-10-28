@@ -12,6 +12,8 @@ set figsize_width=10.4
 set figsize_height=4.8
 set px_size=5e-6
 set cmap="jet"
+set intensity_ylim_min=0
+set intensity_ylim_max=1
 set show_plot=0
 set save_plot=1
 
@@ -19,7 +21,7 @@ set save_plot=1
 :loop
 if "%~1" neq "" (
   echo %~1
-  %python% %visualizer% --file_path "%~1" --save_folder "%~dp1\" --mode %mode% --dpi %dpi% --figsize %figsize_width% %figsize_height% --px_size %px_size% --cmap %cmap% --show_plot %show_plot% --save_plot %save_plot%
+  %python% %visualizer% --file_path "%~1" --save_folder "%~dp1\" --mode %mode% --dpi %dpi% --figsize %figsize_width% %figsize_height% --px_size %px_size% --cmap %cmap% --show_plot %show_plot% --save_plot %save_plot% --intensity_ylim_min %intensity_ylim_min% --intensity_ylim_max %intensity_ylim_max%
 
   shift
   goto :loop
