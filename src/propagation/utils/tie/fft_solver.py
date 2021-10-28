@@ -226,19 +226,32 @@ class FFTSolver1D(TIESolver):
 
 if __name__ == '__main__':
     import os
+    from src.propagation.utils.math.units import m2mm, mm2m
+    from src.propagation.presenter.loader import load_files
 
-    path = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\2. FFT 2D\i=rect0.5 phi=sphere propagation'
-    fn1 = 'i z=-0.005.npy'
-    fn2 = 'i z=0.005.npy'
+    path = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\2. Экспериментальные\1. cs2100'
+    fn1 = 'i z=0.000.tif'
+    fn2 = 'i z=1.000.tif'
+    # fn_iref = 'i z=-0.000.npy'
 
-    dz = 10e-6
-    px_size = 5e-6
+    dz = 1e-3
+    px_size = 5.04e-6
     wavelength = 555e-9
-    threshold = 0.1
+    threshold = 0.001
 
-    i1 = np.load(os.path.join(path, fn1))
-    i2 = np.load(os.path.join(path, fn2))
+    fp1 = os.path.join(path, fn1)
+    fp2 = os.path.join(path, fn2)
+    # i1 = np.load(os.path.join(path, fn1))
+    # i2 = np.load(os.path.join(path, fn2))
+    i1, i2 = load_files([fp1, fp2])
+    # i_ref = (i1 + i2) / 2
+    # i_ref = np.load(os.path.join(path, fn_iref))
 
     solver = FFTSolver2D([i1, i2], dz, wavelength, px_size)
+    # solver.ref_intensity = i_ref
     phase = solver.solve(threshold)
-    np.save(os.path.join(path, f'TIE phase.npy'), phase)
+
+    filename = f'TIE {fn1} {fn1} dz={m2mm(dz):.3f}mm.npy'
+    # filename = f'TIE {fn1} {fn1} mean dz={m2mm(dz):.3f}mm.npy'
+    # filename = f'TIE {fn1} {fn1} ref={fn_iref} dz={m2mm(dz):.3f}mm.npy'
+    np.save(os.path.join(path, filename), phase)

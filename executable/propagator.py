@@ -124,7 +124,7 @@ for distance in distances:
     wave_z = method(complex_field, distance, wavelength, px_size)
 
     # Сохранение файла с волной
-    filename = f'2D z={m2mm(distance):.3f}.npy'
+    filename = f'z={m2mm(distance):.3f}.npy'
     save_path = os.path.join(save_folder, filename)
     ic(save_path)
     np.save(save_path, wave_z)
