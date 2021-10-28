@@ -17,11 +17,14 @@ set python="C:\Users\IGritsenko\.virtualenvs\Phase-problem-modeling-VD4lAbA6\Scr
 rem path to phase_retriever.py
 set phase_retriever="C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-problem-modeling\executable\phase_retriever.py"
 
+rem calculate radius of curvature
+set radius=1
+
 :loop
 if "%~1" neq "" (
   echo %~1
   echo %~2
-  %python% %phase_retriever% --i1_path "%~1" --i2_path "%~2" --save_folder "%~dp1\" --wavelength %wavelength%  --px_size %px_size% --dz %dz% --solver %solver% --bc %bc% --threshold %threshold%
+  %python% %phase_retriever% --i1_path "%~1" --i2_path "%~2" --save_folder "%~dp1\" --wavelength %wavelength%  --px_size %px_size% --dz %dz% --solver %solver% --bc %bc% --threshold %threshold% --radius %radius%
 
   shift
   shift

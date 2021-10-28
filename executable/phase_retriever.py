@@ -11,6 +11,7 @@ sys.path.append(r'/Users/megamot/Programming/Python/Phase-problem-modeling')
 
 from src.propagation.presenter.loader import load_files
 from src.propagation.utils.math.units import m2mm, mm2m
+from src.miscellaneous.radius_of_curvature import find_radius
 from src.propagation.utils.tie import (
     FFTSolver1D,
     FFTSolver2D,
@@ -77,6 +78,12 @@ parser.add_argument(
     type=float,
     required=True,
     help='Все значения ниже этого порога будут приравнены к порогу'
+)
+parser.add_argument(
+    '--radius',
+    type=int,
+    default=0,
+    help='Включить в метаданные результат расчета радиуса кривизны ВФ'
 )
 # endregion
 # region Параметры сохранения
@@ -156,6 +163,11 @@ if np.complex in [intensity.dtype for intensity in intensities]:
 # TIE
 solver = Solver(intensities, dz, wavelength, px_size, bc=bc)
 retrieved_phase = solver.solve(threshold)
+
+# WaveFront Radius of Curvature
+if args.radius:
+    radius = find_radius(intensities[0], retrieved_phase, wavelength, px_size)
+    args.radius_value = radius
 
 # Сохранение файла с волной
 i1_filename = os.path.splitext(os.path.basename(i1_path))[0]
