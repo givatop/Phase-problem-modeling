@@ -1,0 +1,75 @@
+import os
+import sys
+import argparse
+import numpy as np
+
+sys.path.append(r'C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-problem-modeling')
+from src.propagation.utils.math.general import row_slice, column_slice
+
+
+# region Parser Arguments
+ARBITRARY_MODE = 'ARBITRARY'
+ENERGY_CENTER_MODE = 'ENERGY_CENTER'
+
+parser = argparse.ArgumentParser(description='Propagate initial wave on desired distances')
+
+parser.add_argument(
+    '--mode',
+    type=str,
+    choices=[ARBITRARY_MODE, ENERGY_CENTER_MODE],
+    required=True,
+    help='Режим'
+)
+parser.add_argument(
+    '--file_path',
+    type=str,
+    required=True,
+)
+parser.add_argument(
+    '--x',
+    type=int,
+    default=-1,
+    help='-1 means no x-slice will be create'
+)
+parser.add_argument(
+    '--y',
+    type=int,
+    default=-1,
+    help='-1 means no y-slice will be create'
+)
+parser.add_argument(
+    '--step',
+    type=int,
+    default=1,
+)
+
+args = parser.parse_args()
+
+folder, filename = os.path.split(args.file_path)
+
+# endregion
+
+array = np.load(args.file_path)
+height, width = array.shape
+
+if args.mode == ARBITRARY_MODE:
+    row, col = args.y, args.x
+    xslice = row_slice(array, row, args.step) if row != -1 else None
+    yslice = column_slice(array, col, args.step) if col != -1 else None
+elif args.mode == ENERGY_CENTER_MODE:
+    row, col = np.unravel_index(np.argmax(array, axis=None), array.shape)
+    xslice = row_slice(array, row, args.step)
+    yslice = column_slice(array, col, args.step)
+
+if xslice is not None:
+    save_filename = f'xslice y={row} {filename}'
+    save_path = os.path.join(folder, save_filename)
+    np.save(save_path, xslice)
+
+if yslice is not None:
+    save_filename = f'yslice x={col} {filename}'
+    save_path = os.path.join(folder, save_filename)
+    np.save(save_path, yslice)
+
+for k, v in vars(args).items():
+    print(f'{k}: {v}')

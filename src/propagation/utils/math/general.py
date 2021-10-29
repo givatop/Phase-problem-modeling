@@ -18,6 +18,26 @@ def get_slice(array: np.ndarray, index: int, step: int = 1, xslice: bool = True)
     return args, values
 
 
+def row_slice(array: np.ndarray, row: int, step: int = 1):
+    """
+    :param array: 2d array
+    :param row:
+    :param step:
+    :return: строчка
+    """
+    return array[row, ::step]
+
+
+def column_slice(array: np.ndarray, column: int, step: int = 1):
+    """
+    :param array: 2d array
+    :param column:
+    :param step:
+    :return: столбец
+    """
+    return array[::step, column]
+
+
 def calculate_radius(s: Union[int, float], l: Union[int, float]) -> float:
     """
     Расчитывает значение радиуса окружности по известной стрелке прогиба и хорде.\n
@@ -45,7 +65,7 @@ def calculate_chord(radius, sag):
 
 
 def calc_amplitude(array):
-    return np.abs(np.max(array)) + np.abs(np.min(array))
+    return np.abs(np.max(array) - np.min(array))
 
 
 def normalize(array: np.ndarray, **kwargs) -> np.ndarray:
