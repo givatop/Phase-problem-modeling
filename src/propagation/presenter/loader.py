@@ -1,3 +1,4 @@
+import os
 import numpy as np
 
 from typing import List
@@ -5,18 +6,17 @@ from PIL import Image
 from src.propagation.utils.math.general import normalize
 
 
-def load_files(paths: List[str]) -> List[np.ndarray]:
-    """
-    Возвращает список матриц интенсивностей, загруженных из файлов
-    :param paths: список путей к файлам
-    :return:
-    """
-    first_path = paths[0]
+NDARRAY_EXTENSION = '.npy'
 
-    if first_path[-3:] == 'npy':
-        return [np.load(path) for path in paths]
-    else:
-        return [load_image(path) for path in paths]
+
+def load_files(paths: List[str]) -> List[np.ndarray]:
+    return [load_file(path) for path in paths]
+
+
+def load_file(path: str) -> np.ndarray:
+    _, extension = os.path.splitext(path)
+    array = np.load(path) if extension == NDARRAY_EXTENSION else load_image(path)
+    return array
 
 
 def load_image(path: str) -> np.ndarray:
