@@ -73,23 +73,15 @@ parser.add_argument(
 )
 parser.add_argument(
     '--intensity_ylim_min',
-    type=float,
-    default=None,
 )
 parser.add_argument(
     '--intensity_ylim_max',
-    type=float,
-    default=None,
 )
 parser.add_argument(
     '--phase_ylim_min',
-    type=float,
-    default=None,
 )
 parser.add_argument(
     '--phase_ylim_max',
-    type=float,
-    default=None,
 )
 parser.add_argument(
     '--add_grid',
@@ -150,7 +142,10 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-
+if args.intensity_ylim_min == args.intensity_ylim_max:
+    args.intensity_ylim_min = args.intensity_ylim_max = None
+if args.phase_ylim_min == args.phase_ylim_max:
+    args.phase_ylim_min = args.phase_ylim_max = None
 
 # Setup
 mode = args.mode
