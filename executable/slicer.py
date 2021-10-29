@@ -4,7 +4,8 @@ import argparse
 import numpy as np
 
 sys.path.append(r'C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-problem-modeling')
-from src.propagation.utils.math.general import row_slice, column_slice
+from src.propagation.utils.math.general import row_slice, col_slice
+from src.propagation.presenter.loader import load_file
 
 
 # region Parser Arguments
@@ -49,27 +50,28 @@ folder, filename = os.path.split(args.file_path)
 
 # endregion
 
-array = np.load(args.file_path)
+array = load_file(args.file_path)
 height, width = array.shape
 
 if args.mode == ARBITRARY_MODE:
     row, col = args.y, args.x
-    xslice = row_slice(array, row, args.step) if row != -1 else None
-    yslice = column_slice(array, col, args.step) if col != -1 else None
+    rowslice = row_slice(array, row, args.step) if row != -1 else None
+    colslice = col_slice(array, col, args.step) if col != -1 else None
+
 elif args.mode == ENERGY_CENTER_MODE:
     row, col = np.unravel_index(np.argmax(array, axis=None), array.shape)
-    xslice = row_slice(array, row, args.step)
-    yslice = column_slice(array, col, args.step)
+    rowslice = row_slice(array, row, args.step)
+    colslice = col_slice(array, col, args.step)
 
-if xslice is not None:
+if rowslice is not None:
     save_filename = f'xslice y={row} {filename}'
     save_path = os.path.join(folder, save_filename)
-    np.save(save_path, xslice)
+    np.save(save_path, rowslice)
 
-if yslice is not None:
+if colslice is not None:
     save_filename = f'yslice x={col} {filename}'
     save_path = os.path.join(folder, save_filename)
-    np.save(save_path, yslice)
+    np.save(save_path, colslice)
 
 for k, v in vars(args).items():
     print(f'{k}: {v}')

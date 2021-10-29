@@ -28,7 +28,7 @@ def row_slice(array: np.ndarray, row: int, step: int = 1):
     return array[row, ::step]
 
 
-def column_slice(array: np.ndarray, column: int, step: int = 1):
+def col_slice(array: np.ndarray, column: int, step: int = 1):
     """
     :param array: 2d array
     :param column:
