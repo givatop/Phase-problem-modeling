@@ -7,6 +7,7 @@ from src.propagation.utils.math.general import normalize
 
 
 NDARRAY_EXTENSION = '.npy'
+TXT_EXTENSION = '.txt'
 
 
 def load_files(paths: List[str]) -> List[np.ndarray]:
@@ -15,7 +16,34 @@ def load_files(paths: List[str]) -> List[np.ndarray]:
 
 def load_file(path: str) -> np.ndarray:
     _, extension = os.path.splitext(path)
-    array = np.load(path) if extension == NDARRAY_EXTENSION else load_image(path)
+    if extension == NDARRAY_EXTENSION:
+        array = np.load(path)
+    elif extension == TXT_EXTENSION:
+        array = load_txt(path)
+    else:
+        array = load_image(path)
+    return array
+
+
+def load_txt(path: str) -> np.ndarray:
+    """
+    Загрузка массива данных с помощью numpy.loadtxt.
+    Поддержка текстовых файлов из ПО Fresnel.
+    :param path: путь к файлу
+    :return:
+    """
+    try:
+        array = np.loadtxt(path)
+        # from Fresnel
+        if array.ndim == 2 and array.shape[1] == 2:  # 2 columns (x, y) instead of 1 (y)
+            array = array[::, 1]
+    except ValueError:
+        with open(path) as f:
+            lines = f.readlines()
+        lines = [line.strip().split('\t')[1:] for line in lines]  # delete y values col
+        lines.pop(0)  # delete x values row
+        array = np.asarray(lines, dtype=float)
+
     return array
 
 
