@@ -11,6 +11,7 @@ from src.propagation.presenter.loader import load_file
 # region Parser Arguments
 ARBITRARY_MODE = 'ARBITRARY'
 ENERGY_CENTER_MODE = 'ENERGY_CENTER'
+NPY_EXTENSION = '.npy'
 
 parser = argparse.ArgumentParser(description='Propagate initial wave on desired distances')
 
@@ -47,6 +48,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 folder, filename = os.path.split(args.file_path)
+filename = os.path.splitext(filename)[0]
 
 # endregion
 
@@ -64,12 +66,12 @@ elif args.mode == ENERGY_CENTER_MODE:
     colslice = col_slice(array, col, args.step)
 
 if rowslice is not None:
-    save_filename = f'xslice y={row} {filename}'
+    save_filename = f'xslice y={row} {filename}{NPY_EXTENSION}'
     save_path = os.path.join(folder, save_filename)
     np.save(save_path, rowslice)
 
 if colslice is not None:
-    save_filename = f'yslice x={col} {filename}'
+    save_filename = f'yslice x={col} {filename}{NPY_EXTENSION}'
     save_path = os.path.join(folder, save_filename)
     np.save(save_path, colslice)
 
