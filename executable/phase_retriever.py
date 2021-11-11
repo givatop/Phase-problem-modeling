@@ -166,7 +166,7 @@ retrieved_phase = solver.solve(threshold)
 
 # WaveFront Radius of Curvature
 if args.radius:
-    radius = find_radius(intensities[0], retrieved_phase, wavelength, px_size)
+    radius = find_radius(intensities[1], retrieved_phase, wavelength, px_size)
     args.radius_value = radius
 
 # Сохранение файла с волной
