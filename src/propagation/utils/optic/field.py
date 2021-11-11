@@ -265,8 +265,6 @@ def hemisphere(
     :param inverse:
     :return:
     """
-    if sag > r:
-        raise ValueError(f'sag {sag} greater than radius {r}')
     if r <= 0:
         raise ValueError(f'radius <= zero')
 
@@ -274,6 +272,8 @@ def hemisphere(
     hemisphere = np.sqrt(r ** 2 - (x - x0) ** 2 - (y - y0) ** 2)
 
     if sag:
+        if sag > r:
+            raise ValueError(f'sag {sag} greater than radius {r}')
         hemisphere -= r - sag
         hemisphere[hemisphere < 0] = 0
 
