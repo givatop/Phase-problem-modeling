@@ -13,7 +13,7 @@ set figsize_height=4.8
 set px_size=5e-6
 set cmap="jet"
 set intensity_ylim_min=0
-set intensity_ylim_max=1
+set intensity_ylim_max=0
 set show_plot=0
 set save_plot=1
 

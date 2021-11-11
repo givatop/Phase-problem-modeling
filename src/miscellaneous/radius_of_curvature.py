@@ -27,6 +27,7 @@ def find_radius(intensity: np.ndarray, phase: np.ndarray, wavelength, px_size, t
         chord = units.px2m(chord, px_size)
         # Апертура
         aperture = optic.rect_1d(x, a=1, w=chord, x0=0, y0=0)
+        # Ограничение фазы апертурой
         nonzero_indices = aperture.nonzero()
         first_nonzero_value = phase[nonzero_indices[0][0]]
         last_nonzero_value = phase[nonzero_indices[0][-1]]
@@ -37,6 +38,10 @@ def find_radius(intensity: np.ndarray, phase: np.ndarray, wavelength, px_size, t
         sag = units.rad2m(sag, wavelength)
         # Радиус
         radius = calculate_radius(sag, chord)
+
+        print(f'l: {units.m2mm(chord)} mm')
+        print(f's: {units.m2rad(sag, wavelength)} rad')
+        print(f'r: {units.m2mm(radius)} mm')
         return radius
 
     else:
@@ -44,27 +49,11 @@ def find_radius(intensity: np.ndarray, phase: np.ndarray, wavelength, px_size, t
 
 
 if __name__ == '__main__':
-    import os
-    import numpy as np
-    from icecream import ic
-    import matplotlib.pyplot as plt
-    from mpl_toolkits.axes_grid1 import make_axes_locatable
+    import src.propagation.utils.math.units as units
 
-    from src.propagation.presenter.loader import load_image, load_files
+    wave_len = 555e-9
+    s = units.rad2m(209.77, wave_len)
+    l = 0.001925 * 2  # m
+    r = calculate_radius(s, l)  # m
 
-    folder = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\2. Экспериментальные\4. cs2100 21.10.2021\3'
-    filename_1 = 'yslice z=0.000.npy'
-    filename_2 = 'TIE yslice z=0.000 yslice z=1.000 dz=1.000mm.npy'
-    filepath_1 = os.path.join(folder, filename_1)
-    filepath_2 = os.path.join(folder, filename_2)
-    base_filename_1 = os.path.splitext(os.path.basename(filename_1))[0]
-    base_filename_2 = os.path.splitext(os.path.basename(filename_2))[0]
-    wavelength = 532e-9
-    px_size = 5.06e-6
-
-    intensity = np.load(filepath_1)
-    phase = np.load(filepath_2)
-
-    radius = find_radius(intensity, phase, wavelength, px_size)
-
-    ic(radius)
+    print(f'{units.m2mm(r)} mm')  # 99.9987907571921 mm

@@ -2,7 +2,6 @@ import numpy as np
 from numpy.fft import fft2, ifft2, ifftshift, fft, ifft
 
 from src.propagation.model.waves.interface.wave import Wave
-from src.propagation.utils.math import units
 from src.propagation.utils.math.general import get_slice
 from src.propagation.utils.optic.field import rect_2d, rect_1d
 

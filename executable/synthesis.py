@@ -144,6 +144,7 @@ else:
     metadata['radius, px'] = radius
     metadata['sag, px'] = sag
     metadata['chord, px'] = chord
+    metadata['focus, m'] = focus
 
 if ADD_NOISE:
     metadata['noise: mean'] = mean

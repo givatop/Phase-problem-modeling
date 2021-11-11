@@ -4,7 +4,6 @@ set dz=0
 set wavelength=555e-9
 set px_size=5e-6
 
-rem propagation params
 rem 'fft_1d', 'fft_2d', 'dct_2d', 'dct_1d'
 set solver="dct_1d"
 
