@@ -29,10 +29,8 @@ def find_radius(intensity: np.ndarray, phase: np.ndarray, wavelength, px_size, t
         aperture = optic.rect_1d(x, a=1, w=chord, x0=0, y0=0)
         # Ограничение фазы апертурой
         nonzero_indices = aperture.nonzero()
-        first_nonzero_value = phase[nonzero_indices[0][0]]
-        last_nonzero_value = phase[nonzero_indices[0][-1]]
-        nonzero_value = first_nonzero_value if abs(first_nonzero_value > last_nonzero_value) else last_nonzero_value
-        limited_phase = (phase - nonzero_value) * aperture
+        first_nonzero_index, last_nonzero_index = nonzero_indices[0][0], nonzero_indices[0][-1]
+        limited_phase = phase[first_nonzero_index:last_nonzero_index + 1]
         # Стрелка прогиба
         sag = units.radians(calc_amplitude(limited_phase))
         sag = units.rad2m(sag, wavelength)
