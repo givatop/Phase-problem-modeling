@@ -1,4 +1,4 @@
-from .field import (
+from src.propagation.utils.optic.field import (
     rect_1d,
     rect_2d,
     circ,

@@ -5,7 +5,7 @@ from ...model.areas.aperture import Aperture
 from ...model.waves.interface.wave import Wave
 from ...utils.math.general import calc_amplitude
 from ...utils.math.general import calculate_radius
-from ...utils.optic.field import gauss_2d
+from src.propagation.utils.optic.field import gauss_2d
 
 from ...utils.math.units import (
     px2m,

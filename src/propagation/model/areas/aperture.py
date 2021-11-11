@@ -3,7 +3,7 @@ from typing import Union
 import numpy as np
 
 from .grid import PolarGrid
-from ...utils.optic.field import circ
+from src.propagation.utils.optic.field import circ
 from ...utils.math.general import get_slice
 from ...utils.math.units import px2m
 
