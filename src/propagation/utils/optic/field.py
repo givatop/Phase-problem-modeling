@@ -69,16 +69,23 @@ def triangle_2d(x, y, a=1., wx=1., wy=1., x0=0., y0=0.):
     return a * (triangle_1d(x, w=wx, x0=x0) * triangle_1d(y, w=wy, x0=y0))
 
 
-def gauss_1d(x, a=1., w=1., x0=0.):
+def gauss_1d(
+        x: np.ndarray,
+        a: Union[float, int] = 1.,
+        w: Union[float, int] = 1.,
+        x0: Union[float, int] = 0.,
+        y0: Union[float, int] = 0.
+) -> np.ndarray:
     """
-    Возвращает 1-мерную гауссоиду с явно указанной амплитудой
+    1D гауссоида
     :param x: np.ndarray координатная сетка
-    :param a: Union[float, int] амплитуда
-    :param w: Union[float, int] ширина (может выступаить как СКО)
-    :param x0: Union[float, int] смещение относительно нуля координат
+    :param a: амплитуда
+    :param w: ширина по уровню a*e^-2
+    :param x0: смещение по оси X (влево-вправо)
+    :param y0: смещение по оси Y (вниз-вверх)
     :return: np.ndarray
     """
-    return a * np.exp(-(x - x0) ** 2 / (2 * w ** 2))
+    return a * np.exp(-(x - x0) ** 2 / (w ** 2 / 8)) + y0
 
 
 def gauss_2d(x, y, a=1., wx=1., wy=1., x0=0., y0=0.):
