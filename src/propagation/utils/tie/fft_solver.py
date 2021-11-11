@@ -1,13 +1,12 @@
 import numpy as np
 
 from typing import Tuple, Optional, List
-from numpy.fft import fftshift, fftfreq, fft2, ifft2
+from numpy.fft import fftfreq, fft2, ifft2
 from abc import ABC, abstractmethod
 
 from src.propagation.utils.tie.boundary_conditions import BoundaryConditions, apply_volkov_scheme
 from src.propagation.utils.math.derivative.finite_difference import central_finite_difference
 from src.propagation.utils.tie.boundary_conditions import BoundaryConditions, clip
-from src.propagation.model.areas.grid import CartesianGrid, FrequencyGrid
 from src.propagation.utils.math.derivative.fourier import gradient_2d, ilaplacian_2d, ilaplacian_1d, gradient_1d
 
 
@@ -56,12 +55,8 @@ class TIESolver(ABC):
         :param threshold:
         :return: Бинарная маска
         """
-        if threshold == 0. and 0.0 in self.ref_intensity:
-            raise ValueError(f'Нельзя делить на нулевые значения в интенсивности.')
-
+        threshold *= np.max(self.ref_intensity)
         mask = self.ref_intensity < threshold
-
-        # intensity = self.ref_intensity.copy()  # todo этот менто изменяет опорную интенсивность!!!
         self.ref_intensity[mask] = threshold
         return mask
 
@@ -125,10 +120,11 @@ class FFTSolver2D(TIESolver):
         phase_y = ifft2(phase * self.ky).real
 
         # 3. Деление на опорную интенсивность
-        if 0 in self.ref_intensity:
-            raise ValueError(f'Zero value occurred in reference intensity')
+        mask = self.add_threshold(threshold)
         phase_x /= self.ref_intensity
         phase_y /= self.ref_intensity
+        phase_x[mask] = 0
+        phase_y[mask] = 0
 
         # 4. Градиент
         phase_x = fft2(phase_x) * self.kx
@@ -186,6 +182,8 @@ class FFTSolver1D(TIESolver):
     """
 
     def __init__(self, intensities, dz, wavelength, pixel_size, bc=BoundaryConditions.NONE):
+        if intensities[0].ndim > 1:
+            raise ValueError(f'not supported ndim = {intensities[0].ndim}. only ndim = 1 supported')
         super().__init__(intensities, dz, wavelength, bc)
         self._pixel_size = pixel_size
         self._kx = self._get_frequency_coefs()
