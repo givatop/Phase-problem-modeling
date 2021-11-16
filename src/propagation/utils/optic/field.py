@@ -100,7 +100,7 @@ def gauss_2d(x, y, a=1., wx=1., wy=1., x0=0., y0=0.):
     :param y0: Union[float, int] смещение относительно нуля координат по оси Y
     :return: np.ndarray
     """
-    return a * np.exp(-((x - x0) ** 2 / (2 * wx ** 2) + (y - y0) ** 2 / (2 * wy ** 2)))
+    return a * np.exp(-((x - x0) ** 2 / (wx ** 2 / 8) + (y - y0) ** 2 / (wy ** 2 / 8)))
 
 
 def logistic_1d(x, a=1., w=1., x0=0.):
