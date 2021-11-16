@@ -280,23 +280,34 @@ elif mode == 'PHASE':
     # ax.set_ylim([None, None])
 elif mode == 'ERROR':
     true_phase = np.load(args.true_phase_file_path)
-    retrieved_phase = array
-    corrected_retrieved_phase = retrieved_phase + (true_phase.max() - retrieved_phase.max())
-    phase_error = abs(true_phase - corrected_retrieved_phase)
+    retr_phase = array
+
+    if np.max(retr_phase) > 0:
+        mask = retr_phase < (retr_phase[0] + 0.01)
+        nonzero_indices = np.nonzero(np.invert(mask))
+        first_nonzero_index, last_nonzero_index = nonzero_indices[0][0], nonzero_indices[0][-1]
+
+        retr_phase = retr_phase[first_nonzero_index:last_nonzero_index + 1]
+        true_phase = true_phase[first_nonzero_index:last_nonzero_index + 1]
+        x = x[first_nonzero_index:last_nonzero_index + 1]
+
+        corrected_retr_phase = retr_phase + (true_phase.max() - retr_phase.max())
+        phase_error = abs(true_phase - corrected_retr_phase)
 
     z = float(re.findall(Z_VALUE_PATTERN, args.true_phase_file_path)[0])
     dz = float(re.findall(DZ_VALUE_PATTERN, args.file_path)[0])
 
-    if retrieved_phase.ndim == 1:
+    if retr_phase.ndim == 1:
         ax1, ax2 = fig.add_subplot(2, 1, 1), fig.add_subplot(2, 1, 2)
 
-        ax1.plot(x, true_phase, '*', label=f'True z={z:.3f} mm')
-        ax1.plot(x, corrected_retrieved_phase, label=f'Retrieved by TIE dz={dz:.3f} mm')
+        ax1.plot(x, true_phase, '-.', label=f'True z={z:.3f} mm')
+        ax1.plot(x, corrected_retr_phase, '--', label=f'Retrieved by TIE dz={dz:.3f} mm')
         ax1.title.set_text('Phase')
         ax1.legend()
 
         ax2.plot(x, phase_error)
         ax2.title.set_text(f'Absolute Error max = {np.max(phase_error):.5f} rad')
+        ax2.set_yscale('log')
 
         [ax.set_xlabel(phase_xlabel) for ax in [ax1, ax2]]
         [ax.set_ylabel(phase_ylabel) for ax in [ax1, ax2]]
@@ -305,7 +316,7 @@ elif mode == 'ERROR':
         # todo нужны сечения
         ax1, ax2 = fig.add_subplot(1, 2, 1), fig.add_subplot(1, 2, 2)
 
-        img = ax1.imshow(retrieved_phase, extent=extent, cmap=cmap, vmin=None, vmax=None)
+        img = ax1.imshow(retr_phase, extent=extent, cmap=cmap, vmin=None, vmax=None)
         divider = make_axes_locatable(ax1)
         cax = divider.append_axes("right", size="5%", pad=0.05)
         cbar = plt.colorbar(img, cax=cax)
