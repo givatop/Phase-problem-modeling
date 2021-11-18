@@ -235,7 +235,7 @@ if mode == 'CA':
         cbar1.ax.set_ylabel(intensity_cbar_ylabel)
 
     ax1.grid(add_grid)
-    ax1.title.set_text(intensity_title)
+    ax1.title.set_text(f'{intensity_title} max={np.max(intensity):.3f}')
     ax1.set_xlabel(intensity_xlabel)
     ax1.set_ylabel(phase_ylabel)
     ax1.set_ylim([args.intensity_ylim_min, args.intensity_ylim_max])
@@ -253,7 +253,7 @@ if mode == 'CA':
         cbar2.ax.set_ylabel(phase_cbar_ylabel)
 
     ax2.grid(add_grid)
-    ax2.title.set_text(phase_title)
+    ax2.title.set_text(f'{phase_title} max={np.max(phase):.3f}')
     ax2.set_xlabel(phase_xlabel)
     ax2.set_ylabel(phase_ylabel)
     ax2.set_ylim([args.phase_ylim_min, args.phase_ylim_max])
@@ -301,7 +301,18 @@ elif mode == 'ERROR':
         ax1, ax2 = fig.add_subplot(2, 1, 1), fig.add_subplot(2, 1, 2)
 
         ax1.plot(x, true_phase, '-.', label=f'True z={z:.3f} mm')
-        ax1.plot(x, corrected_retr_phase, '--', label=f'Retrieved by TIE dz={dz:.3f} mm')
+
+        ax1.plot(x, corrected_retr_phase, '--',
+                 label=f'Retrieved by TIE dz={dz:.3f} mm')
+
+        ax1.fill_between(x, true_phase, corrected_retr_phase,
+                         where=(corrected_retr_phase < true_phase),
+                         interpolate=1, color='red', alpha=0.25)
+
+        ax1.fill_between(x, true_phase, corrected_retr_phase,
+                         where=(corrected_retr_phase > true_phase),
+                         interpolate=1, color='red', alpha=0.25)
+
         ax1.title.set_text('Phase')
         ax1.legend()
 
