@@ -286,12 +286,12 @@ def hemisphere(
     return hemisphere
 
 
-def lens_1d(x, focus, wavelength, converge=True):
+def lens_1d(x, focus, wavelength, light_diameter, converge=True):
     k = 2 * np.pi / wavelength
     lens = k * np.sqrt(x ** 2 + focus ** 2)
     if converge:
         lens *= -1
-    return lens
+    return lens * rect_1d(x, a=1, w=light_diameter)
 
 
 def lens_2d(x, y, focus, wavelength, converge=True):

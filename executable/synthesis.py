@@ -16,7 +16,7 @@ import src.propagation.utils.math.units as units
 import src.propagation.utils.optic as optic
 
 
-IS_INTENSITY_FROM_IMAGE = False
+IS_INTENSITY_FROM_IMAGE = False  # todo добавить генерацию сеток!!!
 IS_PHASE_FROM_IMAGE = False
 ADD_NOISE = False
 ADD_APERTURE = False
@@ -57,9 +57,11 @@ else:
     p_x0, p_y0 = 0, 0
 
     # Полу-окружности/-сферы
-    radius = 350_000
-    sag = 0.01
-    chord = calculate_chord(radius, sag)
+    radius = 100
+    sag = None
+    chord = 0
+    # chord = calculate_chord(radius, sag)
+    # phase = optic.hemisphere(X, Y, sag=sag, r=radius)
     # phase = \
     #     optic.hemisphere(X, Y, sag=sag, r=radius, x0=-chord * 0.5, y0=-chord * 0.75) + \
     #     optic.hemisphere(X, Y, sag=sag, r=radius, x0=-chord * 0.5, y0= chord * 0.75) + \
@@ -68,12 +70,16 @@ else:
 
     # Линзы
     focus = units.mm2m(100)
-    phase = optic.lens_2d(
-        units.px2m(X, px_size_m=px_size),
-        units.px2m(Y, px_size_m=px_size),
+    phase = optic.lens_1d(
+        units.px2m(x, px_size_m=px_size),
         focus,
-        wavelength=wavelength,
+        wavelength,
+        width * px_size,
+        converge=1
     )
+
+    # Const
+    # phase = p_amplitude * np.ones(shape)
 
 # Noise
 if ADD_NOISE:
