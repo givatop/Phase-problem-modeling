@@ -24,7 +24,7 @@ parser = argparse.ArgumentParser(description='Propagate initial wave on desired 
 parser.add_argument(
     '--mode',
     type=str,
-    choices=['CA', 'SLICE', 'PHASE', 'ERROR'],
+    choices=['CA', 'PHASE', 'ERROR', 'ARRAY'],
     required=True,
     help='Режим'
 )
@@ -36,7 +36,6 @@ parser.add_argument(
 parser.add_argument(
     '--true_phase_file_path',
     type=str,
-    required=False,
 )
 parser.add_argument(
     '--save_folder',
@@ -52,8 +51,8 @@ parser.add_argument(
 parser.add_argument(
     '--figsize',
     type=float,
+    default=[6.4, 4.8],
     nargs=2,
-    required=True,
 )
 parser.add_argument(
     '--figure_title',
@@ -70,7 +69,6 @@ parser.add_argument(
 parser.add_argument(
     '--px_size',
     type=float,
-    required=True,
 )
 parser.add_argument(
     '--intensity_ylim_min',
@@ -205,18 +203,16 @@ elif array.ndim == 2:
 else:
     ValueError(f'Unknown shape: {array.shape}')
 
-x = px2mm(np.arange(-width // 2, width // 2))
-y = px2mm(np.arange(-height // 2, height // 2))
-X, Y = np.meshgrid(x, y)
+x = np.arange(-width // 2, width // 2)
+y = np.arange(-height // 2, height // 2)
+extent = [-width // 2, width // 2, height // 2, -height // 2]
+if px_size:
+    x = px2mm(x, px_size_m=px_size)
+    y = px2mm(y, px_size_m=px_size)
+    extent = list(map(lambda v: px2mm(v, px_size_m=px_size), extent))
 
-extent = list(
-    map(
-        lambda v: px2mm(v, px_size_m=px_size),
-        [-width // 2, width // 2, height // 2, -height // 2]
-    )
-)
 ic(width, height, extent)
-
+X, Y = np.meshgrid(x, y)
 # endregion
 
 if mode == 'CA':
