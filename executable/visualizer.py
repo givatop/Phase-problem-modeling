@@ -345,7 +345,8 @@ elif mode == 'ERROR':
     # [ax.title.set_text(phase_title) for ax in [ax1, ax2]]
     # ax.set_xlim([None, None])
     # ax.set_ylim([None, None])
-
+elif mode == 'ARRAY':
+    raise NotImplementedError
 
 fig.tight_layout()
 
