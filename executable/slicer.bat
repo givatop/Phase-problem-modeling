@@ -14,7 +14,6 @@ set step=1
 
 :loop
 if "%~1" neq "" (
-  echo %~1
   %python% %script% --file_path "%~1" --mode %mode% --x %x% --y %y% --step %step%
 
   shift

@@ -61,7 +61,14 @@ if args.mode == ARBITRARY_MODE:
     colslice = col_slice(array, col, args.step) if col != -1 else None
 
 elif args.mode == ENERGY_CENTER_MODE:
-    row, col = np.unravel_index(np.argmax(array, axis=None), array.shape)
+    ar_min, ar_max = np.min(array), np.max(array)
+
+    if ar_max > abs(ar_min):
+        argmax = np.argmax(array, axis=None)
+    else:
+        argmax = np.argmin(array, axis=None)
+
+    row, col = np.unravel_index(argmax, array.shape)
     rowslice = row_slice(array, row, args.step)
     colslice = col_slice(array, col, args.step)
 
