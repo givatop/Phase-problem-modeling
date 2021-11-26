@@ -3,7 +3,7 @@ from numpy.fft import fft2, ifft2, ifftshift, fft, ifft
 
 from src.propagation.model.waves.interface.wave import Wave
 from src.propagation.utils.math.general import get_slice
-from src.propagation.utils.optic.field import rect_2d, rect_1d
+import src.propagation.utils.optic as optic
 
 
 def angular_spectrum_propagation(wave: Wave, z: float, **kwargs):
@@ -74,7 +74,7 @@ def angular_spectrum_bl_propagation(wave: Wave, z: float):
     nu_y_limit = 1 / (np.sqrt((2 * dnu_y * z) ** 2 + 1) * wave.wavelength)
 
     # Передаточная функция (угловой спектр)
-    h_clipper = rect_2d(nu_x_grid, nu_y_grid, wx=2 * nu_x_limit, wy=2 * nu_y_limit)
+    h_clipper = optic.rect_2d(nu_x_grid, nu_y_grid, wx=2 * nu_x_limit, wy=2 * nu_y_limit)
     h = np.exp(1j * 2 * np.pi * nu_z_grid * z) * h_clipper
 
     # обратное преобразование Фурье
@@ -126,7 +126,7 @@ def angular_spectrum_band_limited(
         nu_y_limit = 1 / (np.sqrt((2 * dnu_y * distance) ** 2 + 1) * wavelength)
 
         # Передаточная функция (угловой спектр)
-        h_clipper = rect_2d(nu_x_grid, nu_y_grid, wx=2 * nu_x_limit, wy=2 * nu_y_limit)
+        h_clipper = optic.rect_2d(nu_x_grid, nu_y_grid, wx=2 * nu_x_limit, wy=2 * nu_y_limit)
         h = np.exp(1j * 2 * np.pi * nu_z_grid * distance) * h_clipper
 
         # обратное преобразование Фурье
@@ -154,7 +154,7 @@ def angular_spectrum_band_limited(
         nu_x_limit = 1 / (np.sqrt((2 * dnu_x * distance) ** 2 + 1) * wavelength)
 
         # Передаточная функция (угловой спектр)
-        h_clipper = rect_1d(nu_x, w=2 * nu_x_limit)
+        h_clipper = optic.rect_1d(nu_x, w=2 * nu_x_limit)
         h = np.exp(1j * 2 * np.pi * nu_z * distance) * h_clipper
 
         # обратное преобразование Фурье
