@@ -2,6 +2,7 @@ import os
 import sys
 import argparse
 import numpy as np
+from icecream import ic
 
 sys.path.append(r'C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-problem-modeling')
 from src.propagation.utils.math.general import row_slice, col_slice
@@ -82,5 +83,6 @@ if colslice is not None:
     save_path = os.path.join(folder, save_filename)
     np.save(save_path, colslice)
 
-for k, v in vars(args).items():
-    print(f'{k}: {v}')
+ic(args.file_path)
+# for k, v in vars(args).items():
+#     print(f'{k}: {v}')

@@ -4,13 +4,12 @@ import argparse
 import re
 
 import numpy as np
-from icecream import ic
 
 sys.path.append(r'C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-problem-modeling')
 sys.path.append(r'/Users/megamot/Programming/Python/Phase-problem-modeling')
 
 from src.propagation.presenter.loader import load_files
-from src.propagation.utils.math.units import m2mm, mm2m
+import src.propagation.utils.math.units as units
 from src.miscellaneous.radius_of_curvature import find_radius
 from src.propagation.utils.tie import (
     FFTSolver1D,
@@ -102,8 +101,8 @@ dz = args.dz
 if dz == 0:
     z1 = re.findall(Z_VALUE_PATTERN, args.i1_path)[0]
     z2 = re.findall(Z_VALUE_PATTERN, args.i2_path)[0]
-    z1 = mm2m(float(z1))
-    z2 = mm2m(float(z2))
+    z1 = units.mm2m(float(z1))
+    z2 = units.mm2m(float(z2))
     if z2 > z1:
         dz = z2 - z1
     else:
@@ -130,30 +129,7 @@ elif bc == 'NBC': bc = BoundaryConditions.NEUMANN
 elif bc == 'DBC': bc = BoundaryConditions.DIRICHLET
 elif bc == 'None': bc = BoundaryConditions.NONE
 
-threshold = args.threshold
-
-# todo DEBUGGING
-# wavelength = 555e-9
-# px_size = 5e-6
-# dz = 1e-3
-# i1_path = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\1. Проверка корректности FFT1d-решения\phi=sphere i=gauss 1D complex_field propagation\intensity z = 0.000.npy'
-# i2_path = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\1. Проверка корректности FFT1d-решения\phi=sphere i=gauss 1D complex_field propagation\intensity z = 10.000.npy'
-# save_folder = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\1. Проверка корректности FFT1d-решения\phi=sphere i=gauss 1D complex_field propagation'
-# Solver = FFTSolver1D
-# bc = BoundaryConditions.NONE
-# threshold = .1
-
-# ic(args)
-ic(wavelength)
-ic(px_size)
-ic(dz)
-ic(i1_path)
-ic(i2_path)
-ic(save_folder)
-ic(Solver)
-ic(bc)
-ic(threshold)
-# endregion
+print(f'z1: {z1:>7.3f} | z2: {z2:>7.3f} | dz: {units.m2mm(dz):.3f} mm')
 
 # Load Files
 intensities = load_files([i1_path, i2_path])
@@ -162,7 +138,7 @@ if np.complex in [intensity.dtype for intensity in intensities]:
 
 # TIE
 solver = Solver(intensities, dz, wavelength, px_size, bc=bc)
-retrieved_phase = solver.solve(threshold)
+retrieved_phase = solver.solve(args.threshold)
 
 # WaveFront Radius of Curvature
 if args.radius:
@@ -172,9 +148,8 @@ if args.radius:
 # Сохранение файла с волной
 i1_filename = os.path.splitext(os.path.basename(i1_path))[0]
 i2_filename = os.path.splitext(os.path.basename(i2_path))[0]
-filename = f'TIE {i1_filename} {i2_filename} dz={m2mm(dz):.3f}mm.npy'
+filename = f'TIE {i1_filename} {i2_filename} dz={units.m2mm(dz):.3f}mm.npy'
 save_path = os.path.join(save_folder, filename)
-ic(save_path)
 np.save(save_path, retrieved_phase)
 
 # Сохранение файла метаданных
@@ -184,6 +159,6 @@ save_path = os.path.join(save_folder, filename)
 if len(save_path) > 260:
     raise ValueError(f'Длина имени файла превышает допустимую: len(save_path) = {len(save_path)}; допустимая - 260')
 
-with open(save_path, 'w') as file:
-    for k, v in vars(args).items():
-        file.write(f'{k}: {v}\n')
+# with open(save_path, 'w') as file:
+#     for k, v in vars(args).items():
+#         file.write(f'{k}: {v}\n')

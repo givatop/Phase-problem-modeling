@@ -172,23 +172,23 @@ intensity_cbar_ylabel = args.intensity_cbar_ylabel
 phase_cbar_ylabel = args.phase_cbar_ylabel
 
 # Print
-ic(mode)
-ic(filepath)
-ic(save_folder)
-ic(dpi)
-ic(figsize)
-ic(figure_title)
-ic(cmap)
-ic(px_size)
-ic(add_grid)
-ic(intensity_title)
-ic(phase_title)
-ic(intensity_xlabel)
-ic(phase_xlabel)
-ic(intensity_ylabel)
-ic(phase_ylabel)
-ic(intensity_cbar_ylabel)
-ic(phase_cbar_ylabel)
+# ic(mode)
+# ic(filepath)
+# ic(save_folder)
+# ic(dpi)
+# ic(figsize)
+# ic(figure_title)
+# ic(cmap)
+# ic(px_size)
+# ic(add_grid)
+# ic(intensity_title)
+# ic(phase_title)
+# ic(intensity_xlabel)
+# ic(phase_xlabel)
+# ic(intensity_ylabel)
+# ic(phase_ylabel)
+# ic(intensity_cbar_ylabel)
+# ic(phase_cbar_ylabel)
 
 # Initial
 fig = plt.figure(dpi=dpi, figsize=figsize)
@@ -211,7 +211,7 @@ if px_size:
     y = px2mm(y, px_size_m=px_size)
     extent = list(map(lambda v: px2mm(v, px_size_m=px_size), extent))
 
-ic(width, height, extent)
+# ic(width, height, extent)
 X, Y = np.meshgrid(x, y)
 # endregion
 
