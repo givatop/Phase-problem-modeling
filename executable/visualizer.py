@@ -262,6 +262,7 @@ elif mode == 'PHASE':
         ax.set_ylabel(phase_ylabel)
         ax.title.set_text(phase_title)
     else:
+        array -= array.min()
         img = ax.imshow(array, extent=extent, cmap=cmap)
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("right", size="5%", pad=0.05)
