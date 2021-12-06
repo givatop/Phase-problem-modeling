@@ -94,5 +94,22 @@ def normalize(array: np.ndarray, **kwargs) -> np.ndarray:
     return np.asarray(array, dtype=dtype)
 
 
+def energy_center(array):
+    """
+    Поиск координат жнергетического центра изображения
+    :param array: ndarray with ndim = 2
+    :return: erow, ecol
+    """
+    ecol = np.sum(np.sum(array, axis=0) *
+                 np.array(np.arange(1, array.shape[1]+1))) / \
+                 np.sum(array)
+
+    erow = np.sum(np.sum(array, axis=1) *
+                 np.array(np.arange(1, array.shape[0]+1))) / \
+                 np.sum(array)
+
+    return erow, ecol
+
+
 def print_min_max(array: np.ndarray, array_name: str = 'array'):
     print(f'{np.min(array): >10.2e}{np.max(array): >10.2e} - {array_name}')
