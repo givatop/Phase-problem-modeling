@@ -74,12 +74,12 @@ elif args.mode == ENERGY_CENTER_MODE:
     colslice = col_slice(array, col, args.step)
 
 if rowslice is not None:
-    save_filename = f'xslice y={row} {filename}{NPY_EXTENSION}'
+    save_filename = f'xslice {filename}{NPY_EXTENSION}'
     save_path = os.path.join(folder, save_filename)
     np.save(save_path, rowslice)
 
 if colslice is not None:
-    save_filename = f'yslice x={col} {filename}{NPY_EXTENSION}'
+    save_filename = f'yslice {filename}{NPY_EXTENSION}'
     save_path = os.path.join(folder, save_filename)
     np.save(save_path, colslice)
 
