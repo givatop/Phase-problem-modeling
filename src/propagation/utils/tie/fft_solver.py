@@ -21,6 +21,7 @@ class TIESolver(ABC):
             dz: float,
             wavelength: Optional[float],
             bc: BoundaryConditions,
+            ref_intensity=None
     ):
         """
         :param intensities: интенсивности
@@ -39,7 +40,10 @@ class TIESolver(ABC):
         self._wavelength = wavelength
         self._axial_derivative = central_finite_difference(self._intensities, dz/2)
 
-        self._ref_intensity = self._intensities[0]
+        if ref_intensity is None:
+            self._ref_intensity = self._intensities[0]
+        else:
+            self._ref_intensity = ref_intensity
 
     @abstractmethod
     def solve(self, threshold) -> np.ndarray:
@@ -95,8 +99,8 @@ class FFTSolver2D(TIESolver):
     D. Paganin and K. A. Nugent, Phys. Rev. Lett. 80, 2586 (1998).
     """
 
-    def __init__(self, intensities, dz, wavelength, pixel_size, bc=BoundaryConditions.NONE):
-        super().__init__(intensities, dz, wavelength, bc)
+    def __init__(self, intensities, dz, wavelength, pixel_size, bc=BoundaryConditions.NONE, ref_intensity=None):
+        super().__init__(intensities, dz, wavelength, bc, ref_intensity=ref_intensity)
         self._pixel_size = pixel_size
         self._kx, self._ky = self._get_frequency_coefs()
 
