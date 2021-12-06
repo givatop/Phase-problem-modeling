@@ -19,7 +19,7 @@ from src.propagation.utils.tie import (
     BoundaryConditions,
 )
 
-Z_VALUE_PATTERN = r'z=([-]?\d+\.\d+)\.\w+$'
+Z_VALUE_PATTERN = r'([-]?\d+\.\d+)\.\w+$'
 
 parser = argparse.ArgumentParser(description='Retrieve Phase via Transport-of-Intensity Equation')
 
