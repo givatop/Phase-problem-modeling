@@ -129,7 +129,7 @@ elif bc == 'NBC': bc = BoundaryConditions.NEUMANN
 elif bc == 'DBC': bc = BoundaryConditions.DIRICHLET
 elif bc == 'None': bc = BoundaryConditions.NONE
 
-print(f'z1: {z1:>7.3f} | z2: {z2:>7.3f} | dz: {units.m2mm(dz):.3f} mm')
+print(f'z1: {units.m2mm(z1):>7.3f} mm | z2: {units.m2mm(z2):>7.3f} mm | dz: {units.m2mm(dz):.3f} mm')
 
 # Load Files
 intensities = load_files([i1_path, i2_path])
