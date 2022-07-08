@@ -219,8 +219,6 @@ def semicircle(
     :param inverse:
     :return:
     """
-    if sag > r:
-        raise ValueError(f'sag {sag} greater than radius {r}')
     if r <= 0:
         raise ValueError(f'radius <= zero')
 
@@ -230,6 +228,8 @@ def semicircle(
     semicircle = np.sqrt(r ** 2 - (x - x0) ** 2)
     # сдвиг по оси y, чтобы получить нужное значение стрелки прогиба
     if sag:
+        if sag > r:
+            raise ValueError(f'sag {sag} greater than radius {r}')
         semicircle -= r - sag
         semicircle[semicircle < 0] = 0
     # приравниваем все nan к 0
