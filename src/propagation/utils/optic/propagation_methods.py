@@ -1,5 +1,5 @@
 import numpy as np
-from numpy.fft import fft2, ifft2, ifftshift, fft, ifft
+from numpy.fft import fft2, ifft2, ifftshift, fftshift, fft, ifft
 
 from src.propagation.model.waves.interface.wave import Wave
 from src.propagation.utils.math.general import get_slice
@@ -264,6 +264,34 @@ def fresnel(field: np.ndarray, propagate_distance: float,
     h = np.exp(1j * wave_number * propagate_distance * exp_term)
 
     return ifft2(field * h)
+
+
+def coherent_TF(field: np.ndarray, zxp, wavelength, px_size, wxp):
+    """
+    Распространение с помощью Когерентной Передаточной Функции
+    :param field: исходная комплесная амплитуда поля
+    :param zxp: расстояние от выходного зрачка до плоскости изображения
+    :param wavelength: длина волны
+    :param px_size: размер пикселя матрица
+    :param wxp: диаметр выходного зрачка
+    :return:
+    """
+    if field.ndim == 1:
+        raise NotImplementedError
+    elif field.ndim == 2:
+        height, width = field.shape
+        f0 = wxp / (wavelength * zxp)
+
+        # Сетка в частотной области
+        nu_x = np.arange(-width / 2, width / 2) / (width * px_size)
+        nu_y = np.arange(-height / 2, height / 2) / (height * px_size)
+        nu_x_grid, nu_y_grid = np.meshgrid(nu_x, nu_y)
+        nu_r_grid = np.sqrt(nu_x_grid ** 2 + nu_y_grid ** 2)
+
+        H = optic.circ(nu_r_grid, w=f0)
+        H = fftshift(H)
+
+        return ifft2(H * fft2(field))
 
 
 if __name__ == '__main__':
