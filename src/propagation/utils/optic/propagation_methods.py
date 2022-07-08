@@ -295,13 +295,96 @@ def coherent_TF(field: np.ndarray, zxp, wavelength, px_size, wxp):
 
 
 if __name__ == '__main__':
-    path = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\1. Проверка корректности FFT1d-решения\phi=sphere i=gauss 1D complex_field.npy'
-    array = np.load(path)
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+    from skimage.restoration import unwrap_phase
+    from src.propagation.presenter.loader import load_file
+    import src.propagation.utils.math.units as units
 
-    distance = 1e-3
+    path = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\2. Исследования\2020 TIE\2. Программы\Code_TIE_tutorial\Data\Logo\TIE_Single.tif'
+    intensity = load_file(path) / 2 + 0.2
+
+    height, width = intensity.shape
     px_size = 5e-6
-    wavelength = 555e-9
-    array_z = angular_spectrum_band_limited(array, distance, wavelength, px_size)
+    x = np.arange(-width / 2, width / 2) * px_size
+    y = np.arange(-height / 2, height / 2) * px_size
+    X, Y = np.meshgrid(x, y)
 
-    save_path = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\1. Проекты\2021 РНФ TIE\1. Данные\1. Тестовые\1. Проверка корректности FFT1d-решения\sine phase 1D complex_field propagation'
-    np.save(save_path + f'test.npy', array_z)
+    distance = -5e-6
+    wavelength = 555e-9
+    wxp = 10e-3
+    f0 = wxp / (wavelength * distance)
+    print(f'f0: {f0}')
+
+    path = r'\\hololab.ru\store\Рабочие папки K-Team\Гриценко\1. Работа\2. Исследования\2020 TIE\2. Программы\Code_TIE_tutorial\Data\Logo\SCILab.tif'
+    phase = load_file(path) * optic.rect_2d(X, Y, wx=180*px_size, wy=180*px_size)
+
+    # focus = 0.1
+    # phase = optic.lens_2d(X, Y, focus, wavelength)
+    # phase = np.ones(intensity.shape)
+    # phase = optic.rect_2d(X, Y, wx=50 * px_size, wy=50 * px_size)
+
+    field = np.sqrt(intensity) * np.exp(1j * phase)
+
+    # Tilt
+    shift = units.px2m(50, px_size_m=px_size)
+    alpha = np.arctan(shift / distance)
+    theta = units.degree2rad(0)
+    # field = optic.add_tilt_2d(X, Y, field, wavelength, alpha, theta)
+
+    # Сетка в частотной области
+    nu_x = np.arange(-width / 2, width / 2) / (width * px_size)
+    nu_y = np.arange(-height / 2, height / 2) / (height * px_size)
+    nu_x_grid, nu_y_grid = np.meshgrid(nu_x, nu_y)
+    nu_r_grid = np.sqrt(nu_x_grid ** 2 + nu_y_grid ** 2)
+
+    H = optic.circ(nu_r_grid, w=f0)
+    H = fftshift(H)
+
+    field_z = angular_spectrum_band_limited(field, distance, wavelength, px_size)
+    # field_z = ifft2(H * fft2(field))
+
+    intensity_z = np.abs(field_z) ** 2
+    phase_z = unwrap_phase(np.angle(field_z))
+
+
+    fig, ax = plt.subplots()
+    img = ax.imshow(np.log(np.abs(ifftshift(H * fft2(intensity))) ** 2 + 10))
+
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cbar = plt.colorbar(img, cax=cax)
+
+    fig.tight_layout()
+
+
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(nrows=2, ncols=2)
+
+    img1 = ax1.imshow(intensity)
+    divider1 = make_axes_locatable(ax1)
+    cax1 = divider1.append_axes("right", size="5%", pad=0.05)
+    cbar1 = plt.colorbar(img1, cax=cax1)
+
+    img2 = ax2.imshow(unwrap_phase(np.angle(field)))
+    divider2 = make_axes_locatable(ax2)
+    cax2 = divider2.append_axes("right", size="5%", pad=0.05)
+    cbar2 = plt.colorbar(img2, cax=cax2)
+    cbar2.ax.set_ylabel('rad')
+
+    img1 = ax3.imshow(intensity_z)
+    divider1 = make_axes_locatable(ax3)
+    cax1 = divider1.append_axes("right", size="5%", pad=0.05)
+    cbar1 = plt.colorbar(img1, cax=cax1)
+
+    img2 = ax4.imshow(phase_z)
+    divider2 = make_axes_locatable(ax4)
+    cax2 = divider2.append_axes("right", size="5%", pad=0.05)
+    cbar2 = plt.colorbar(img2, cax=cax2)
+    cbar2.ax.set_ylabel('rad')
+
+    fig.tight_layout()
+
+    # plt.show()
+
+    save_path = r'C:\Users\IGritsenko\Downloads'
+    np.save(save_path + f'\z={units.m2mm(distance):.3f}.npy', intensity_z)
