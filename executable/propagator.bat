@@ -16,10 +16,10 @@ set save_folder="%~dp1\%~n1 propagation"
 set separate_save=1
 
 rem path to python
-set python="C:\Users\IGritsenko\.virtualenvs\Phase-problem-modeling-VD4lAbA6\Scripts\python.exe"
+set python="C:\Users\NStsepuro\PycharmProjects\TIE_NStsepuro\Phase-problem-modeling\Scripts\python.exe"
 
 rem path to propagator.py
-set propagator="C:\Users\IGritsenko\Documents\Python Scripts\TIE v2\Phase-problem-modeling\executable\propagator.py"
+set propagator="C:\Users\NStsepuro\PycharmProjects\TIE_NStsepuro\Phase-problem-modeling\executable\propagator.py"
 
 echo running...
 %python% %propagator% --wavelength %wavelength%  --px_size %px_size% --wave_path %wave_path% --start %start% --stop %stop% --step %step% --method %method% --save_folder %save_folder% --separate_save %separate_save%
